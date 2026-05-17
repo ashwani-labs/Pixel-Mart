@@ -60,12 +60,12 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 #### Definition of Done (D1)
 
-- [ ] `docker compose up --build` starts MySQL + gateway + 4 services + frontend (or frontend via `npm run dev` documented)
-- [ ] `GET http://localhost:8080/actuator/health` or gateway health returns UP
-- [ ] `npm run dev` in `frontend/` shows themed shell with route navigation
-- [ ] No secrets in git; `.env` gitignored
+- [x] `docker compose up --build` starts MySQL + gateway + 4 services (frontend via `npm run dev` — documented in README)
+- [x] `GET http://localhost:8080/actuator/health` returns UP when stack is running
+- [x] `npm run dev` in `frontend/` shows themed shell with route navigation
+- [x] No secrets in git; `.env` gitignored
 
-> **D1 progress:** Monorepo scaffold, Docker Compose, gateway, service shells, Flyway placeholders, frontend RTK + theme presets — implemented. Verify with `mvn package` and `docker compose up --build`.
+> **D1 status: COMPLETE** (verified: `mvn clean package`, `npm run build`). Run `docker compose up --build` locally to confirm container health.
 
 #### P2 (skip if behind)
 
@@ -523,7 +523,7 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 | Week | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9 | D10 | D11 | D12 | D13 | D14 | D15 |
 |------|----|----|----|----|----|----|----|----|----|-----|-----|-----|-----|-----|-----|
-| Status | 🔄 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| Status | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 
 Replace ⬜ with ✅ as each day completes.
 

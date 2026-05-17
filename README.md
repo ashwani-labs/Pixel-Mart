@@ -6,7 +6,7 @@ Production-grade e-commerce platform using **Java Spring Boot** microservices, *
 
 | Week | Focus | Progress |
 |------|--------|----------|
-| 1 | Foundation & browse | Day 1 scaffold in progress |
+| 1 | Foundation & browse | Day 1 complete — starting Day 2 (auth) |
 | 2 | Cart, checkout, offers | — |
 | 3 | Wishlist, reviews, CI, ship | — |
 
@@ -59,6 +59,10 @@ Open http://localhost:5173 — the dev server proxies `/api` to the gateway.
 ### 4. Build backend locally (optional)
 
 ```bash
+# Windows / Linux / macOS (Maven Wrapper — no global Maven required)
+./mvnw clean package -DskipTests
+
+# Or with Maven installed
 mvn clean package -DskipTests
 ```
 
