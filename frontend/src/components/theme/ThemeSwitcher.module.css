@@ -1,0 +1,31 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.select {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--foreground);
+  border-radius: calc(var(--radius) - 4px);
+  padding: 0.35rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.modeBtn {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--foreground);
+  border-radius: calc(var(--radius) - 4px);
+  width: 2.25rem;
+  height: 2.25rem;
+  display: grid;
+  place-items: center;
+  font-size: 1rem;
+}
+
+.modeBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
