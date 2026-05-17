@@ -1,0 +1,25 @@
+# Build
+target/
+dist/
+build/
+node_modules/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# Env & secrets
+.env
+.env.local
+
+# Uploads & data
+data/uploads/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
