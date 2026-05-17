@@ -1,0 +1,31 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/pixelmart?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+    username: ${MYSQL_USER:pixelmart}
+    password: ${MYSQL_PASSWORD:pixelmart}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: auth
+  flyway:
+    enabled: true
+    schemas: auth
+    default-schema: auth
+    locations: classpath:db/migration
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
