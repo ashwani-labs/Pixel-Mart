@@ -12,6 +12,12 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(com.pixelmart.auth.exception.AuthException.class)
+    public ResponseEntity<ApiError> handleAuth(com.pixelmart.auth.exception.AuthException ex, HttpServletRequest request) {
+        ApiError body = ApiError.of(ex.getStatus(), ex.getError(), ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(ex.getStatus()).body(body);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
         List<String> details = ex.getBindingResult().getFieldErrors().stream()
