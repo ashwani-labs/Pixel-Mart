@@ -103,10 +103,10 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 #### Definition of Done (D2)
 
-- [ ] Register new customer via UI or curl
-- [ ] Login returns JWT; `GET /api/auth/me` returns profile (stub OK if minimal)
-- [ ] Invalid credentials → 401 with consistent error body
-- [ ] Seed admin can login
+- [x] Register new customer via UI or curl
+- [x] Login returns JWT; `GET /api/auth/me` returns profile
+- [x] Invalid credentials → 401 with consistent error body
+- [x] Seed admin can login
 
 #### P2
 
@@ -523,7 +523,7 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 | Week | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9 | D10 | D11 | D12 | D13 | D14 | D15 |
 |------|----|----|----|----|----|----|----|----|----|-----|-----|-----|-----|-----|-----|
-| Status | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| Status | ✅ | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 
 Replace ⬜ with ✅ as each day completes.
 
