@@ -21,6 +21,11 @@ spring:
     default-schema: auth
     locations: classpath:db/migration
 
+pixelmart:
+  jwt:
+    secret: ${JWT_SECRET:pixelmart-dev-secret-key-min-32-chars-long!!}
+    access-expiration-ms: ${JWT_ACCESS_EXPIRATION_MS:900000}
+
 management:
   endpoints:
     web:
