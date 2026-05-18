@@ -5,6 +5,7 @@ import themeReducer from './slices/themeSlice';
 import uiReducer from './slices/uiSlice';
 import { baseApi } from './api/baseApi';
 import './api/healthApi';
+import './api/authApi';
 
 export const store = configureStore({
   reducer: {

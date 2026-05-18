@@ -1,8 +1,10 @@
 import { createBrowserRouter } from 'react-router-dom';
+import { RequireAuth } from '../components/auth/RequireAuth';
 import { AppLayout } from '../components/layout/AppLayout';
+import { AdminPage } from '../pages/AdminPage';
 import { HomePage } from '../pages/HomePage';
 import { LoginPage } from '../pages/LoginPage';
-import { AdminPage } from '../pages/AdminPage';
+import { RegisterPage } from '../pages/RegisterPage';
 
 export const router = createBrowserRouter([
   {
@@ -11,7 +13,15 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: 'login', element: <LoginPage /> },
-      { path: 'admin', element: <AdminPage /> },
+      { path: 'register', element: <RegisterPage /> },
+      {
+        path: 'admin',
+        element: (
+          <RequireAuth>
+            <AdminPage />
+          </RequireAuth>
+        ),
+      },
     ],
   },
 ]);
