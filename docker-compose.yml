@@ -33,6 +33,8 @@ services:
       MYSQL_PORT: 3306
       MYSQL_USER: ${MYSQL_USER:-pixelmart}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pixelmart}
+      JWT_SECRET: ${JWT_SECRET:-pixelmart-dev-secret-key-min-32-chars-long!!}
+      JWT_ACCESS_EXPIRATION_MS: ${JWT_ACCESS_EXPIRATION_MS:-900000}
     ports:
       - "8081:8081"
 
