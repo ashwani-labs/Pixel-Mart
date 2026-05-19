@@ -25,6 +25,13 @@ pixelmart:
   jwt:
     secret: ${JWT_SECRET:pixelmart-dev-secret-key-min-32-chars-long!!}
     access-expiration-ms: ${JWT_ACCESS_EXPIRATION_MS:900000}
+    refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000}
+  auth:
+    cookie:
+      refresh-name: refresh_token
+      secure: false
+      same-site: Lax
+      path: /api/auth
 
 management:
   endpoints:
