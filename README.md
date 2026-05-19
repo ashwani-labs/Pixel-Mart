@@ -6,7 +6,7 @@ Production-grade e-commerce platform using **Java Spring Boot** microservices, *
 
 | Week | Focus | Progress |
 |------|--------|----------|
-| 1 | Foundation & browse | Day 2 complete — Day 3 next (refresh tokens) |
+| 1 | Foundation & browse | Day 3 complete — Day 4 next (catalog) |
 | 2 | Cart, checkout, offers | — |
 | 3 | Wishlist, reviews, CI, ship | — |
 

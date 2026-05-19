@@ -45,6 +45,13 @@ flowchart LR
 | `orders` | order-service | Cart, addresses, orders, payments |
 | `notify` | notification-service | Email outbox |
 
+## Authentication flow (Day 3+)
+
+- **Access token:** JWT in `Authorization: Bearer` header (15 min).
+- **Refresh token:** opaque value in HTTP-only cookie `refresh_token` on path `/api/auth` (7 days, rotated on refresh).
+- **Gateway:** validates access JWT on protected routes; forwards `X-User-Id` and `X-Roles` to downstream services.
+- **Public at gateway:** `POST /api/auth/register|login|refresh|logout`, `GET /api/auth/health`, `GET /api/catalog/**`, `/actuator/**`.
+
 ## Gateway routes
 
 | Path prefix | Target |

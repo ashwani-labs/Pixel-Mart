@@ -141,9 +141,9 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 #### Definition of Done (D3)
 
-- [ ] Access token expiry triggers silent refresh
-- [ ] Logout invalidates refresh; next refresh fails
-- [ ] Gateway blocks unauthenticated access to `/api/orders/**` (501/404 OK for now)
+- [x] Access token expiry triggers silent refresh
+- [x] Logout invalidates refresh; next refresh fails
+- [x] Gateway blocks unauthenticated access to `/api/orders/**` (401 from gateway)
 
 #### P2
 
@@ -523,7 +523,7 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 | Week | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9 | D10 | D11 | D12 | D13 | D14 | D15 |
 |------|----|----|----|----|----|----|----|----|----|-----|-----|-----|-----|-----|-----|
-| Status | ✅ | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| Status | ✅ | ✅ | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 
 Replace ⬜ with ✅ as each day completes.
 
