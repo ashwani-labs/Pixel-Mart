@@ -24,6 +24,10 @@ spring:
           predicates:
             - Path=/api/internal/**
 
+pixelmart:
+  jwt:
+    secret: ${JWT_SECRET:pixelmart-dev-secret-key-min-32-chars-long!!}
+
 management:
   endpoints:
     web:
