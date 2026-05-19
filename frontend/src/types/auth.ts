@@ -22,6 +22,10 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface UpdateProfileRequest {
+  name: string;
+}
+
 export interface ApiErrorBody {
   status: number;
   error: string;

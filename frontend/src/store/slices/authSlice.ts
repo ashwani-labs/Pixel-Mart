@@ -28,10 +28,18 @@ const authSlice = createSlice({
       state.user = null;
       clearPersistedAuth();
     },
+    updateUser(state, action: PayloadAction<AuthUser>) {
+      state.user = action.payload;
+      if (state.accessToken) {
+        persistAuth(state.accessToken, action.payload);
+      }
+    },
   },
 });
 
-export const { setCredentials, clearCredentials } = authSlice.actions;
+export const { setCredentials, clearCredentials, updateUser } = authSlice.actions;
 export const selectIsAuthenticated = (state: { auth: AuthState }) => Boolean(state.auth.accessToken);
 export const selectAuthUser = (state: { auth: AuthState }) => state.auth.user;
+export const selectHasRole = (role: string) => (state: { auth: AuthState }) =>
+  state.auth.user?.roles.includes(role) ?? false;
 export default authSlice.reducer;

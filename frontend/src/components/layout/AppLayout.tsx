@@ -1,7 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import type { RootState } from '../../store';
-import { clearCredentials, selectAuthUser, selectIsAuthenticated } from '../../store/slices/authSlice';
+import { useLogoutMutation } from '../../store/api/authApi';
+import { clearCredentials, selectAuthUser, selectHasRole, selectIsAuthenticated } from '../../store/slices/authSlice';
 import { ThemeSwitcher } from '../theme/ThemeSwitcher';
 import styles from './AppLayout.module.css';
 
@@ -10,8 +11,15 @@ export function AppLayout() {
   const navigate = useNavigate();
   const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
   const user = useSelector((s: RootState) => selectAuthUser(s));
+  const isAdmin = useSelector((s: RootState) => selectHasRole('ADMIN')(s));
+  const [logoutApi] = useLogoutMutation();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await logoutApi().unwrap();
+    } catch {
+      // Clear local session even if API fails
+    }
     dispatch(clearCredentials());
     navigate('/');
   };
@@ -28,7 +36,16 @@ export function AppLayout() {
             Home
           </NavLink>
           {isAuthenticated ? (
-            <span className={styles.userGreeting}>Hi, {user?.name?.split(' ')[0]}</span>
+            <>
+              <NavLink to="/profile" className={({ isActive }) => (isActive ? styles.active : undefined)}>
+                Profile
+              </NavLink>
+              {isAdmin && (
+                <NavLink to="/admin" className={({ isActive }) => (isActive ? styles.active : undefined)}>
+                  Admin
+                </NavLink>
+              )}
+            </>
           ) : (
             <>
               <NavLink to="/login" className={({ isActive }) => (isActive ? styles.active : undefined)}>
@@ -39,15 +56,15 @@ export function AppLayout() {
               </NavLink>
             </>
           )}
-          <NavLink to="/admin" className={({ isActive }) => (isActive ? styles.active : undefined)}>
-            Admin
-          </NavLink>
         </nav>
         <div className={styles.headerActions}>
           {isAuthenticated && (
-            <button type="button" className={styles.logoutBtn} onClick={handleLogout}>
-              Logout
-            </button>
+            <>
+              <span className={styles.userGreeting}>Hi, {user?.name?.split(' ')[0]}</span>
+              <button type="button" className={styles.logoutBtn} onClick={handleLogout}>
+                Logout
+              </button>
+            </>
           )}
           <ThemeSwitcher />
         </div>
@@ -56,7 +73,7 @@ export function AppLayout() {
         <Outlet />
       </main>
       <footer className={styles.footer}>
-        <p>PixelMart — Week 1 Day 2</p>
+        <p>PixelMart — Week 1 Day 3</p>
       </footer>
     </div>
   );

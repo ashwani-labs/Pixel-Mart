@@ -1,9 +1,11 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { RequireAuth } from '../components/auth/RequireAuth';
+import { RequireRole } from '../components/auth/RequireRole';
 import { AppLayout } from '../components/layout/AppLayout';
 import { AdminPage } from '../pages/AdminPage';
 import { HomePage } from '../pages/HomePage';
 import { LoginPage } from '../pages/LoginPage';
+import { ProfilePage } from '../pages/ProfilePage';
 import { RegisterPage } from '../pages/RegisterPage';
 
 export const router = createBrowserRouter([
@@ -14,11 +16,14 @@ export const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
+      { path: 'profile', element: <ProfilePage /> },
       {
         path: 'admin',
         element: (
           <RequireAuth>
-            <AdminPage />
+            <RequireRole role="ADMIN">
+              <AdminPage />
+            </RequireRole>
           </RequireAuth>
         ),
       },
