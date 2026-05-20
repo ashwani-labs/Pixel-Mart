@@ -35,6 +35,9 @@ export function AppLayout() {
           <NavLink to="/" end className={({ isActive }) => (isActive ? styles.active : undefined)}>
             Home
           </NavLink>
+          <NavLink to="/products" className={({ isActive }) => (isActive ? styles.active : undefined)}>
+            Products
+          </NavLink>
           {isAuthenticated ? (
             <>
               <NavLink to="/profile" className={({ isActive }) => (isActive ? styles.active : undefined)}>
@@ -73,7 +76,7 @@ export function AppLayout() {
         <Outlet />
       </main>
       <footer className={styles.footer}>
-        <p>PixelMart — Week 1 Day 3</p>
+        <p>PixelMart — Week 1 Day 4</p>
       </footer>
     </div>
   );

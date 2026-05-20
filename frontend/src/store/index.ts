@@ -6,6 +6,7 @@ import uiReducer from './slices/uiSlice';
 import { baseApi } from './api/baseApi';
 import './api/healthApi';
 import './api/authApi';
+import './api/catalogApi';
 
 export const store = configureStore({
   reducer: {

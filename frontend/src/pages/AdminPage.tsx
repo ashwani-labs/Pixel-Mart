@@ -16,6 +16,9 @@ export function AdminPage() {
         </p>
       ) : null}
       <p>Full MUI admin console lands on Day 5+.</p>
+      <p>
+        <Link to="/admin/products">Manage products (stub)</Link>
+      </p>
       <Link to="/">← Back home</Link>
     </div>
   );
