@@ -1,9 +1,15 @@
-import { useAuthHealthQuery, useCatalogHealthQuery } from '../store/api/healthApi';
+import { Link } from 'react-router-dom';
+import { useGetCategoriesQuery, useGetProductsQuery } from '../store/api/catalogApi';
 import styles from './HomePage.module.css';
+import productStyles from './ProductsPage.module.css';
+
+function formatPrice(value: number) {
+  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(value);
+}
 
 export function HomePage() {
-  const { data: authHealth, isLoading: authLoading } = useAuthHealthQuery();
-  const { data: catalogHealth, isLoading: catalogLoading } = useCatalogHealthQuery();
+  const { data: categories } = useGetCategoriesQuery();
+  const { data: featured, isLoading } = useGetProductsQuery({ page: 0, size: 8, featured: true });
 
   return (
     <div className={styles.page}>
@@ -11,31 +17,65 @@ export function HomePage() {
         <p className={styles.eyebrow}>Production-grade e-commerce</p>
         <h1>Welcome to PixelMart</h1>
         <p className={styles.lead}>
-          Spring Boot microservices + React + MySQL. Week 1 Day 1: infrastructure shell is live.
+          Discover curated electronics, fashion, and home essentials. Week 1 Day 4: catalog is live.
         </p>
+        <Link to="/products" className={styles.cta}>
+          Shop all products
+        </Link>
       </section>
 
-      <section className={styles.grid}>
-        <article className={styles.card}>
-          <h2>API Gateway</h2>
-          <p>Routes <code>/api/*</code> to auth, catalog, order, and notification services.</p>
-        </article>
-        <article className={styles.card}>
-          <h2>Auth service</h2>
-          {authLoading ? <p>Checking…</p> : <p className={styles.status}>{authHealth?.status ?? '—'}</p>}
-        </article>
-        <article className={styles.card}>
-          <h2>Catalog service</h2>
-          {catalogLoading ? (
-            <p>Checking…</p>
-          ) : (
-            <p className={styles.status}>{catalogHealth?.status ?? '—'}</p>
-          )}
-        </article>
-        <article className={styles.card}>
-          <h2>Theme presets</h2>
-          <p>Pixel, Ocean, Sunset, Forest, Mono — light &amp; dark with local persistence.</p>
-        </article>
+      {categories && categories.length > 0 && (
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Shop by category</h2>
+          <div className={productStyles.filters}>
+            {categories.map((cat) => (
+              <Link
+                key={cat.id}
+                to={`/products?categoryId=${cat.id}`}
+                className={productStyles.chip}
+              >
+                {cat.name}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Featured products</h2>
+          <Link to="/products">View all →</Link>
+        </div>
+        {isLoading ? (
+          <div className={productStyles.grid}>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className={productStyles.skeleton} />
+            ))}
+          </div>
+        ) : (
+          <div className={productStyles.grid}>
+            {featured?.content.map((product) => (
+              <Link
+                key={product.id}
+                to={`/products/${product.slug}`}
+                className={productStyles.card}
+              >
+                <div className={productStyles.cardImage}>◆</div>
+                <div className={productStyles.cardBody}>
+                  <h3 className={productStyles.cardName}>{product.name}</h3>
+                  <div className={productStyles.priceRow}>
+                    <span className={productStyles.price}>{formatPrice(product.basePrice)}</span>
+                    {product.compareAtPrice && (
+                      <span className={productStyles.compare}>
+                        {formatPrice(product.compareAtPrice)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );
