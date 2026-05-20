@@ -179,9 +179,9 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 #### Definition of Done (D4)
 
-- [ ] Admin creates product via API (Postman/curl) → appears on storefront
-- [ ] Hidden product (`visible=false`) not in public list
-- [ ] PLP pagination works
+- [x] Admin creates product via API (Postman/curl) → appears on storefront
+- [x] Hidden product (`visible=false`) not in public list
+- [x] PLP pagination works
 
 #### P2
 
@@ -523,7 +523,7 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 | Week | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9 | D10 | D11 | D12 | D13 | D14 | D15 |
 |------|----|----|----|----|----|----|----|----|----|-----|-----|-----|-----|-----|-----|
-| Status | ✅ | ✅ | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| Status | ✅ | ✅ | ✅ | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 
 Replace ⬜ with ✅ as each day completes.
 
