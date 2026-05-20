@@ -1,0 +1,220 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.subtitle {
+  margin: 0.25rem 0 0;
+  color: var(--muted-foreground);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip {
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--foreground);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.chipActive {
+  background: color-mix(in srgb, var(--primary) 14%, var(--card));
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.search {
+  min-width: 220px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 4px);
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--foreground) 8%, transparent);
+  text-decoration: none;
+}
+
+.cardImage {
+  height: 140px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 20%, var(--muted)), var(--muted));
+  display: grid;
+  place-items: center;
+  color: var(--muted-foreground);
+  font-size: 2rem;
+}
+
+.cardBody {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.cardName {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.price {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.compare {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  text-decoration: line-through;
+}
+
+.badge {
+  align-self: flex-start;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--primary) 18%, transparent);
+  color: var(--primary);
+}
+
+.skeleton {
+  height: 260px;
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, var(--muted) 25%, color-mix(in srgb, var(--muted) 60%, var(--card)) 50%, var(--muted) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: 3rem;
+  color: var(--muted-foreground);
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.pageBtn {
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 4px);
+  background: var(--card);
+  color: var(--foreground);
+}
+
+.pageBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pdpLayout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .pdpLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pdpImage {
+  min-height: 280px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 18%, var(--muted)), var(--muted));
+  display: grid;
+  place-items: center;
+  font-size: 4rem;
+  color: var(--muted-foreground);
+}
+
+.pdpTitle {
+  margin: 0 0 0.5rem;
+  font-size: 2rem;
+}
+
+.pdpDesc {
+  color: var(--muted-foreground);
+  line-height: 1.6;
+}
+
+.addBtn {
+  margin-top: 1.25rem;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: calc(var(--radius) - 4px);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-weight: 600;
+  cursor: not-allowed;
+}
