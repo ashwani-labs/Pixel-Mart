@@ -4,7 +4,6 @@ import com.pixelmart.catalog.domain.Category;
 import com.pixelmart.catalog.dto.CategoryRequests.CreateCategoryRequest;
 import com.pixelmart.catalog.dto.CategoryRequests.UpdateCategoryRequest;
 import com.pixelmart.catalog.dto.CategoryResponse;
-import com.pixelmart.catalog.exception.ConflictException;
 import com.pixelmart.catalog.exception.ResourceNotFoundException;
 import com.pixelmart.catalog.repository.CategoryRepository;
 import com.pixelmart.catalog.util.SlugUtil;
