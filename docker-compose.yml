@@ -52,6 +52,9 @@ services:
       MYSQL_PORT: 3306
       MYSQL_USER: ${MYSQL_USER:-pixelmart}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pixelmart}
+      STORAGE_LOCAL_PATH: /app/data/uploads
+    volumes:
+      - catalog_uploads:/app/data/uploads
     ports:
       - "8082:8082"
 
@@ -108,3 +111,4 @@ services:
 
 volumes:
   mysql_data:
+  catalog_uploads:

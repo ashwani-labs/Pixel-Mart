@@ -216,9 +216,9 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 #### Definition of Done (D5) — **Week 1 complete**
 
-- [ ] Admin changes store name → header updates after reload
-- [ ] Product image upload displays on PDP
-- [ ] Week 1 demo path: login → browse → view product with images
+- [x] Admin changes store name → header updates after reload
+- [x] Product image upload displays on PDP
+- [x] Week 1 demo path: login → browse → view product with images
 
 #### P2
 
