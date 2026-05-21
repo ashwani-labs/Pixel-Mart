@@ -5,14 +5,18 @@ import com.pixelmart.catalog.dto.ProductRequests.CreateProductRequest;
 import com.pixelmart.catalog.dto.ProductRequests.UpdateProductRequest;
 import com.pixelmart.catalog.dto.ProductRequests.UpdateProductVisibilityRequest;
 import com.pixelmart.catalog.dto.ProductResponse;
+import com.pixelmart.catalog.dto.ProductImageResponse;
+import com.pixelmart.catalog.service.ProductImageService;
 import com.pixelmart.catalog.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/admin/products")
@@ -20,9 +24,11 @@ import org.springframework.web.bind.annotation.*;
 public class AdminProductController {
 
     private final ProductService productService;
+    private final ProductImageService productImageService;
 
-    public AdminProductController(ProductService productService) {
+    public AdminProductController(ProductService productService, ProductImageService productImageService) {
         this.productService = productService;
+        this.productImageService = productImageService;
     }
 
     @GetMapping
@@ -62,5 +68,15 @@ public class AdminProductController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable String id) {
         productService.delete(id);
+    }
+
+    @PostMapping(value = "/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductImageResponse uploadImage(
+            @PathVariable String id,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(required = false) String altText
+    ) {
+        return productImageService.upload(id, file, altText);
     }
 }
