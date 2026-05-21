@@ -4,6 +4,7 @@ import { RequireRole } from '../components/auth/RequireRole';
 import { AppLayout } from '../components/layout/AppLayout';
 import { AdminPage } from '../pages/AdminPage';
 import { AdminProductsPage } from '../pages/AdminProductsPage';
+import { AdminSettingsPage } from '../pages/AdminSettingsPage';
 import { HomePage } from '../pages/HomePage';
 import { LoginPage } from '../pages/LoginPage';
 import { ProductDetailPage } from '../pages/ProductDetailPage';
@@ -38,6 +39,16 @@ export const router = createBrowserRouter([
           <RequireAuth>
             <RequireRole role="ADMIN">
               <AdminProductsPage />
+            </RequireRole>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'admin/settings',
+        element: (
+          <RequireAuth>
+            <RequireRole role="ADMIN">
+              <AdminSettingsPage />
             </RequireRole>
           </RequireAuth>
         ),

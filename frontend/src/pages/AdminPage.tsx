@@ -15,9 +15,11 @@ export function AdminPage() {
           Signed in as <strong>{me.email}</strong> ({me.roles.join(', ')})
         </p>
       ) : null}
-      <p>Full MUI admin console lands on Day 5+.</p>
       <p>
-        <Link to="/admin/products">Manage products (stub)</Link>
+        <Link to="/admin/settings">Store settings &amp; branding</Link>
+      </p>
+      <p>
+        <Link to="/admin/products">Manage products &amp; images</Link>
       </p>
       <Link to="/">← Back home</Link>
     </div>
