@@ -12,6 +12,8 @@ export function AppLayout() {
   const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
   const user = useSelector((s: RootState) => selectAuthUser(s));
   const isAdmin = useSelector((s: RootState) => selectHasRole('ADMIN')(s));
+  const storeName = useSelector((s: RootState) => s.settings.storeName);
+  const logoUrl = useSelector((s: RootState) => s.settings.logoUrl);
   const [logoutApi] = useLogoutMutation();
 
   const handleLogout = async () => {
@@ -28,8 +30,12 @@ export function AppLayout() {
     <div className={styles.shell}>
       <header className={styles.header}>
         <Link to="/" className={styles.logo}>
-          <span className={styles.logoMark}>◆</span>
-          PixelMart
+          {logoUrl ? (
+            <img src={logoUrl} alt="" className={styles.logoImg} />
+          ) : (
+            <span className={styles.logoMark}>◆</span>
+          )}
+          {storeName}
         </Link>
         <nav className={styles.nav}>
           <NavLink to="/" end className={({ isActive }) => (isActive ? styles.active : undefined)}>
@@ -76,7 +82,7 @@ export function AppLayout() {
         <Outlet />
       </main>
       <footer className={styles.footer}>
-        <p>PixelMart — Week 1 Day 4</p>
+        <p>{storeName} — Week 1</p>
       </footer>
     </div>
   );
