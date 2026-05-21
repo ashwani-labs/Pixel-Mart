@@ -15,9 +15,10 @@ export function HomePage() {
     <div className={styles.page}>
       <section className={styles.hero}>
         <p className={styles.eyebrow}>Production-grade e-commerce</p>
-        <h1>Welcome to PixelMart</h1>
+        <h1>Welcome to the store</h1>
         <p className={styles.lead}>
-          Discover curated electronics, fashion, and home essentials. Week 1 Day 4: catalog is live.
+          Discover curated electronics, fashion, and home essentials. Branding and product images are
+          admin-configurable.
         </p>
         <Link to="/products" className={styles.cta}>
           Shop all products
