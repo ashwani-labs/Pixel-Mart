@@ -4,15 +4,20 @@ import com.pixelmart.catalog.domain.Product;
 import com.pixelmart.catalog.dto.ProductRequests.CreateProductRequest;
 import com.pixelmart.catalog.dto.ProductRequests.UpdateProductRequest;
 import com.pixelmart.catalog.dto.ProductRequests.UpdateProductVisibilityRequest;
+import com.pixelmart.catalog.dto.ProductDetailResponse;
 import com.pixelmart.catalog.dto.ProductResponse;
 import com.pixelmart.catalog.exception.ConflictException;
 import com.pixelmart.catalog.exception.ResourceNotFoundException;
 import com.pixelmart.catalog.repository.CategoryRepository;
 import com.pixelmart.catalog.repository.ProductRepository;
 import com.pixelmart.catalog.util.SlugUtil;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -20,12 +25,19 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ProductImageService productImageService;
+    private final AuditLogService auditLogService;
+
     public ProductService(
             ProductRepository productRepository,
-            CategoryRepository categoryRepository
+            CategoryRepository categoryRepository,
+            @Lazy ProductImageService productImageService,
+            AuditLogService auditLogService
     ) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.productImageService = productImageService;
+        this.auditLogService = auditLogService;
     }
 
     @Transactional(readOnly = true)
@@ -41,10 +53,12 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public ProductResponse getPublicBySlug(String slug) {
-        return ProductResponse.fromPublic(
-                productRepository.findBySlugAndVisibleTrue(slug)
-                        .orElseThrow(() -> new ResourceNotFoundException("Product", slug))
+    public ProductDetailResponse getPublicBySlug(String slug) {
+        Product product = productRepository.findBySlugAndVisibleTrue(slug)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", slug));
+        return ProductDetailResponse.fromPublic(
+                product,
+                productImageService.listForProductPublic(product.getId())
         );
     }
 
@@ -71,16 +85,33 @@ public class ProductService {
     public ProductResponse update(String id, UpdateProductRequest request) {
         validateCategory(request.categoryId());
         Product product = findProduct(id);
+        Map<String, Object> before = priceSnapshot(product);
         String slug = resolveSlug(request.slug(), request.name(), id);
         mapProduct(product, request, slug);
-        return ProductResponse.from(productRepository.save(product));
+        Product saved = productRepository.save(product);
+        Map<String, Object> after = priceSnapshot(saved);
+        if (!before.equals(after)) {
+            auditLogService.log("PRODUCT_PRICE_UPDATED", "product", id, before, after);
+        }
+        return ProductResponse.from(saved);
     }
 
     @Transactional
     public ProductResponse updateVisibility(String id, UpdateProductVisibilityRequest request) {
         Product product = findProduct(id);
+        boolean oldVisible = product.isVisible();
         product.setVisible(request.visible());
-        return ProductResponse.from(productRepository.save(product));
+        Product saved = productRepository.save(product);
+        if (oldVisible != saved.isVisible()) {
+            auditLogService.log(
+                    "PRODUCT_VISIBILITY_UPDATED",
+                    "product",
+                    id,
+                    Map.of("visible", oldVisible),
+                    Map.of("visible", saved.isVisible())
+            );
+        }
+        return ProductResponse.from(saved);
     }
 
     @Transactional
@@ -144,5 +175,12 @@ public class ProductService {
 
     private String normalize(String value) {
         return (value == null || value.isBlank()) ? null : value.trim();
+    }
+
+    private Map<String, Object> priceSnapshot(Product product) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("basePrice", product.getBasePrice());
+        map.put("compareAtPrice", product.getCompareAtPrice());
+        return map;
     }
 }

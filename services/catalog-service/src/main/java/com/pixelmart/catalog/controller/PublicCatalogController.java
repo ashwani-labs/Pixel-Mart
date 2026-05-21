@@ -2,6 +2,7 @@ package com.pixelmart.catalog.controller;
 
 import com.pixelmart.catalog.dto.CategoryResponse;
 import com.pixelmart.catalog.dto.PageResponse;
+import com.pixelmart.catalog.dto.ProductDetailResponse;
 import com.pixelmart.catalog.dto.ProductResponse;
 import com.pixelmart.catalog.service.CategoryService;
 import com.pixelmart.catalog.service.ProductService;
@@ -43,7 +44,7 @@ public class PublicCatalogController {
     }
 
     @GetMapping("/products/{slug}")
-    public ProductResponse productBySlug(@PathVariable String slug) {
+    public ProductDetailResponse productBySlug(@PathVariable String slug) {
         return productService.getPublicBySlug(slug);
     }
 }

@@ -20,6 +20,16 @@ spring:
     schemas: catalog
     default-schema: catalog
     locations: classpath:db/migration
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
+
+pixelmart:
+  storage:
+    type: ${STORAGE_TYPE:local}
+    local:
+      base-path: ${STORAGE_LOCAL_PATH:./data/uploads}
 
 management:
   endpoints:
