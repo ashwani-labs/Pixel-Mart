@@ -1,4 +1,4 @@
-import type { Category, PageResponse, Product } from '../../types/catalog';
+import type { Category, PageResponse, Product, ProductDetail } from '../../types/catalog';
 import { baseApi } from './baseApi';
 
 export interface ProductListParams {
@@ -34,7 +34,7 @@ export const catalogApi = baseApi.injectEndpoints({
             ]
           : [{ type: 'ProductList', id: 'LIST' }],
     }),
-    getProductBySlug: build.query<Product, string>({
+    getProductBySlug: build.query<ProductDetail, string>({
       query: (slug) => `/catalog/products/${slug}`,
       providesTags: (_r, _e, slug) => [{ type: 'Product', id: slug }],
     }),

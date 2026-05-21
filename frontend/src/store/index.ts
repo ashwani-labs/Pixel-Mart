@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import authReducer from './slices/authSlice';
+import settingsReducer from './slices/settingsSlice';
 import themeReducer from './slices/themeSlice';
 import uiReducer from './slices/uiSlice';
 import { baseApi } from './api/baseApi';
@@ -11,6 +12,7 @@ import './api/catalogApi';
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    settings: settingsReducer,
     theme: themeReducer,
     ui: uiReducer,
     [baseApi.reducerPath]: baseApi.reducer,
