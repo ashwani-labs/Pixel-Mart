@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom';
+import { ProductImageGallery } from '../components/product/ProductImageGallery';
 import { useGetProductBySlugQuery } from '../store/api/catalogApi';
 import styles from './ProductsPage.module.css';
 
@@ -33,7 +34,7 @@ export function ProductDetailPage() {
     <div className={styles.page}>
       <Link to="/products">← Back to products</Link>
       <div className={styles.pdpLayout}>
-        <div className={styles.pdpImage}>◆</div>
+        <ProductImageGallery images={product.images} productName={product.name} />
         <div>
           {product.featured && <span className={styles.badge}>Featured</span>}
           <h1 className={styles.pdpTitle}>{product.name}</h1>
