@@ -265,8 +265,8 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 #### Definition of Done (D6)
 
-- [ ] Add/update/remove cart items
-- [ ] Cart persists per user across sessions
+- [x] Add/update/remove cart items
+- [x] Cart persists per user across sessions
 
 ---
 
