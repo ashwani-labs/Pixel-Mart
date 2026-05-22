@@ -21,6 +21,11 @@ spring:
     default-schema: orders
     locations: classpath:db/migration
 
+pixelmart:
+  catalog:
+    base-url: ${CATALOG_SERVICE_URL:http://localhost:8082}
+    internal-service-name: order-service
+
 management:
   endpoints:
     web:
