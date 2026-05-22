@@ -8,6 +8,8 @@ import { baseApi } from './api/baseApi';
 import './api/healthApi';
 import './api/authApi';
 import './api/catalogApi';
+import './api/settingsApi';
+import './api/orderApi';
 
 export const store = configureStore({
   reducer: {
