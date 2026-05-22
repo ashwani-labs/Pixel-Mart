@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import type { RootState } from '../../store';
 import { useLogoutMutation } from '../../store/api/authApi';
+import { useGetCartQuery } from '../../store/api/orderApi';
 import { clearCredentials, selectAuthUser, selectHasRole, selectIsAuthenticated } from '../../store/slices/authSlice';
 import { ThemeSwitcher } from '../theme/ThemeSwitcher';
 import styles from './AppLayout.module.css';
@@ -15,6 +16,8 @@ export function AppLayout() {
   const storeName = useSelector((s: RootState) => s.settings.storeName);
   const logoUrl = useSelector((s: RootState) => s.settings.logoUrl);
   const [logoutApi] = useLogoutMutation();
+  const { data: cart } = useGetCartQuery(undefined, { skip: !isAuthenticated });
+  const cartQty = cart?.totalQuantity ?? 0;
 
   const handleLogout = async () => {
     try {
@@ -44,6 +47,12 @@ export function AppLayout() {
           <NavLink to="/products" className={({ isActive }) => (isActive ? styles.active : undefined)}>
             Products
           </NavLink>
+          {isAuthenticated && (
+            <NavLink to="/cart" className={({ isActive }) => (isActive ? styles.active : undefined)}>
+              Cart
+              {cartQty > 0 && <span className={styles.cartBadge}>{cartQty}</span>}
+            </NavLink>
+          )}
           {isAuthenticated ? (
             <>
               <NavLink to="/profile" className={({ isActive }) => (isActive ? styles.active : undefined)}>
