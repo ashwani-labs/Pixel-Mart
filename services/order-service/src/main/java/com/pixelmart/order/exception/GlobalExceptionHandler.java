@@ -12,6 +12,12 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(OrderException.class)
+    public ResponseEntity<ApiError> handleOrder(OrderException ex, HttpServletRequest request) {
+        return ResponseEntity.status(ex.getStatus()).body(ApiError.of(
+                ex.getStatus(), ex.getError(), ex.getMessage(), request.getRequestURI()));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
         List<String> details = ex.getBindingResult().getFieldErrors().stream()
