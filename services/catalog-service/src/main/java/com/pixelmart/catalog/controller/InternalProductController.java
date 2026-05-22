@@ -1,0 +1,24 @@
+package com.pixelmart.catalog.controller;
+
+import com.pixelmart.catalog.dto.InternalProductResponse;
+import com.pixelmart.catalog.service.ProductService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/catalog/internal/products")
+public class InternalProductController {
+
+    private final ProductService productService;
+
+    public InternalProductController(ProductService productService) {
+        this.productService = productService;
+    }
+
+    @GetMapping("/{id}")
+    public InternalProductResponse getById(@PathVariable String id) {
+        return productService.getInternalById(id);
+    }
+}
