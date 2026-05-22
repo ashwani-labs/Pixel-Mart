@@ -1,6 +1,11 @@
-import { Link, useParams } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { ProductImageGallery } from '../components/product/ProductImageGallery';
 import { useGetProductBySlugQuery } from '../store/api/catalogApi';
+import { useAddCartItemMutation } from '../store/api/orderApi';
+import type { RootState } from '../store';
+import { selectIsAuthenticated } from '../store/slices/authSlice';
 import styles from './ProductsPage.module.css';
 
 function formatPrice(value: number) {
@@ -8,10 +13,14 @@ function formatPrice(value: number) {
 }
 
 export function ProductDetailPage() {
+  const navigate = useNavigate();
+  const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
   const { slug } = useParams<{ slug: string }>();
   const { data: product, isLoading, isError } = useGetProductBySlugQuery(slug ?? '', {
     skip: !slug,
   });
+  const [addToCart, { isLoading: adding }] = useAddCartItemMutation();
+  const [cartMessage, setCartMessage] = useState<string | null>(null);
 
   if (isLoading) {
     return (
@@ -48,9 +57,32 @@ export function ProductDetailPage() {
           </div>
           <p className={styles.pdpDesc}>{product.description ?? 'No description available.'}</p>
           <p className={styles.subtitle}>In stock: {product.stockQty}</p>
-          <button type="button" className={styles.addBtn} disabled title="Available after cart (Day 6)">
-            Add to cart — coming Day 6
+          <button
+            type="button"
+            className={styles.addBtnActive}
+            disabled={adding || product.stockQty < 1}
+            onClick={async () => {
+              setCartMessage(null);
+              if (!isAuthenticated) {
+                navigate('/login', { state: { from: `/products/${slug}` } });
+                return;
+              }
+              try {
+                await addToCart({ productId: product.id, quantity: 1 }).unwrap();
+                setCartMessage('Added to cart.');
+              } catch {
+                setCartMessage('Could not add to cart.');
+              }
+            }}
+          >
+            {adding ? 'Adding…' : 'Add to cart'}
           </button>
+          {cartMessage && <p className={styles.cartMsg}>{cartMessage}</p>}
+          {isAuthenticated && (
+            <Link to="/cart" className={styles.viewCartLink}>
+              View cart
+            </Link>
+          )}
         </div>
       </div>
     </div>
