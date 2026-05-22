@@ -4,6 +4,7 @@ import com.pixelmart.catalog.domain.Product;
 import com.pixelmart.catalog.dto.ProductRequests.CreateProductRequest;
 import com.pixelmart.catalog.dto.ProductRequests.UpdateProductRequest;
 import com.pixelmart.catalog.dto.ProductRequests.UpdateProductVisibilityRequest;
+import com.pixelmart.catalog.dto.InternalProductResponse;
 import com.pixelmart.catalog.dto.ProductDetailResponse;
 import com.pixelmart.catalog.dto.ProductResponse;
 import com.pixelmart.catalog.exception.ConflictException;
@@ -50,6 +51,11 @@ public class ProductService {
     public Page<ProductResponse> listFeatured(Pageable pageable) {
         return productRepository.findByVisibleTrueAndFeaturedTrue(pageable)
                 .map(ProductResponse::fromPublic);
+    }
+
+    @Transactional(readOnly = true)
+    public InternalProductResponse getInternalById(String id) {
+        return InternalProductResponse.from(findProduct(id));
     }
 
     @Transactional(readOnly = true)
