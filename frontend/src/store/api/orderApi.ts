@@ -1,3 +1,4 @@
+import type { Address, PincodeLookup, UpsertAddressRequest } from '../../types/address';
 import type { AddCartItemRequest, Cart, UpdateCartItemRequest } from '../../types/order';
 import { baseApi } from './baseApi';
 
@@ -30,6 +31,56 @@ export const orderApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['Cart'],
     }),
+    getAddresses: build.query<Address[], void>({
+      query: () => '/orders/addresses',
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map((a) => ({ type: 'Address' as const, id: a.id })),
+              { type: 'Address', id: 'LIST' },
+            ]
+          : [{ type: 'Address', id: 'LIST' }],
+    }),
+    getAddress: build.query<Address, string>({
+      query: (id) => `/orders/addresses/${id}`,
+      providesTags: (_r, _e, id) => [{ type: 'Address', id }],
+    }),
+    lookupPincode: build.query<PincodeLookup, string>({
+      query: (pincode) => `/orders/addresses/pincode/${pincode}`,
+    }),
+    createAddress: build.mutation<Address, UpsertAddressRequest>({
+      query: (body) => ({
+        url: '/orders/addresses',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: [{ type: 'Address', id: 'LIST' }],
+    }),
+    updateAddress: build.mutation<Address, { id: string; body: UpsertAddressRequest }>({
+      query: ({ id, body }) => ({
+        url: `/orders/addresses/${id}`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: (_r, _e, { id }) => [
+        { type: 'Address', id },
+        { type: 'Address', id: 'LIST' },
+      ],
+    }),
+    setDefaultAddress: build.mutation<Address, string>({
+      query: (id) => ({
+        url: `/orders/addresses/${id}/default`,
+        method: 'PATCH',
+      }),
+      invalidatesTags: [{ type: 'Address', id: 'LIST' }],
+    }),
+    deleteAddress: build.mutation<void, string>({
+      query: (id) => ({
+        url: `/orders/addresses/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: [{ type: 'Address', id: 'LIST' }],
+    }),
   }),
 });
 
@@ -38,4 +89,11 @@ export const {
   useAddCartItemMutation,
   useUpdateCartItemMutation,
   useRemoveCartItemMutation,
+  useGetAddressesQuery,
+  useGetAddressQuery,
+  useLazyLookupPincodeQuery,
+  useCreateAddressMutation,
+  useUpdateAddressMutation,
+  useSetDefaultAddressMutation,
+  useDeleteAddressMutation,
 } = orderApi;

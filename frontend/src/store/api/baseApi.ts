@@ -64,6 +64,7 @@ export const baseApi = createApi({
     'Category',
     'Offer',
     'Cart',
+    'Address',
     'Order',
     'Settings',
     'Wishlist',
