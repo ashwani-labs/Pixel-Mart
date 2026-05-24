@@ -82,6 +82,9 @@ function ProfileForm() {
         </form>
 
         <p className={styles.footer}>
+          <Link to="/profile/addresses">Manage delivery addresses →</Link>
+        </p>
+        <p className={styles.footer}>
           <Link to="/">← Back home</Link>
         </p>
       </div>

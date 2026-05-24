@@ -10,6 +10,7 @@ import { LoginPage } from '../pages/LoginPage';
 import { ProductDetailPage } from '../pages/ProductDetailPage';
 import { ProductListPage } from '../pages/ProductListPage';
 import { ProfilePage } from '../pages/ProfilePage';
+import { ProfileAddressesPage } from '../pages/ProfileAddressesPage';
 import { RegisterPage } from '../pages/RegisterPage';
 import { CartPage } from '../pages/CartPage';
 import { CheckoutPage } from '../pages/CheckoutPage';
@@ -25,6 +26,7 @@ export const router = createBrowserRouter([
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
       { path: 'profile', element: <ProfilePage /> },
+      { path: 'profile/addresses', element: <ProfileAddressesPage /> },
       {
         path: 'cart',
         element: (
