@@ -293,8 +293,8 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 #### Definition of Done (D7)
 
-- [ ] Pincode `110001` autofills Delhi
-- [ ] CRUD addresses saved per user
+- [x] Pincode `110001` autofills Delhi
+- [x] CRUD addresses saved per user
 
 ---
 
