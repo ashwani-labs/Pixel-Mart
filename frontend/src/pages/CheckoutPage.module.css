@@ -1,0 +1,144 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 860px;
+}
+
+.muted {
+  color: var(--muted-foreground);
+}
+
+.stepper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+}
+
+.stepper span {
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+}
+
+.section {
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.section h2 {
+  margin: 0 0 0.85rem;
+  font-size: 1.1rem;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.addressGrid,
+.paymentGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.card,
+.selectedCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 4px);
+  cursor: pointer;
+  background: var(--background);
+  font-size: 0.875rem;
+}
+
+.selectedCard {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+.card input,
+.selectedCard input {
+  align-self: flex-start;
+}
+
+.badge {
+  align-self: flex-start;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--primary) 18%, transparent);
+  color: var(--primary);
+}
+
+.items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.items li,
+.totals p {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0;
+}
+
+.totals {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.grandTotal {
+  font-size: 1.1rem;
+}
+
+.error {
+  margin: 0;
+  color: #dc2626;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.placeOrderBtn,
+.primaryLink {
+  display: inline-block;
+  padding: 0.7rem 1.1rem;
+  border: none;
+  border-radius: calc(var(--radius) - 4px);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.placeOrderBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
