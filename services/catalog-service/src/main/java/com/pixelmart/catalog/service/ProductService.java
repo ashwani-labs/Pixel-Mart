@@ -1,12 +1,15 @@
 package com.pixelmart.catalog.service;
 
 import com.pixelmart.catalog.domain.Product;
+import com.pixelmart.catalog.dto.InternalStockRequests.ReserveStockLine;
+import com.pixelmart.catalog.dto.InternalStockRequests.ReserveStockRequest;
 import com.pixelmart.catalog.dto.ProductRequests.CreateProductRequest;
 import com.pixelmart.catalog.dto.ProductRequests.UpdateProductRequest;
 import com.pixelmart.catalog.dto.ProductRequests.UpdateProductVisibilityRequest;
 import com.pixelmart.catalog.dto.InternalProductResponse;
 import com.pixelmart.catalog.dto.ProductDetailResponse;
 import com.pixelmart.catalog.dto.ProductResponse;
+import com.pixelmart.catalog.exception.BadRequestException;
 import com.pixelmart.catalog.exception.ConflictException;
 import com.pixelmart.catalog.exception.ResourceNotFoundException;
 import com.pixelmart.catalog.repository.CategoryRepository;
@@ -18,7 +21,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -56,6 +62,37 @@ public class ProductService {
     @Transactional(readOnly = true)
     public InternalProductResponse getInternalById(String id) {
         return InternalProductResponse.from(findProduct(id));
+    }
+
+    @Transactional
+    public void reserveStock(ReserveStockRequest request) {
+        Map<String, Integer> requested = request.items().stream()
+                .collect(Collectors.toMap(
+                        ReserveStockLine::productId,
+                        ReserveStockLine::quantity,
+                        Integer::sum,
+                        LinkedHashMap::new
+                ));
+        Map<String, Product> products = productRepository.findAllByIdForUpdate(requested.keySet()).stream()
+                .collect(Collectors.toMap(Product::getId, Function.identity()));
+
+        for (Map.Entry<String, Integer> entry : requested.entrySet()) {
+            Product product = products.get(entry.getKey());
+            if (product == null) {
+                throw new ResourceNotFoundException("Product", entry.getKey());
+            }
+            if (!product.isVisible()) {
+                throw new BadRequestException("Product is not available: " + product.getName());
+            }
+            if (product.getStockQty() < entry.getValue()) {
+                throw new BadRequestException("Insufficient stock for " + product.getName());
+            }
+        }
+
+        requested.forEach((productId, quantity) -> {
+            Product product = products.get(productId);
+            product.setStockQty(product.getStockQty() - quantity);
+        });
     }
 
     @Transactional(readOnly = true)
