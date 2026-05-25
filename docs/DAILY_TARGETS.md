@@ -322,9 +322,9 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 #### Definition of Done (D8)
 
-- [ ] End-to-end checkout without overselling stock
-- [ ] 401 if not logged in
-- [ ] Order line items store price snapshots
+- [x] End-to-end checkout without overselling stock
+- [x] 401 if not logged in
+- [x] Order line items store price snapshots
 
 ---
 

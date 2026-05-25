@@ -7,7 +7,7 @@ Production-grade e-commerce platform using **Java Spring Boot** microservices, *
 | Week | Focus | Progress |
 |------|--------|----------|
 | 1 | Foundation & browse | Week 1 complete |
-| 2 | Cart, checkout, offers | Day 7 complete — Day 8 next (checkout) |
+| 2 | Cart, checkout, offers | Day 8 complete — Day 9 next (offers) |
 | 3 | Wishlist, reviews, CI, ship | — |
 
 See [docs/DAILY_TARGETS.md](docs/DAILY_TARGETS.md) for day-by-day goals.
