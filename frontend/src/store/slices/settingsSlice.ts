@@ -9,6 +9,9 @@ interface SettingsState {
   marketCurrencyCode: string;
   marketCurrencySymbol: string;
   marketLocale: string;
+  taxEnabled: boolean;
+  taxRatePercent: number;
+  taxLabel: string;
 }
 
 const initialState: SettingsState = {
@@ -19,6 +22,9 @@ const initialState: SettingsState = {
   marketCurrencyCode: 'INR',
   marketCurrencySymbol: '₹',
   marketLocale: 'en-IN',
+  taxEnabled: true,
+  taxRatePercent: 18,
+  taxLabel: 'GST',
 };
 
 const settingsSlice = createSlice({
@@ -34,6 +40,9 @@ const settingsSlice = createSlice({
       state.marketCurrencyCode = s.marketCurrencyCode;
       state.marketCurrencySymbol = s.marketCurrencySymbol;
       state.marketLocale = s.marketLocale;
+      state.taxEnabled = s.taxEnabled;
+      state.taxRatePercent = s.taxRatePercent;
+      state.taxLabel = s.taxLabel;
     },
   },
 });

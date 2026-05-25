@@ -1,5 +1,11 @@
 import type { Address, PincodeLookup, UpsertAddressRequest } from '../../types/address';
-import type { AddCartItemRequest, Cart, UpdateCartItemRequest } from '../../types/order';
+import type {
+  AddCartItemRequest,
+  Cart,
+  CheckoutRequest,
+  Order,
+  UpdateCartItemRequest,
+} from '../../types/order';
 import { baseApi } from './baseApi';
 
 export const orderApi = baseApi.injectEndpoints({
@@ -81,6 +87,22 @@ export const orderApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'Address', id: 'LIST' }],
     }),
+    checkout: build.mutation<Order, CheckoutRequest>({
+      query: (body) => ({
+        url: '/orders/checkout',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Cart', 'Order'],
+    }),
+    getOrders: build.query<Order[], void>({
+      query: () => '/orders',
+      providesTags: ['Order'],
+    }),
+    getOrder: build.query<Order, string>({
+      query: (id) => `/orders/${id}`,
+      providesTags: (_r, _e, id) => [{ type: 'Order', id }],
+    }),
   }),
 });
 
@@ -96,4 +118,7 @@ export const {
   useUpdateAddressMutation,
   useSetDefaultAddressMutation,
   useDeleteAddressMutation,
+  useCheckoutMutation,
+  useGetOrdersQuery,
+  useGetOrderQuery,
 } = orderApi;
