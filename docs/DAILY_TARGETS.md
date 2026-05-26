@@ -352,8 +352,10 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 #### Definition of Done (D9)
 
-- [ ] Active offer reduces displayed and checkout price
-- [ ] Expired offer ignored
+- [x] Active offer reduces displayed and checkout price
+- [x] Expired offer ignored
+
+> **D9 status: COMPLETE** (verified: catalog/order focused Maven build, frontend production build).
 
 ---
 
@@ -523,7 +525,7 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 | Week | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9 | D10 | D11 | D12 | D13 | D14 | D15 |
 |------|----|----|----|----|----|----|----|----|----|-----|-----|-----|-----|-----|-----|
-| Status | ✅ | ✅ | ✅ | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| Status | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 
 Replace ⬜ with ✅ as each day completes.
 
