@@ -46,10 +46,11 @@ export function ProductDetailPage() {
         <ProductImageGallery images={product.images} productName={product.name} />
         <div>
           {product.featured && <span className={styles.badge}>Featured</span>}
+          {product.offerName && <span className={styles.offerBadge}>{product.offerName}</span>}
           <h1 className={styles.pdpTitle}>{product.name}</h1>
           <div className={styles.priceRow}>
             <span className={styles.price} style={{ fontSize: '1.5rem' }}>
-              {formatPrice(product.basePrice)}
+              {formatPrice(product.effectivePrice)}
             </span>
             {product.compareAtPrice && (
               <span className={styles.compare}>{formatPrice(product.compareAtPrice)}</span>

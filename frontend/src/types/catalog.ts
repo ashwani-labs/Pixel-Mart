@@ -14,7 +14,9 @@ export interface Product {
   slug: string;
   description: string | null;
   basePrice: number;
+  effectivePrice: number;
   compareAtPrice: number | null;
+  offerName: string | null;
   stockQty: number;
   visible: boolean;
   featured: boolean;
@@ -34,10 +36,42 @@ export interface ProductDetail {
   slug: string;
   description: string | null;
   basePrice: number;
+  effectivePrice: number;
   compareAtPrice: number | null;
+  offerName: string | null;
   stockQty: number;
   featured: boolean;
   images: ProductImage[];
+}
+
+export type OfferType = 'PERCENT' | 'FIXED';
+export type OfferScope = 'PRODUCT' | 'CATEGORY' | 'CART';
+
+export interface Offer {
+  id: string;
+  name: string;
+  type: OfferType;
+  scope: OfferScope;
+  productId: string | null;
+  categoryId: string | null;
+  value: number;
+  startsAt: string;
+  endsAt: string | null;
+  couponCode: string | null;
+  active: boolean;
+}
+
+export interface UpsertOfferRequest {
+  name: string;
+  type: OfferType;
+  scope: OfferScope;
+  productId?: string | null;
+  categoryId?: string | null;
+  value: number;
+  startsAt: string;
+  endsAt?: string | null;
+  couponCode?: string | null;
+  active?: boolean;
 }
 
 export interface PageResponse<T> {

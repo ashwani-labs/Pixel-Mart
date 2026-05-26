@@ -92,6 +92,24 @@
   gap: 0.55rem;
 }
 
+.couponField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-width: 260px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.couponField input {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 4px);
+  background: var(--background);
+  color: var(--foreground);
+}
+
 .items li,
 .totals p {
   display: flex;

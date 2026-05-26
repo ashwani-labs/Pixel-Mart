@@ -134,6 +134,18 @@
   color: var(--primary);
 }
 
+.offerBadge {
+  align-self: flex-start;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: color-mix(in srgb, #16a34a 18%, transparent);
+  color: #15803d;
+}
+
 .skeleton {
   height: 260px;
   border-radius: var(--radius);

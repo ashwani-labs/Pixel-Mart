@@ -107,9 +107,10 @@ export function ProductListPage() {
                 <div className={styles.cardImage}>◆</div>
                 <div className={styles.cardBody}>
                   {product.featured && <span className={styles.badge}>Featured</span>}
+                  {product.offerName && <span className={styles.offerBadge}>{product.offerName}</span>}
                   <h2 className={styles.cardName}>{product.name}</h2>
                   <div className={styles.priceRow}>
-                    <span className={styles.price}>{formatPrice(product.basePrice)}</span>
+                    <span className={styles.price}>{formatPrice(product.effectivePrice)}</span>
                     {product.compareAtPrice && (
                       <span className={styles.compare}>{formatPrice(product.compareAtPrice)}</span>
                     )}

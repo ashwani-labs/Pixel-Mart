@@ -1,4 +1,11 @@
-import type { Category, PageResponse, Product, ProductDetail } from '../../types/catalog';
+import type {
+  Category,
+  Offer,
+  PageResponse,
+  Product,
+  ProductDetail,
+  UpsertOfferRequest,
+} from '../../types/catalog';
 import { baseApi } from './baseApi';
 
 export interface ProductListParams {
@@ -38,7 +45,66 @@ export const catalogApi = baseApi.injectEndpoints({
       query: (slug) => `/catalog/products/${slug}`,
       providesTags: (_r, _e, slug) => [{ type: 'Product', id: slug }],
     }),
+    getActiveOffers: build.query<Offer[], void>({
+      query: () => '/catalog/offers/active',
+      providesTags: ['Offer'],
+    }),
+    getAdminOffers: build.query<PageResponse<Offer>, void>({
+      query: () => '/admin/offers',
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.content.map((offer) => ({ type: 'Offer' as const, id: offer.id })),
+              { type: 'Offer', id: 'LIST' },
+            ]
+          : [{ type: 'Offer', id: 'LIST' }],
+    }),
+    createOffer: build.mutation<Offer, UpsertOfferRequest>({
+      query: (body) => ({
+        url: '/admin/offers',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: [
+        { type: 'Offer', id: 'LIST' },
+        { type: 'ProductList', id: 'LIST' },
+        'Cart',
+      ],
+    }),
+    updateOffer: build.mutation<Offer, { id: string; body: UpsertOfferRequest }>({
+      query: ({ id, body }) => ({
+        url: `/admin/offers/${id}`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: (_r, _e, { id }) => [
+        { type: 'Offer', id },
+        { type: 'Offer', id: 'LIST' },
+        { type: 'ProductList', id: 'LIST' },
+        'Cart',
+      ],
+    }),
+    deleteOffer: build.mutation<void, string>({
+      query: (id) => ({
+        url: `/admin/offers/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: [
+        { type: 'Offer', id: 'LIST' },
+        { type: 'ProductList', id: 'LIST' },
+        'Cart',
+      ],
+    }),
   }),
 });
 
-export const { useGetCategoriesQuery, useGetProductsQuery, useGetProductBySlugQuery } = catalogApi;
+export const {
+  useGetCategoriesQuery,
+  useGetProductsQuery,
+  useGetProductBySlugQuery,
+  useGetActiveOffersQuery,
+  useGetAdminOffersQuery,
+  useCreateOfferMutation,
+  useUpdateOfferMutation,
+  useDeleteOfferMutation,
+} = catalogApi;

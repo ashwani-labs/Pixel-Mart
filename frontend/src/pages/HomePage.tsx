@@ -1,5 +1,9 @@
 import { Link } from 'react-router-dom';
-import { useGetCategoriesQuery, useGetProductsQuery } from '../store/api/catalogApi';
+import {
+  useGetActiveOffersQuery,
+  useGetCategoriesQuery,
+  useGetProductsQuery,
+} from '../store/api/catalogApi';
 import styles from './HomePage.module.css';
 import productStyles from './ProductsPage.module.css';
 
@@ -10,6 +14,7 @@ function formatPrice(value: number) {
 export function HomePage() {
   const { data: categories } = useGetCategoriesQuery();
   const { data: featured, isLoading } = useGetProductsQuery({ page: 0, size: 8, featured: true });
+  const { data: activeOffers } = useGetActiveOffersQuery();
 
   return (
     <div className={styles.page}>
@@ -24,6 +29,12 @@ export function HomePage() {
           Shop all products
         </Link>
       </section>
+
+      {activeOffers && activeOffers.length > 0 && (
+        <section className={styles.dealsBanner}>
+          <strong>Deals live now:</strong> {activeOffers.map((offer) => offer.name).join(', ')}
+        </section>
+      )}
 
       {categories && categories.length > 0 && (
         <section className={styles.section}>
@@ -64,8 +75,11 @@ export function HomePage() {
                 <div className={productStyles.cardImage}>◆</div>
                 <div className={productStyles.cardBody}>
                   <h3 className={productStyles.cardName}>{product.name}</h3>
+                  {product.offerName && (
+                    <span className={productStyles.offerBadge}>{product.offerName}</span>
+                  )}
                   <div className={productStyles.priceRow}>
-                    <span className={productStyles.price}>{formatPrice(product.basePrice)}</span>
+                    <span className={productStyles.price}>{formatPrice(product.effectivePrice)}</span>
                     {product.compareAtPrice && (
                       <span className={productStyles.compare}>
                         {formatPrice(product.compareAtPrice)}

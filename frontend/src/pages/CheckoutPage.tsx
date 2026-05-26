@@ -33,6 +33,7 @@ export function CheckoutPage() {
   const [checkout, { isLoading: placingOrder }] = useCheckoutMutation();
   const [addressId, setAddressId] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('MOCK_CARD');
+  const [couponCode, setCouponCode] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const items = cart?.items ?? [];
@@ -55,10 +56,15 @@ export function CheckoutPage() {
       return;
     }
     try {
-      const order = await checkout({ addressId: selectedAddressId, paymentMethod }).unwrap();
+      const trimmedCoupon = couponCode.trim();
+      const order = await checkout({
+        addressId: selectedAddressId,
+        paymentMethod,
+        couponCode: trimmedCoupon || undefined,
+      }).unwrap();
       navigate(`/orders/${order.id}`, { state: { checkedOut: true } });
     } catch {
-      setError('Could not place order. Check stock and try again.');
+      setError('Could not place order. Check stock, coupon, and try again.');
     }
   };
 
@@ -145,6 +151,14 @@ export function CheckoutPage() {
 
       <section className={styles.section}>
         <h2>Review order</h2>
+        <label className={styles.couponField}>
+          Coupon code
+          <input
+            value={couponCode}
+            onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+            placeholder="STYLE15"
+          />
+        </label>
         <ul className={styles.items}>
           {items.map((item) => (
             <li key={item.id}>

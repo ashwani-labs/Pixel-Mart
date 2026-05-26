@@ -52,6 +52,14 @@
   text-decoration: none;
 }
 
+.dealsBanner {
+  padding: 1rem 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--primary) 35%, var(--border));
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--primary) 12%, var(--card));
+  color: var(--foreground);
+}
+
 .section {
   display: flex;
   flex-direction: column;

@@ -21,6 +21,9 @@ export function AdminPage() {
       <p>
         <Link to="/admin/products">Manage products &amp; images</Link>
       </p>
+      <p>
+        <Link to="/admin/offers">Manage offers</Link>
+      </p>
       <Link to="/">← Back home</Link>
     </div>
   );

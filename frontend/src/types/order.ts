@@ -29,6 +29,7 @@ export type PaymentMethod = 'MOCK_CARD' | 'MOCK_UPI' | 'MOCK_WALLET' | 'MOCK_COD
 export interface CheckoutRequest {
   addressId: string;
   paymentMethod: PaymentMethod;
+  couponCode?: string;
 }
 
 export interface OrderItem {
