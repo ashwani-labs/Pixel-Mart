@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,8 +23,11 @@ public class InternalProductController {
     }
 
     @GetMapping("/{id}")
-    public InternalProductResponse getById(@PathVariable String id) {
-        return productService.getInternalById(id);
+    public InternalProductResponse getById(
+            @PathVariable String id,
+            @RequestParam(required = false) String couponCode
+    ) {
+        return productService.getInternalById(id, couponCode);
     }
 
     @PostMapping("/reserve-stock")

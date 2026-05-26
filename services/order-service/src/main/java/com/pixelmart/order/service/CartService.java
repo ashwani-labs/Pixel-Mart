@@ -63,7 +63,7 @@ public class CartService {
                 throw new BadRequestException("Insufficient stock");
             }
             item.setQuantity(newQty);
-            item.setUnitPrice(product.basePrice());
+            item.setUnitPrice(product.effectivePrice());
             item.setProductName(product.name());
             item.setProductSlug(product.slug());
             cartItemRepository.save(item);
@@ -73,7 +73,7 @@ public class CartService {
             created.setProductId(product.id());
             created.setProductName(product.name());
             created.setProductSlug(product.slug());
-            created.setUnitPrice(product.basePrice());
+            created.setUnitPrice(product.effectivePrice());
             created.setQuantity(quantity);
             cartItemRepository.save(created);
         }
@@ -95,7 +95,7 @@ public class CartService {
         }
 
         item.setQuantity(request.quantity());
-        item.setUnitPrice(product.basePrice());
+        item.setUnitPrice(product.effectivePrice());
         cartItemRepository.save(item);
         return buildResponse(cartItemRepository.findByCartIdOrderByCreatedAtAsc(cart.getId()));
     }

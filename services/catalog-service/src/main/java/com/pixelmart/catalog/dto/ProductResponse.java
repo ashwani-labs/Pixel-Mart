@@ -1,6 +1,7 @@
 package com.pixelmart.catalog.dto;
 
 import com.pixelmart.catalog.domain.Product;
+import com.pixelmart.catalog.service.OfferPricing;
 
 import java.math.BigDecimal;
 
@@ -11,7 +12,9 @@ public record ProductResponse(
         String slug,
         String description,
         BigDecimal basePrice,
+        BigDecimal effectivePrice,
         BigDecimal compareAtPrice,
+        String offerName,
         int stockQty,
         boolean visible,
         boolean featured
@@ -24,14 +27,16 @@ public record ProductResponse(
                 product.getSlug(),
                 product.getDescription(),
                 product.getBasePrice(),
+                product.getBasePrice(),
                 product.getCompareAtPrice(),
+                null,
                 product.getStockQty(),
                 product.isVisible(),
                 product.isFeatured()
         );
     }
 
-    public static ProductResponse fromPublic(Product product) {
+    public static ProductResponse fromPublic(Product product, OfferPricing pricing) {
         return new ProductResponse(
                 product.getId(),
                 product.getCategoryId(),
@@ -39,7 +44,9 @@ public record ProductResponse(
                 product.getSlug(),
                 product.getDescription(),
                 product.getBasePrice(),
-                product.getCompareAtPrice(),
+                pricing.effectivePrice(),
+                pricing.compareAtPrice(),
+                pricing.offerName(),
                 product.getStockQty(),
                 true,
                 product.isFeatured()

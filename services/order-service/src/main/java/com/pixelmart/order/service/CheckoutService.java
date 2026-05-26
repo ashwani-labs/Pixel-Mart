@@ -79,7 +79,9 @@ public class CheckoutService {
         Address address = addressRepository.findByIdAndUserId(request.addressId(), userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Address", request.addressId()));
 
-        Map<String, CatalogProductSnapshot> products = loadProducts(cartItems);
+        String couponCode = normalizeCoupon(request.couponCode());
+        Map<String, CatalogProductSnapshot> products = loadProducts(cartItems, couponCode);
+        validateCoupon(couponCode, products);
         List<ReserveStockLine> stockLines = cartItems.stream()
                 .map(item -> new ReserveStockLine(item.getProductId(), item.getQuantity()))
                 .toList();
@@ -124,11 +126,11 @@ public class CheckoutService {
         return toResponse(order);
     }
 
-    private Map<String, CatalogProductSnapshot> loadProducts(List<CartItem> cartItems) {
+    private Map<String, CatalogProductSnapshot> loadProducts(List<CartItem> cartItems, String couponCode) {
         Map<String, CatalogProductSnapshot> products = new LinkedHashMap<>();
         for (CartItem item : cartItems) {
             products.computeIfAbsent(item.getProductId(), productId -> {
-                CatalogProductSnapshot product = catalogClient.getProductForCart(productId);
+                CatalogProductSnapshot product = catalogClient.getProductForCart(productId, couponCode);
                 if (!product.visible()) {
                     throw new BadRequestException("Product is no longer available: " + product.name());
                 }
@@ -143,7 +145,7 @@ public class CheckoutService {
 
     private BigDecimal subtotal(List<CartItem> cartItems, Map<String, CatalogProductSnapshot> products) {
         return cartItems.stream()
-                .map(item -> products.get(item.getProductId()).basePrice()
+                .map(item -> products.get(item.getProductId()).effectivePrice()
                         .multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
@@ -193,11 +195,28 @@ public class CheckoutService {
             orderItem.setProductId(product.id());
             orderItem.setProductName(product.name());
             orderItem.setProductSlug(product.slug());
-            orderItem.setUnitPrice(product.basePrice());
+            orderItem.setUnitPrice(product.effectivePrice());
             orderItem.setQuantity(item.getQuantity());
-            orderItem.setLineTotal(product.basePrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+            orderItem.setLineTotal(product.effectivePrice().multiply(BigDecimal.valueOf(item.getQuantity())));
             return orderItem;
         }).toList();
+    }
+
+    private void validateCoupon(String couponCode, Map<String, CatalogProductSnapshot> products) {
+        if (couponCode == null) {
+            return;
+        }
+        boolean matchedCart = products.values().stream().anyMatch(CatalogProductSnapshot::couponMatched);
+        if (!matchedCart) {
+            throw new BadRequestException("Coupon is not valid for this cart");
+        }
+    }
+
+    private String normalizeCoupon(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.trim().toUpperCase();
     }
 
     private Payment buildPayment(Order order, PaymentMethod method, BigDecimal amount) {

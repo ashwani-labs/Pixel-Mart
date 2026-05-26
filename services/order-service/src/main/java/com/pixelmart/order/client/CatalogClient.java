@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
@@ -24,7 +25,14 @@ public class CatalogClient {
     }
 
     public CatalogProductSnapshot getProductForCart(String productId) {
-        String url = properties.getBaseUrl() + "/api/catalog/internal/products/" + productId;
+        return getProductForCart(productId, null);
+    }
+
+    public CatalogProductSnapshot getProductForCart(String productId, String couponCode) {
+        String url = UriComponentsBuilder
+                .fromUriString(properties.getBaseUrl() + "/api/catalog/internal/products/" + productId)
+                .queryParamIfPresent("couponCode", java.util.Optional.ofNullable(couponCode))
+                .toUriString();
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-Internal-Service", properties.getInternalServiceName());
         try {

@@ -23,7 +23,8 @@ public final class CheckoutDtos {
 
     public record CheckoutRequest(
             @NotBlank String addressId,
-            @NotNull PaymentMethod paymentMethod
+            @NotNull PaymentMethod paymentMethod,
+            String couponCode
     ) {
     }
 

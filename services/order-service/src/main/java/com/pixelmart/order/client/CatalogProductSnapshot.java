@@ -7,7 +7,9 @@ public record CatalogProductSnapshot(
         String name,
         String slug,
         BigDecimal basePrice,
+        BigDecimal effectivePrice,
         int stockQty,
-        boolean visible
+        boolean visible,
+        boolean couponMatched
 ) {
 }

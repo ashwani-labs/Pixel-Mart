@@ -34,34 +34,38 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final ProductImageService productImageService;
     private final AuditLogService auditLogService;
+    private final OfferService offerService;
 
     public ProductService(
             ProductRepository productRepository,
             CategoryRepository categoryRepository,
             @Lazy ProductImageService productImageService,
-            AuditLogService auditLogService
+            AuditLogService auditLogService,
+            @Lazy OfferService offerService
     ) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.productImageService = productImageService;
         this.auditLogService = auditLogService;
+        this.offerService = offerService;
     }
 
     @Transactional(readOnly = true)
     public Page<ProductResponse> listPublic(String categoryId, String search, Pageable pageable) {
         return productRepository.findPublicProducts(normalize(categoryId), normalize(search), pageable)
-                .map(ProductResponse::fromPublic);
+                .map(product -> ProductResponse.fromPublic(product, offerService.price(product)));
     }
 
     @Transactional(readOnly = true)
     public Page<ProductResponse> listFeatured(Pageable pageable) {
         return productRepository.findByVisibleTrueAndFeaturedTrue(pageable)
-                .map(ProductResponse::fromPublic);
+                .map(product -> ProductResponse.fromPublic(product, offerService.price(product)));
     }
 
     @Transactional(readOnly = true)
-    public InternalProductResponse getInternalById(String id) {
-        return InternalProductResponse.from(findProduct(id));
+    public InternalProductResponse getInternalById(String id, String couponCode) {
+        Product product = findProduct(id);
+        return InternalProductResponse.from(product, offerService.price(product, couponCode));
     }
 
     @Transactional
@@ -101,6 +105,7 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product", slug));
         return ProductDetailResponse.fromPublic(
                 product,
+                offerService.price(product),
                 productImageService.listForProductPublic(product.getId())
         );
     }
