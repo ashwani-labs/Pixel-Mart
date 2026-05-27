@@ -25,6 +25,12 @@ pixelmart:
   catalog:
     base-url: ${CATALOG_SERVICE_URL:http://localhost:8082}
     internal-service-name: order-service
+  auth:
+    base-url: ${AUTH_SERVICE_URL:http://localhost:8081}
+    internal-service-name: order-service
+  notification:
+    base-url: ${NOTIFICATION_SERVICE_URL:http://localhost:8084}
+    internal-service-name: order-service
   pincode:
     api-base-url: ${PINCODE_API_BASE_URL:https://api.postalpincode.in}
     cache-ttl-hours: ${PINCODE_CACHE_TTL_HOURS:24}

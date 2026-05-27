@@ -74,6 +74,8 @@ services:
       MYSQL_USER: ${MYSQL_USER:-pixelmart}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pixelmart}
       CATALOG_SERVICE_URL: http://catalog-service:8082
+      AUTH_SERVICE_URL: http://auth-service:8081
+      NOTIFICATION_SERVICE_URL: http://notification-service:8084
     ports:
       - "8083:8083"
 
@@ -90,6 +92,11 @@ services:
       MYSQL_PORT: 3306
       MYSQL_USER: ${MYSQL_USER:-pixelmart}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pixelmart}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      MAIL_FROM: ${MAIL_FROM:-no-reply@pixelmart.local}
     ports:
       - "8084:8084"
 
