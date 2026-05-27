@@ -8,7 +8,9 @@ import { AdminProductsPage } from '../pages/AdminProductsPage';
 import { AdminSettingsPage } from '../pages/AdminSettingsPage';
 import { HomePage } from '../pages/HomePage';
 import { LoginPage } from '../pages/LoginPage';
+import { AdminOrdersPage } from '../pages/AdminOrdersPage';
 import { OrderDetailPage } from '../pages/OrderDetailPage';
+import { OrdersListPage } from '../pages/OrdersListPage';
 import { ProductDetailPage } from '../pages/ProductDetailPage';
 import { ProductListPage } from '../pages/ProductListPage';
 import { ProfilePage } from '../pages/ProfilePage';
@@ -46,6 +48,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: 'orders',
+        element: (
+          <RequireAuth>
+            <OrdersListPage />
+          </RequireAuth>
+        ),
+      },
+      {
         path: 'orders/:id',
         element: (
           <RequireAuth>
@@ -59,6 +69,16 @@ export const router = createBrowserRouter([
           <RequireAuth>
             <RequireRole role="ADMIN">
               <AdminPage />
+            </RequireRole>
+          </RequireAuth>
+        ),
+      },
+      {
+        path: 'admin/orders',
+        element: (
+          <RequireAuth>
+            <RequireRole role="ADMIN">
+              <AdminOrdersPage />
             </RequireRole>
           </RequireAuth>
         ),
