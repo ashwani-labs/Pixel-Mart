@@ -1,5 +1,6 @@
 package com.pixelmart.auth.config;
 
+import com.pixelmart.auth.security.InternalServiceAuthFilter;
 import com.pixelmart.auth.security.JwtAuthenticationFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pixelmart.auth.exception.ApiError;
@@ -27,8 +28,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter, ObjectMapper objectMapper)
-            throws Exception {
+    SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            InternalServiceAuthFilter internalServiceAuthFilter,
+            JwtAuthenticationFilter jwtFilter,
+            ObjectMapper objectMapper
+    ) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -39,6 +44,7 @@ public class SecurityConfig {
                                 "/api/auth/logout",
                                 "/api/auth/health"
                         ).permitAll()
+                        .requestMatchers("/api/auth/internal/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> {
@@ -51,6 +57,7 @@ public class SecurityConfig {
                             request.getRequestURI());
                     objectMapper.writeValue(response.getOutputStream(), body);
                 }))
+                .addFilterBefore(internalServiceAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
