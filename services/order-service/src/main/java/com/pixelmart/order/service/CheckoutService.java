@@ -1,9 +1,14 @@
 package com.pixelmart.order.service;
 
+import com.pixelmart.order.client.AuthClient;
+import com.pixelmart.order.client.AuthUserSnapshot;
 import com.pixelmart.order.client.CatalogClient;
 import com.pixelmart.order.client.CatalogClient.ReserveStockLine;
 import com.pixelmart.order.client.CatalogProductSnapshot;
 import com.pixelmart.order.client.CatalogStoreSettings;
+import com.pixelmart.order.client.NotificationClient;
+import com.pixelmart.order.client.NotificationClient.OrderConfirmationPayload;
+import com.pixelmart.order.client.NotificationClient.OrderLinePayload;
 import com.pixelmart.order.domain.Address;
 import com.pixelmart.order.domain.Cart;
 import com.pixelmart.order.domain.CartItem;
@@ -48,6 +53,8 @@ public class CheckoutService {
     private final OrderItemRepository orderItemRepository;
     private final PaymentRepository paymentRepository;
     private final CatalogClient catalogClient;
+    private final AuthClient authClient;
+    private final NotificationClient notificationClient;
 
     public CheckoutService(
             CartRepository cartRepository,
@@ -56,7 +63,9 @@ public class CheckoutService {
             OrderRepository orderRepository,
             OrderItemRepository orderItemRepository,
             PaymentRepository paymentRepository,
-            CatalogClient catalogClient
+            CatalogClient catalogClient,
+            AuthClient authClient,
+            NotificationClient notificationClient
     ) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
@@ -65,6 +74,8 @@ public class CheckoutService {
         this.orderItemRepository = orderItemRepository;
         this.paymentRepository = paymentRepository;
         this.catalogClient = catalogClient;
+        this.authClient = authClient;
+        this.notificationClient = notificationClient;
     }
 
     @Transactional
@@ -107,7 +118,26 @@ public class CheckoutService {
         Payment payment = paymentRepository.save(buildPayment(order, request.paymentMethod(), grandTotal));
         cartItemRepository.deleteByCartId(cart.getId());
 
+        queueOrderConfirmation(order, orderItems, settings);
+
         return OrderResponse.from(order, orderItems, payment);
+    }
+
+    private void queueOrderConfirmation(Order order, List<OrderItem> orderItems, CatalogStoreSettings settings) {
+        AuthUserSnapshot user = authClient.getUser(order.getUserId());
+        List<OrderLinePayload> lines = orderItems.stream()
+                .map(item -> new OrderLinePayload(item.getProductName(), item.getQuantity(), item.getLineTotal()))
+                .toList();
+        notificationClient.sendOrderConfirmation(new OrderConfirmationPayload(
+                order.getId(),
+                order.getOrderNumber(),
+                user.email(),
+                user.name(),
+                order.getStatus(),
+                order.getGrandTotal(),
+                settings.effectiveCurrencyCode(),
+                lines
+        ));
     }
 
     @Transactional(readOnly = true)

@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 public final class CheckoutDtos {
@@ -64,10 +65,16 @@ public final class CheckoutDtos {
         }
     }
 
+    public record UpdateOrderStatusRequest(
+            @NotBlank String status
+    ) {
+    }
+
     public record OrderResponse(
             String id,
             String orderNumber,
             String status,
+            Instant createdAt,
             BigDecimal subtotal,
             BigDecimal taxTotal,
             BigDecimal grandTotal,
@@ -90,6 +97,7 @@ public final class CheckoutDtos {
                     order.getId(),
                     order.getOrderNumber(),
                     order.getStatus(),
+                    order.getCreatedAt(),
                     order.getSubtotal(),
                     order.getTaxTotal(),
                     order.getGrandTotal(),
