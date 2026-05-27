@@ -380,8 +380,10 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 #### Definition of Done (D10) — **Week 2 complete**
 
-- [ ] Order confirmation recorded in `email_outbox`
-- [ ] Customer sees order history
+- [x] Order confirmation recorded in `email_outbox`
+- [x] Customer sees order history
+
+> **D10 status: COMPLETE** (verified: notification/auth/order Maven build, frontend production build).
 
 ---
 
@@ -525,7 +527,7 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 | Week | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9 | D10 | D11 | D12 | D13 | D14 | D15 |
 |------|----|----|----|----|----|----|----|----|----|-----|-----|-----|-----|-----|-----|
-| Status | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| Status | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 
 Replace ⬜ with ✅ as each day completes.
 

@@ -9,7 +9,7 @@ PixelMart is being built from the day-by-day plan in `docs/DAILY_TARGETS.md`.
 | Week | Focus | Progress |
 |------|-------|----------|
 | 1 | Foundation, auth, catalog, branding, product browse | Complete |
-| 2 | Cart, addresses, checkout, seasonal offers, order history | Day 9 complete, Day 10 next |
+| 2 | Cart, addresses, checkout, seasonal offers, order history | Day 10 complete — Week 3 next |
 | 3 | Wishlist, reviews, admin dashboards, audit UI, tests, CI, polish | Not started |
 
 Completed user paths include registration/login, refresh/logout, public catalog browse, product images, admin store settings, cart, address CRUD with pincode lookup, mock checkout, order detail, and seasonal offer pricing. The next planned work is Day 10: notification outbox plus order history/admin order screens.
