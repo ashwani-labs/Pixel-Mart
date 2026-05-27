@@ -52,6 +52,7 @@ export interface Order {
   id: string;
   orderNumber: string;
   status: string;
+  createdAt: string;
   subtotal: number;
   taxTotal: number;
   grandTotal: number;

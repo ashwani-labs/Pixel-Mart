@@ -103,6 +103,18 @@ export const orderApi = baseApi.injectEndpoints({
       query: (id) => `/orders/${id}`,
       providesTags: (_r, _e, id) => [{ type: 'Order', id }],
     }),
+    getAdminOrders: build.query<Order[], void>({
+      query: () => '/admin/orders',
+      providesTags: ['Order'],
+    }),
+    updateAdminOrderStatus: build.mutation<Order, { id: string; status: string }>({
+      query: ({ id, status }) => ({
+        url: `/admin/orders/${id}/status`,
+        method: 'PATCH',
+        body: { status },
+      }),
+      invalidatesTags: ['Order'],
+    }),
   }),
 });
 
@@ -121,4 +133,6 @@ export const {
   useCheckoutMutation,
   useGetOrdersQuery,
   useGetOrderQuery,
+  useGetAdminOrdersQuery,
+  useUpdateAdminOrderStatusMutation,
 } = orderApi;
