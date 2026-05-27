@@ -223,7 +223,7 @@ All browser-facing requests should go through the gateway on `:8080`.
 | `JWT_REFRESH_EXPIRATION_MS` | Refresh token lifetime |
 | `STORAGE_TYPE` | Storage adapter selector, currently local |
 | `STORAGE_LOCAL_PATH` | Local upload path for catalog media |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` | Optional notification-service SMTP settings |
+| `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM` | Notification-service Gmail/SMTP settings (set in `.env`) |
 
 ## Troubleshooting
 
