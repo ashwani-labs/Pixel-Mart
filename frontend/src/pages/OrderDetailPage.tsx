@@ -32,8 +32,8 @@ export function OrderDetailPage() {
   return (
     <div className={styles.page}>
       {checkedOut && <div className={styles.success}>Order placed successfully.</div>}
-      <Link to="/products" className={styles.back}>
-        Continue shopping
+      <Link to="/orders" className={styles.back}>
+        ← My orders
       </Link>
       <section className={styles.card}>
         <h1>Order {order.orderNumber}</h1>
