@@ -55,6 +55,9 @@ export function AppLayout() {
           )}
           {isAuthenticated ? (
             <>
+              <NavLink to="/wishlist" className={({ isActive }) => (isActive ? styles.active : undefined)}>
+                Wishlist
+              </NavLink>
               <NavLink to="/orders" className={({ isActive }) => (isActive ? styles.active : undefined)}>
                 Orders
               </NavLink>

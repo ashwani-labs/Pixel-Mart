@@ -16,6 +16,7 @@ import { ProductListPage } from '../pages/ProductListPage';
 import { ProfilePage } from '../pages/ProfilePage';
 import { ProfileAddressesPage } from '../pages/ProfileAddressesPage';
 import { RegisterPage } from '../pages/RegisterPage';
+import { WishlistPage } from '../pages/WishlistPage';
 import { CartPage } from '../pages/CartPage';
 import { CheckoutPage } from '../pages/CheckoutPage';
 
@@ -31,6 +32,14 @@ export const router = createBrowserRouter([
       { path: 'register', element: <RegisterPage /> },
       { path: 'profile', element: <ProfilePage /> },
       { path: 'profile/addresses', element: <ProfileAddressesPage /> },
+      {
+        path: 'wishlist',
+        element: (
+          <RequireAuth>
+            <WishlistPage />
+          </RequireAuth>
+        ),
+      },
       {
         path: 'cart',
         element: (

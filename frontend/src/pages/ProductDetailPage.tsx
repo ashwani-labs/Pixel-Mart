@@ -2,7 +2,12 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { ProductImageGallery } from '../components/product/ProductImageGallery';
-import { useGetProductBySlugQuery } from '../store/api/catalogApi';
+import {
+  useAddWishlistItemMutation,
+  useGetProductBySlugQuery,
+  useGetWishlistQuery,
+  useRemoveWishlistItemMutation,
+} from '../store/api/catalogApi';
 import { useAddCartItemMutation } from '../store/api/orderApi';
 import type { RootState } from '../store';
 import { selectIsAuthenticated } from '../store/slices/authSlice';
@@ -20,6 +25,9 @@ export function ProductDetailPage() {
     skip: !slug,
   });
   const [addToCart, { isLoading: adding }] = useAddCartItemMutation();
+  const { data: wishlist = [] } = useGetWishlistQuery(undefined, { skip: !isAuthenticated });
+  const [addWishlistItem] = useAddWishlistItemMutation();
+  const [removeWishlistItem] = useRemoveWishlistItemMutation();
   const [cartMessage, setCartMessage] = useState<string | null>(null);
 
   if (isLoading) {
@@ -38,6 +46,20 @@ export function ProductDetailPage() {
       </div>
     );
   }
+
+  const isWishlisted = wishlist.some((item) => item.id === product.id);
+
+  const handleWishlistToggle = async () => {
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: `/products/${slug}` } });
+      return;
+    }
+    if (isWishlisted) {
+      await removeWishlistItem(product.id);
+      return;
+    }
+    await addWishlistItem(product.id);
+  };
 
   return (
     <div className={styles.page}>
@@ -77,6 +99,9 @@ export function ProductDetailPage() {
             }}
           >
             {adding ? 'Adding…' : 'Add to cart'}
+          </button>
+          <button type="button" className={styles.wishlistSecondaryBtn} onClick={handleWishlistToggle}>
+            {isWishlisted ? '♥ Remove from wishlist' : '♡ Add to wishlist'}
           </button>
           {cartMessage && <p className={styles.cartMsg}>{cartMessage}</p>}
           {isAuthenticated && (

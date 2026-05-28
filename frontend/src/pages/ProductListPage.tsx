@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { useGetCategoriesQuery, useGetProductsQuery } from '../store/api/catalogApi';
+import { useSelector } from 'react-redux';
+import {
+  useAddWishlistItemMutation,
+  useGetCategoriesQuery,
+  useGetProductsQuery,
+  useGetWishlistQuery,
+  useRemoveWishlistItemMutation,
+} from '../store/api/catalogApi';
+import type { RootState } from '../store';
+import { selectIsAuthenticated } from '../store/slices/authSlice';
 import styles from './ProductsPage.module.css';
 
 function formatPrice(value: number) {
@@ -8,6 +17,7 @@ function formatPrice(value: number) {
 }
 
 export function ProductListPage() {
+  const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryId = searchParams.get('categoryId') ?? undefined;
   const search = searchParams.get('search') ?? '';
@@ -15,12 +25,16 @@ export function ProductListPage() {
   const [searchInput, setSearchInput] = useState(search);
 
   const { data: categories } = useGetCategoriesQuery();
+  const { data: wishlist = [] } = useGetWishlistQuery(undefined, { skip: !isAuthenticated });
+  const [addWishlistItem] = useAddWishlistItemMutation();
+  const [removeWishlistItem] = useRemoveWishlistItemMutation();
   const { data, isLoading, isFetching } = useGetProductsQuery({
     page,
     size: 12,
     categoryId,
     search: search || undefined,
   });
+  const wishlistIds = new Set(wishlist.map((item) => item.id));
 
   const applySearch = () => {
     const next = new URLSearchParams(searchParams);
@@ -103,12 +117,34 @@ export function ProductListPage() {
         <>
           <div className={styles.grid}>
             {data.content.map((product) => (
-              <Link key={product.id} to={`/products/${product.slug}`} className={styles.card}>
-                <div className={styles.cardImage}>◆</div>
+              <div key={product.id} className={styles.card}>
+                <Link to={`/products/${product.slug}`} className={styles.cardImage}>
+                  ◆
+                </Link>
                 <div className={styles.cardBody}>
-                  {product.featured && <span className={styles.badge}>Featured</span>}
-                  {product.offerName && <span className={styles.offerBadge}>{product.offerName}</span>}
-                  <h2 className={styles.cardName}>{product.name}</h2>
+                  <div className={styles.cardTopRow}>
+                    <div className={styles.badges}>
+                      {product.featured && <span className={styles.badge}>Featured</span>}
+                      {product.offerName && <span className={styles.offerBadge}>{product.offerName}</span>}
+                    </div>
+                    {isAuthenticated && (
+                      <button
+                        type="button"
+                        className={styles.wishlistBtn}
+                        aria-label={wishlistIds.has(product.id) ? 'Remove from wishlist' : 'Add to wishlist'}
+                        onClick={() =>
+                          wishlistIds.has(product.id)
+                            ? removeWishlistItem(product.id)
+                            : addWishlistItem(product.id)
+                        }
+                      >
+                        {wishlistIds.has(product.id) ? '♥' : '♡'}
+                      </button>
+                    )}
+                  </div>
+                  <Link to={`/products/${product.slug}`} className={styles.productNameLink}>
+                    <h2 className={styles.cardName}>{product.name}</h2>
+                  </Link>
                   <div className={styles.priceRow}>
                     <span className={styles.price}>{formatPrice(product.effectivePrice)}</span>
                     {product.compareAtPrice && (
@@ -116,7 +152,7 @@ export function ProductListPage() {
                     )}
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
           <div className={styles.pagination}>

@@ -49,6 +49,26 @@ export const catalogApi = baseApi.injectEndpoints({
       query: () => '/catalog/offers/active',
       providesTags: ['Offer'],
     }),
+    getWishlist: build.query<Product[], void>({
+      query: () => '/catalog/wishlist',
+      providesTags: ['Wishlist'],
+    }),
+    addWishlistItem: build.mutation<void, string>({
+      query: (productId) => ({
+        url: '/catalog/wishlist',
+        method: 'POST',
+        body: { productId },
+      }),
+      invalidatesTags: ['Wishlist'],
+    }),
+    removeWishlistItem: build.mutation<void, string>({
+      query: (productId) => ({
+        url: '/catalog/wishlist',
+        method: 'DELETE',
+        body: { productId },
+      }),
+      invalidatesTags: ['Wishlist'],
+    }),
     getAdminOffers: build.query<PageResponse<Offer>, void>({
       query: () => '/admin/offers',
       providesTags: (result) =>
@@ -103,6 +123,9 @@ export const {
   useGetProductsQuery,
   useGetProductBySlugQuery,
   useGetActiveOffersQuery,
+  useGetWishlistQuery,
+  useAddWishlistItemMutation,
+  useRemoveWishlistItemMutation,
   useGetAdminOffersQuery,
   useCreateOfferMutation,
   useUpdateOfferMutation,
