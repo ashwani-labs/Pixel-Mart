@@ -63,6 +63,20 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    public List<ProductResponse> listPublicByIds(List<String> idsInOrder) {
+        if (idsInOrder == null || idsInOrder.isEmpty()) {
+            return List.of();
+        }
+        Map<String, Product> productsById = productRepository.findByIdInAndVisibleTrue(idsInOrder).stream()
+                .collect(Collectors.toMap(Product::getId, Function.identity()));
+        return idsInOrder.stream()
+                .map(productsById::get)
+                .filter(product -> product != null)
+                .map(product -> ProductResponse.fromPublic(product, offerService.price(product)))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public InternalProductResponse getInternalById(String id, String couponCode) {
         Product product = findProduct(id);
         return InternalProductResponse.from(product, offerService.price(product, couponCode));

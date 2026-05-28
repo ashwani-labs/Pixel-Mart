@@ -50,4 +50,6 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     List<Product> findAllByIdForUpdate(@Param("ids") Collection<String> ids);
 
     Page<Product> findByVisibleTrueAndFeaturedTrue(Pageable pageable);
+
+    List<Product> findByIdInAndVisibleTrue(Collection<String> ids);
 }
