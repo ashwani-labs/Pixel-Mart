@@ -1,6 +1,6 @@
 # PixelMart
 
-PixelMart is a portfolio-grade e-commerce platform built as a Spring Boot microservices monorepo with a React storefront and MySQL persistence. The project is intentionally small enough to run locally with Docker Compose, while still modeling production concerns such as an API gateway, service-owned schemas, Flyway migrations, JWT authentication, refresh token rotation, role-based admin APIs, local media storage, checkout price snapshots, offer-driven pricing, reviews, wishlist, audit logging, and CI.
+PixelMart is a portfolio-grade e-commerce platform built as a Spring Boot microservices monorepo with a React storefront and MySQL persistence. v1 is complete; see [docs/NEXT_TARGETS.md](docs/NEXT_TARGETS.md) for the v1.1 backlog.
 
 ## One-command local start
 
@@ -26,14 +26,6 @@ Open `http://localhost:5173`. The SPA proxies `/api` to the gateway at `http://l
 | 3 | Wishlist, reviews, admin console, audit log, CI, polish | Complete |
 
 Demo seed data (Flyway `V8__demo_seed.sql`) includes **15 visible products**, **2 active offers**, and **sample reviews** (approved on the storefront plus one pending item for admin moderation).
-
-## Screenshots
-
-| Storefront home | Admin dashboard |
-|-----------------|-----------------|
-| ![Storefront home](docs/images/storefront-home.svg) | ![Admin dashboard](docs/images/admin-dashboard.svg) |
-
-Replace the SVG mockups with PNG captures from your local run when preparing a portfolio submission.
 
 ## 3-minute demo script
 
@@ -75,8 +67,6 @@ flowchart LR
 | `order-service` | `8083` | `orders` | Carts, addresses, pincode cache, checkout, orders, payments |
 | `notification-service` | `8084` | `notify` | Email outbox / order confirmation |
 | `frontend` | `5173` | N/A | React storefront and admin console |
-
-See [docs/architecture.md](docs/architecture.md) for more detail.
 
 ## Tech stack
 
@@ -190,9 +180,7 @@ docker compose up --build
 
 ## Documentation
 
-- [Master specification](docs/PIXELMART_MASTER_SPEC.md)
-- [Daily targets](docs/DAILY_TARGETS.md)
-- [Architecture](docs/architecture.md)
+- [Next targets (v1.1 backlog)](docs/NEXT_TARGETS.md)
 
 ## License
 
