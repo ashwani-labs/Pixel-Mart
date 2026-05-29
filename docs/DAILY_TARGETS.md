@@ -449,7 +449,9 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 #### Definition of Done (D12)
 
-- [ ] Pending review hidden on storefront until approved
+- [x] Pending review hidden on storefront until approved
+
+> **D12 status: COMPLETE** (verified: catalog/order/auth Maven build, frontend production build).
 
 ---
 
@@ -529,7 +531,7 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 | Week | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9 | D10 | D11 | D12 | D13 | D14 | D15 |
 |------|----|----|----|----|----|----|----|----|----|-----|-----|-----|-----|-----|-----|
-| Status | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⬜ | ⬜ | ⬜ | ⬜ |
+| Status | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⬜ | ⬜ | ⬜ |
 
 Replace ⬜ with ✅ as each day completes.
 
