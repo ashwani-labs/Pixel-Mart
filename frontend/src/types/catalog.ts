@@ -82,3 +82,25 @@ export interface PageResponse<T> {
   totalPages: number;
   last: boolean;
 }
+
+export type ReviewStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+export interface Review {
+  id: string;
+  productId: string;
+  productName: string | null;
+  reviewerName: string;
+  rating: number;
+  title: string | null;
+  body: string;
+  status: ReviewStatus;
+  verifiedPurchase: boolean;
+  createdAt: string;
+}
+
+export interface SubmitReviewRequest {
+  productId: string;
+  rating: number;
+  title?: string;
+  body: string;
+}

@@ -22,6 +22,9 @@ export function AdminPage() {
         <Link to="/admin/products">Manage products &amp; images</Link>
       </p>
       <p>
+        <Link to="/admin/reviews">Moderate reviews</Link>
+      </p>
+      <p>
         <Link to="/admin/offers">Manage offers</Link>
       </p>
       <p>

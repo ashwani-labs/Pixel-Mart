@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { ProductImageGallery } from '../components/product/ProductImageGallery';
+import { ProductReviews } from '../components/product/ProductReviews';
 import {
   useAddWishlistItemMutation,
   useGetProductBySlugQuery,
@@ -111,6 +112,7 @@ export function ProductDetailPage() {
           )}
         </div>
       </div>
+      <ProductReviews productId={product.id} />
     </div>
   );
 }

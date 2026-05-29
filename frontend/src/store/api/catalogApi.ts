@@ -4,6 +4,8 @@ import type {
   PageResponse,
   Product,
   ProductDetail,
+  Review,
+  SubmitReviewRequest,
   UpsertOfferRequest,
 } from '../../types/catalog';
 import { baseApi } from './baseApi';
@@ -69,6 +71,55 @@ export const catalogApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['Wishlist'],
     }),
+    getProductReviews: build.query<Review[], string>({
+      query: (productId) => `/catalog/products/${productId}/reviews`,
+      providesTags: (_r, _e, productId) => [{ type: 'Review', id: productId }],
+    }),
+    getMyReview: build.query<Review | null, string>({
+      query: (productId) => `/catalog/reviews/me?productId=${productId}`,
+      providesTags: (_r, _e, productId) => [{ type: 'Review', id: `mine-${productId}` }],
+    }),
+    submitReview: build.mutation<Review, SubmitReviewRequest>({
+      query: (body) => ({
+        url: '/catalog/reviews',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: (_r, _e, { productId }) => [
+        { type: 'Review', id: productId },
+        { type: 'Review', id: `mine-${productId}` },
+        { type: 'Review', id: 'LIST' },
+      ],
+    }),
+    getAdminReviews: build.query<PageResponse<Review>, { status?: string } | void>({
+      query: (params) => ({
+        url: '/admin/reviews',
+        params: params?.status ? { status: params.status } : undefined,
+      }),
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.content.map((review) => ({ type: 'Review' as const, id: review.id })),
+              { type: 'Review', id: 'LIST' },
+            ]
+          : [{ type: 'Review', id: 'LIST' }],
+    }),
+    moderateReview: build.mutation<Review, { id: string; status: 'APPROVED' | 'REJECTED' }>({
+      query: ({ id, status }) => ({
+        url: `/admin/reviews/${id}/status`,
+        method: 'PATCH',
+        body: { status },
+      }),
+      invalidatesTags: (result) =>
+        result
+          ? [
+              { type: 'Review', id: result.id },
+              { type: 'Review', id: result.productId },
+              { type: 'Review', id: `mine-${result.productId}` },
+              { type: 'Review', id: 'LIST' },
+            ]
+          : [{ type: 'Review', id: 'LIST' }],
+    }),
     getAdminOffers: build.query<PageResponse<Offer>, void>({
       query: () => '/admin/offers',
       providesTags: (result) =>
@@ -126,6 +177,11 @@ export const {
   useGetWishlistQuery,
   useAddWishlistItemMutation,
   useRemoveWishlistItemMutation,
+  useGetProductReviewsQuery,
+  useGetMyReviewQuery,
+  useSubmitReviewMutation,
+  useGetAdminReviewsQuery,
+  useModerateReviewMutation,
   useGetAdminOffersQuery,
   useCreateOfferMutation,
   useUpdateOfferMutation,
