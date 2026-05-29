@@ -23,7 +23,7 @@ spring:
 
 pixelmart:
   internal:
-    allowed-service: order-service
+    allowed-services: order-service,catalog-service
   jwt:
     secret: ${JWT_SECRET:pixelmart-dev-secret-key-min-32-chars-long!!}
     access-expiration-ms: ${JWT_ACCESS_EXPIRATION_MS:900000}

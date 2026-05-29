@@ -1,4 +1,4 @@
-package com.pixelmart.auth.security;
+package com.pixelmart.order.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,12 +18,12 @@ public class InternalServiceAuthFilter extends OncePerRequestFilter {
 
     public static final String INTERNAL_SERVICE_HEADER = "X-Internal-Service";
 
-    @Value("${pixelmart.internal.allowed-services:order-service}")
+    @Value("${pixelmart.internal.allowed-services:catalog-service}")
     private String allowedServices;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return !request.getRequestURI().startsWith("/api/auth/internal/");
+        return !request.getRequestURI().startsWith("/api/orders/internal/");
     }
 
     @Override

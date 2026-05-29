@@ -28,6 +28,12 @@ spring:
 pixelmart:
   internal:
     allowed-service: order-service
+  order:
+    base-url: ${ORDER_SERVICE_URL:http://localhost:8083}
+    internal-service-name: catalog-service
+  auth:
+    base-url: ${AUTH_SERVICE_URL:http://localhost:8081}
+    internal-service-name: catalog-service
   storage:
     type: ${STORAGE_TYPE:local}
     local:

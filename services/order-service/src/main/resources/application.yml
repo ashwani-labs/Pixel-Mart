@@ -22,6 +22,8 @@ spring:
     locations: classpath:db/migration
 
 pixelmart:
+  internal:
+    allowed-services: catalog-service
   catalog:
     base-url: ${CATALOG_SERVICE_URL:http://localhost:8082}
     internal-service-name: order-service

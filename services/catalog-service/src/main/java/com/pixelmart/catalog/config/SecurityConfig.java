@@ -29,6 +29,7 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**", "/api/catalog/health").permitAll()
                         .requestMatchers("/api/catalog/internal/**").permitAll()
                         .requestMatchers("/api/catalog/wishlist/**").authenticated()
+                        .requestMatchers("/api/catalog/reviews/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/catalog/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
