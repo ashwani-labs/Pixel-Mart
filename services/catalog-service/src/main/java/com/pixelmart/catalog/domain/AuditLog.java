@@ -54,4 +54,36 @@ public class AuditLog {
         log.newValue = newValue;
         return log;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getActorUserId() {
+        return actorUserId;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public String getEntityType() {
+        return entityType;
+    }
+
+    public String getEntityId() {
+        return entityId;
+    }
+
+    public String getOldValue() {
+        return oldValue;
+    }
+
+    public String getNewValue() {
+        return newValue;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
 }

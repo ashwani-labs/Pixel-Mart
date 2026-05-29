@@ -68,6 +68,13 @@ public class StoreSettingsService {
         settings.setLogoStorageKey(stored.storageKey());
         settings.setLogoUrl(mediaUrlService.brandLogoUrl());
         storeSettingsRepository.save(settings);
+        auditLogService.log(
+                "STORE_LOGO_UPDATED",
+                "store_settings",
+                SETTINGS_ID,
+                null,
+                Map.of("logoStorageKey", stored.storageKey())
+        );
         return AdminStoreSettingsResponse.from(settings, resolveLogoUrl(settings));
     }
 

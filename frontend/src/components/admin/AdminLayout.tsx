@@ -15,6 +15,7 @@ import CategoryIcon from '@mui/icons-material/Category';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import RateReviewIcon from '@mui/icons-material/RateReview';
+import HistoryIcon from '@mui/icons-material/History';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 const drawerWidth = 240;
@@ -26,6 +27,7 @@ const navItems = [
   { to: '/admin/offers', label: 'Offers', icon: <LocalOfferIcon fontSize="small" /> },
   { to: '/admin/orders', label: 'Orders', icon: <ShoppingCartIcon fontSize="small" /> },
   { to: '/admin/reviews', label: 'Reviews', icon: <RateReviewIcon fontSize="small" /> },
+  { to: '/admin/audit-log', label: 'Audit log', icon: <HistoryIcon fontSize="small" /> },
   { to: '/admin/settings', label: 'Settings', icon: <SettingsIcon fontSize="small" /> },
 ];
 

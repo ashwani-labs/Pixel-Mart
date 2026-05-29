@@ -3,6 +3,7 @@ import { RequireAuth } from '../components/auth/RequireAuth';
 import { RequireRole } from '../components/auth/RequireRole';
 import { AdminLayout } from '../components/admin/AdminLayout';
 import { AppLayout } from '../components/layout/AppLayout';
+import { AdminAuditLogPage } from '../pages/AdminAuditLogPage';
 import { AdminCategoriesPage } from '../pages/AdminCategoriesPage';
 import { AdminDashboardPage } from '../pages/AdminDashboardPage';
 import { AdminReviewsPage } from '../pages/AdminReviewsPage';
@@ -91,6 +92,7 @@ export const router = createBrowserRouter([
           { path: 'offers', element: <AdminOffersPage /> },
           { path: 'orders', element: <AdminOrdersPage /> },
           { path: 'reviews', element: <AdminReviewsPage /> },
+          { path: 'audit-log', element: <AdminAuditLogPage /> },
           { path: 'settings', element: <AdminSettingsPage /> },
         ],
       },

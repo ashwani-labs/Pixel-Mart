@@ -140,20 +140,22 @@ public class ProductService {
         validateCategory(request.categoryId());
         String slug = resolveSlug(request.slug(), request.name(), null);
         Product product = mapProduct(new Product(), request, slug);
-        return ProductResponse.from(productRepository.save(product));
+        Product saved = productRepository.save(product);
+        auditLogService.log("PRODUCT_CREATED", "product", saved.getId(), null, productSnapshot(saved));
+        return ProductResponse.from(saved);
     }
 
     @Transactional
     public ProductResponse update(String id, UpdateProductRequest request) {
         validateCategory(request.categoryId());
         Product product = findProduct(id);
-        Map<String, Object> before = priceSnapshot(product);
+        Map<String, Object> before = productSnapshot(product);
         String slug = resolveSlug(request.slug(), request.name(), id);
         mapProduct(product, request, slug);
         Product saved = productRepository.save(product);
-        Map<String, Object> after = priceSnapshot(saved);
+        Map<String, Object> after = productSnapshot(saved);
         if (!before.equals(after)) {
-            auditLogService.log("PRODUCT_PRICE_UPDATED", "product", id, before, after);
+            auditLogService.log("PRODUCT_UPDATED", "product", id, before, after);
         }
         return ProductResponse.from(saved);
     }
@@ -178,10 +180,10 @@ public class ProductService {
 
     @Transactional
     public void delete(String id) {
-        if (!productRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Product", id);
-        }
-        productRepository.deleteById(id);
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", id));
+        auditLogService.log("PRODUCT_DELETED", "product", id, productSnapshot(product), null);
+        productRepository.delete(product);
     }
 
     private Product mapProduct(Product product, CreateProductRequest request, String slug) {
@@ -237,6 +239,19 @@ public class ProductService {
 
     private String normalize(String value) {
         return (value == null || value.isBlank()) ? null : value.trim();
+    }
+
+    private Map<String, Object> productSnapshot(Product product) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("name", product.getName());
+        map.put("slug", product.getSlug());
+        map.put("categoryId", product.getCategoryId());
+        map.put("basePrice", product.getBasePrice());
+        map.put("compareAtPrice", product.getCompareAtPrice());
+        map.put("stockQty", product.getStockQty());
+        map.put("visible", product.isVisible());
+        map.put("featured", product.isFeatured());
+        return map;
     }
 
     private Map<String, Object> priceSnapshot(Product product) {

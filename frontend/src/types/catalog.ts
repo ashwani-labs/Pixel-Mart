@@ -118,3 +118,22 @@ export interface CatalogDashboardStats {
   lowStockCount: number;
   lowStockProducts: Product[];
 }
+
+export interface AuditLogEntry {
+  id: string;
+  actorUserId: string | null;
+  action: string;
+  entityType: string;
+  entityId: string;
+  oldValue: string | null;
+  newValue: string | null;
+  createdAt: string;
+}
+
+export interface AuditLogParams {
+  page?: number;
+  size?: number;
+  action?: string;
+  from?: string;
+  to?: string;
+}

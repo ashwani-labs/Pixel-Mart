@@ -34,19 +34,22 @@ public class ReviewService {
     private final ProductService productService;
     private final OrderClient orderClient;
     private final AuthClient authClient;
+    private final AuditLogService auditLogService;
 
     public ReviewService(
             ReviewRepository reviewRepository,
             ProductRepository productRepository,
             ProductService productService,
             OrderClient orderClient,
-            AuthClient authClient
+            AuthClient authClient,
+            AuditLogService auditLogService
     ) {
         this.reviewRepository = reviewRepository;
         this.productRepository = productRepository;
         this.productService = productService;
         this.orderClient = orderClient;
         this.authClient = authClient;
+        this.auditLogService = auditLogService;
     }
 
     @Transactional(readOnly = true)
@@ -127,9 +130,18 @@ public class ReviewService {
         if (nextStatus == ReviewStatus.PENDING) {
             throw new BadRequestException("Moderation status must be APPROVED or REJECTED");
         }
+        ReviewStatus previousStatus = review.getStatus();
         review.setStatus(nextStatus);
         Product product = productRepository.findById(review.getProductId()).orElse(null);
-        return ReviewResponse.fromAdmin(reviewRepository.save(review), product);
+        Review saved = reviewRepository.save(review);
+        auditLogService.log(
+                "REVIEW_MODERATED",
+                "review",
+                id,
+                Map.of("status", previousStatus.name()),
+                Map.of("status", saved.getStatus().name())
+        );
+        return ReviewResponse.fromAdmin(saved, product);
     }
 
     private ReviewStatus parseModerationStatus(String status) {

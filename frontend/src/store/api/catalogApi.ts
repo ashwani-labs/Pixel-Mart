@@ -1,4 +1,6 @@
 import type {
+  AuditLogEntry,
+  AuditLogParams,
   Category,
   CatalogDashboardStats,
   Offer,
@@ -234,6 +236,13 @@ export const catalogApi = baseApi.injectEndpoints({
         'Cart',
       ],
     }),
+    getAdminAuditLog: build.query<PageResponse<AuditLogEntry>, AuditLogParams | void>({
+      query: ({ page = 0, size = 20, action, from, to } = {}) => ({
+        url: '/admin/audit-log',
+        params: { page, size, action, from, to },
+      }),
+      providesTags: [{ type: 'AuditLog', id: 'LIST' }],
+    }),
   }),
 });
 
@@ -261,4 +270,5 @@ export const {
   useCreateOfferMutation,
   useUpdateOfferMutation,
   useDeleteOfferMutation,
+  useGetAdminAuditLogQuery,
 } = catalogApi;

@@ -10,15 +10,19 @@ import com.pixelmart.catalog.util.SlugUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final AuditLogService auditLogService;
 
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, AuditLogService auditLogService) {
         this.categoryRepository = categoryRepository;
+        this.auditLogService = auditLogService;
     }
 
     @Transactional(readOnly = true)
@@ -49,27 +53,31 @@ public class CategoryService {
         category.setParentId(request.parentId());
         category.setSortOrder(request.sortOrder());
         category.setActive(request.active());
-        return CategoryResponse.from(categoryRepository.save(category));
+        Category saved = categoryRepository.save(category);
+        auditLogService.log("CATEGORY_CREATED", "category", saved.getId(), null, snapshot(saved));
+        return CategoryResponse.from(saved);
     }
 
     @Transactional
     public CategoryResponse update(String id, UpdateCategoryRequest request) {
         Category category = findCategory(id);
+        Map<String, Object> before = snapshot(category);
         String slug = resolveSlug(request.slug(), request.name(), id);
         category.setName(request.name().trim());
         category.setSlug(slug);
         category.setParentId(request.parentId());
         category.setSortOrder(request.sortOrder());
         category.setActive(request.active());
-        return CategoryResponse.from(categoryRepository.save(category));
+        Category saved = categoryRepository.save(category);
+        auditLogService.log("CATEGORY_UPDATED", "category", id, before, snapshot(saved));
+        return CategoryResponse.from(saved);
     }
 
     @Transactional
     public void delete(String id) {
-        if (!categoryRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Category", id);
-        }
-        categoryRepository.deleteById(id);
+        Category category = findCategory(id);
+        auditLogService.log("CATEGORY_DELETED", "category", id, snapshot(category), null);
+        categoryRepository.delete(category);
     }
 
     Category findCategory(String id) {
@@ -93,5 +101,15 @@ public class CategoryService {
         return categoryRepository.findBySlug(slug)
                 .map(c -> excludeId == null || !c.getId().equals(excludeId))
                 .orElse(false);
+    }
+
+    private Map<String, Object> snapshot(Category category) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("name", category.getName());
+        map.put("slug", category.getSlug());
+        map.put("parentId", category.getParentId());
+        map.put("sortOrder", category.getSortOrder());
+        map.put("active", category.isActive());
+        return map;
     }
 }

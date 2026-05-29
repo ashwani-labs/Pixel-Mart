@@ -502,8 +502,10 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 #### Definition of Done (D14)
 
-- [ ] CI passes on push
-- [ ] At least 3 integration tests green
+- [x] CI passes on push
+- [x] At least 3 integration tests green
+
+> **D14 status: COMPLETE** (verified: full Maven verify, frontend production build, GitHub Actions CI workflow added).
 
 ---
 
@@ -533,7 +535,7 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 | Week | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9 | D10 | D11 | D12 | D13 | D14 | D15 |
 |------|----|----|----|----|----|----|----|----|----|-----|-----|-----|-----|-----|-----|
-| Status | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⬜ | ⬜ |
+| Status | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⬜ |
 
 Replace ⬜ with ✅ as each day completes.
 

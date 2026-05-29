@@ -3,12 +3,18 @@ package com.pixelmart.catalog.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pixelmart.catalog.domain.AuditLog;
+import com.pixelmart.catalog.dto.AuditLogResponse;
+import com.pixelmart.catalog.dto.PageResponse;
 import com.pixelmart.catalog.repository.AuditLogRepository;
 import com.pixelmart.catalog.security.GatewayPrincipal;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
 
 @Service
 public class AuditLogService {
@@ -19,6 +25,13 @@ public class AuditLogService {
     public AuditLogService(AuditLogRepository auditLogRepository, ObjectMapper objectMapper) {
         this.auditLogRepository = auditLogRepository;
         this.objectMapper = objectMapper;
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<AuditLogResponse> list(String action, Instant from, Instant to, Pageable pageable) {
+        String normalizedAction = action == null || action.isBlank() ? null : action.trim();
+        Page<AuditLog> page = auditLogRepository.search(normalizedAction, from, to, pageable);
+        return PageResponse.from(page.map(AuditLogResponse::from));
     }
 
     @Transactional
