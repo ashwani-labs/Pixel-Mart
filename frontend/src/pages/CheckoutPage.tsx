@@ -128,9 +128,9 @@ export function CheckoutPage() {
         )}
       </section>
 
-      <section className={styles.section}>
-        <h2>Payment method</h2>
-        <div className={styles.paymentGrid}>
+      <section className={styles.section} aria-labelledby="checkout-payment-heading">
+        <h2 id="checkout-payment-heading">Payment method</h2>
+        <div className={styles.paymentGrid} role="radiogroup" aria-label="Payment method">
           {PAYMENT_METHODS.map((method) => (
             <label
               key={method.id}
@@ -187,7 +187,7 @@ export function CheckoutPage() {
         </div>
       </section>
 
-      {error && <p className={styles.error}>{error}</p>}
+      {error && <p className={styles.error} role="alert">{error}</p>}
       <div className={styles.actions}>
         <Link to="/cart">← Back to cart</Link>
         <button

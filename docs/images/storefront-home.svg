@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">PixelMart storefront home</title>
+  <desc id="desc">Mock screenshot of the PixelMart home page with hero, deals banner, and product grid.</desc>
+  <rect width="1280" height="720" fill="#f8fafc"/>
+  <rect width="1280" height="64" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="40" y="40" font-family="Segoe UI, sans-serif" font-size="22" font-weight="700" fill="#6366f1">Æ PixelMart</text>
+  <text x="220" y="40" font-family="Segoe UI, sans-serif" font-size="14" fill="#475569">Home  Products  Cart  Orders</text>
+  <rect x="40" y="96" width="1200" height="160" rx="16" fill="#eef2ff" stroke="#c7d2fe"/>
+  <text x="72" y="140" font-family="Segoe UI, sans-serif" font-size="14" fill="#6366f1">PRODUCTION-GRADE E-COMMERCE</text>
+  <text x="72" y="182" font-family="Segoe UI, sans-serif" font-size="34" font-weight="700" fill="#0f172a">Welcome to the store</text>
+  <text x="72" y="220" font-family="Segoe UI, sans-serif" font-size="16" fill="#475569">Browse catalog, seasonal offers, and mock checkout.</text>
+  <rect x="72" y="236" width="140" height="40" rx="8" fill="#6366f1"/>
+  <text x="98" y="261" font-family="Segoe UI, sans-serif" font-size="14" font-weight="600" fill="#ffffff">Shop products</text>
+  <rect x="40" y="280" width="1200" height="48" rx="10" fill="#ecfdf5" stroke="#bbf7d0"/>
+  <text x="60" y="310" font-family="Segoe UI, sans-serif" font-size="14" fill="#166534">Deals live now: Electronics launch deal, Fashion coupon</text>
+  <text x="40" y="370" font-family="Segoe UI, sans-serif" font-size="20" font-weight="700" fill="#0f172a">Featured products</text>
+  <g transform="translate(40 390)">
+    <rect width="280" height="260" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
+    <rect x="16" y="16" width="248" height="120" rx="8" fill="#f1f5f9"/>
+    <text x="24" y="168" font-family="Segoe UI, sans-serif" font-size="16" font-weight="600" fill="#0f172a">PixelBuds Pro</text>
+    <text x="24" y="194" font-family="Segoe UI, sans-serif" font-size="14" fill="#16a34a">Electronics launch deal</text>
+    <text x="24" y="228" font-family="Segoe UI, sans-serif" font-size="18" font-weight="700" fill="#6366f1">¹4,499.10</text>
+    <text x="120" y="228" font-family="Segoe UI, sans-serif" font-size="14" fill="#94a3b8" text-decoration="line-through">¹5,999.00</text>
+  </g>
+  <g transform="translate(340 390)">
+    <rect width="280" height="260" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
+    <rect x="16" y="16" width="248" height="120" rx="8" fill="#f1f5f9"/>
+    <text x="24" y="168" font-family="Segoe UI, sans-serif" font-size="16" font-weight="600" fill="#0f172a">Mechanical Keyboard</text>
+    <text x="24" y="228" font-family="Segoe UI, sans-serif" font-size="18" font-weight="700" fill="#6366f1">¹5,849.10</text>
+  </g>
+  <g transform="translate(640 390)">
+    <rect width="280" height="260" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
+    <rect x="16" y="16" width="248" height="120" rx="8" fill="#f1f5f9"/>
+    <text x="24" y="168" font-family="Segoe UI, sans-serif" font-size="16" font-weight="600" fill="#0f172a">Classic Denim Jacket</text>
+    <text x="24" y="228" font-family="Segoe UI, sans-serif" font-size="18" font-weight="700" fill="#6366f1">¹3,399.15</text>
+  </g>
+</svg>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">PixelMart admin dashboard</title>
+  <desc id="desc">Mock screenshot of the PixelMart admin console with sidebar and dashboard cards.</desc>
+  <rect width="1280" height="720" fill="#f8fafc"/>
+  <rect width="240" height="720" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="24" y="40" font-family="Segoe UI, sans-serif" font-size="16" font-weight="700" fill="#0f172a">Admin console</text>
+  <text x="24" y="88" font-family="Segoe UI, sans-serif" font-size="14" fill="#6366f1" font-weight="600">Dashboard</text>
+  <text x="24" y="120" font-family="Segoe UI, sans-serif" font-size="14" fill="#475569">Products</text>
+  <text x="24" y="152" font-family="Segoe UI, sans-serif" font-size="14" fill="#475569">Offers</text>
+  <text x="24" y="184" font-family="Segoe UI, sans-serif" font-size="14" fill="#475569">Orders</text>
+  <text x="24" y="216" font-family="Segoe UI, sans-serif" font-size="14" fill="#475569">Audit log</text>
+  <text x="280" y="56" font-family="Segoe UI, sans-serif" font-size="28" font-weight="700" fill="#0f172a">Dashboard</text>
+  <text x="280" y="84" font-family="Segoe UI, sans-serif" font-size="14" fill="#64748b">Store overview for today and inventory alerts.</text>
+  <rect x="280" y="112" width="460" height="160" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="304" y="148" font-family="Segoe UI, sans-serif" font-size="14" fill="#64748b">Orders today</text>
+  <text x="304" y="210" font-family="Segoe UI, sans-serif" font-size="48" font-weight="700" fill="#0f172a">3</text>
+  <text x="304" y="244" font-family="Segoe UI, sans-serif" font-size="14" fill="#64748b">Revenue: ¹12,450.00</text>
+  <rect x="760" y="112" width="460" height="160" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="784" y="148" font-family="Segoe UI, sans-serif" font-size="14" fill="#64748b">Low stock products</text>
+  <text x="784" y="210" font-family="Segoe UI, sans-serif" font-size="48" font-weight="700" fill="#0f172a">2</text>
+  <rect x="280" y="300" width="940" height="340" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="304" y="336" font-family="Segoe UI, sans-serif" font-size="16" font-weight="700" fill="#0f172a">Recent admin activity</text>
+  <text x="304" y="380" font-family="Segoe UI, sans-serif" font-size="13" fill="#475569">PRODUCT_UPDATED · Mechanical Keyboard · 2 min ago</text>
+  <text x="304" y="412" font-family="Segoe UI, sans-serif" font-size="13" fill="#475569">OFFER_CREATED · Fashion coupon · 18 min ago</text>
+  <text x="304" y="444" font-family="Segoe UI, sans-serif" font-size="13" fill="#475569">REVIEW_MODERATED · rev-006 · 35 min ago</text>
+</svg>

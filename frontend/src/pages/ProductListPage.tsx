@@ -74,7 +74,11 @@ export function ProductListPage() {
           </p>
         </div>
         <div className={styles.filters}>
+          <label className="sr-only" htmlFor="product-search">
+            Search products
+          </label>
           <input
+            id="product-search"
             className={styles.search}
             placeholder="Search products…"
             value={searchInput}
@@ -87,7 +91,7 @@ export function ProductListPage() {
         </div>
       </div>
 
-      <div className={styles.filters}>
+      <div className={styles.filters} role="group" aria-label="Filter by category">
         <button
           type="button"
           className={`${styles.chip} ${!categoryId ? styles.chipActive : ''}`}

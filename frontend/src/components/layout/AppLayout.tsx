@@ -40,7 +40,7 @@ export function AppLayout() {
           )}
           {storeName}
         </Link>
-        <nav className={styles.nav}>
+        <nav className={styles.nav} aria-label="Primary">
           <NavLink to="/" end className={({ isActive }) => (isActive ? styles.active : undefined)}>
             Home
           </NavLink>
@@ -85,7 +85,7 @@ export function AppLayout() {
           {isAuthenticated && (
             <>
               <span className={styles.userGreeting}>Hi, {user?.name?.split(' ')[0]}</span>
-              <button type="button" className={styles.logoutBtn} onClick={handleLogout}>
+              <button type="button" className={styles.logoutBtn} onClick={handleLogout} aria-label="Sign out">
                 Logout
               </button>
             </>
@@ -97,7 +97,7 @@ export function AppLayout() {
         <Outlet />
       </main>
       <footer className={styles.footer}>
-        <p>{storeName} — Week 1</p>
+        <p>{storeName} — Portfolio demo v1</p>
       </footer>
     </div>
   );

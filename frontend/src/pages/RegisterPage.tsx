@@ -56,7 +56,7 @@ export function RegisterPage() {
         <h1 className={styles.title}>Create account</h1>
         <p className={styles.subtitle}>Join PixelMart as a customer</p>
 
-        {serverError && <div className={styles.bannerError}>{serverError}</div>}
+        {serverError && <div className={styles.bannerError} role="alert">{serverError}</div>}
 
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className={styles.field}>

@@ -526,8 +526,10 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 #### Definition of Done (D15) — **Project v1 complete**
 
-- [ ] All P0 + P1 items in [PIXELMART_MASTER_SPEC.md](./PIXELMART_MASTER_SPEC.md) acceptance criteria
-- [ ] 3-minute demo script written in README
+- [x] All P0 + P1 items in [PIXELMART_MASTER_SPEC.md](./PIXELMART_MASTER_SPEC.md) acceptance criteria
+- [x] 3-minute demo script written in README
+
+> **D15 status: COMPLETE** (verified: full Maven verify, frontend production build, demo seed migration, README polish).
 
 ---
 
@@ -535,7 +537,7 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 | Week | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9 | D10 | D11 | D12 | D13 | D14 | D15 |
 |------|----|----|----|----|----|----|----|----|----|-----|-----|-----|-----|-----|-----|
-| Status | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⬜ |
+| Status | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 Replace ⬜ with ✅ as each day completes.
 

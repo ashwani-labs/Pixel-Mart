@@ -20,6 +20,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/**", "/api/internal/health").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/internal/email/**").permitAll()
                         .anyRequest().denyAll())
                 .addFilterBefore(internalFilter, UsernamePasswordAuthenticationFilter.class);

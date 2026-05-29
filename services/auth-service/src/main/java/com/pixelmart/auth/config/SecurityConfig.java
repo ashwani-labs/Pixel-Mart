@@ -44,6 +44,7 @@ public class SecurityConfig {
                                 "/api/auth/logout",
                                 "/api/auth/health"
                         ).permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/auth/internal/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
                         .anyRequest().authenticated())

@@ -1,26 +1,54 @@
 # PixelMart
 
-PixelMart is a portfolio-grade e-commerce platform built as a Spring Boot microservices monorepo with a React storefront and MySQL persistence. The project is intentionally small enough to run locally with Docker Compose, while still modeling production concerns such as an API gateway, service-owned schemas, Flyway migrations, JWT authentication, refresh token rotation, role-based admin APIs, local media storage, checkout price snapshots, and offer-driven pricing.
+PixelMart is a portfolio-grade e-commerce platform built as a Spring Boot microservices monorepo with a React storefront and MySQL persistence. The project is intentionally small enough to run locally with Docker Compose, while still modeling production concerns such as an API gateway, service-owned schemas, Flyway migrations, JWT authentication, refresh token rotation, role-based admin APIs, local media storage, checkout price snapshots, offer-driven pricing, reviews, wishlist, audit logging, and CI.
 
-## Current Status
+## One-command local start
 
-PixelMart is being built from the day-by-day plan in `docs/DAILY_TARGETS.md`.
+```bash
+cp .env.example .env   # Windows: Copy-Item .env.example .env
+docker compose up --build
+```
 
-| Week | Focus | Progress |
-|------|-------|----------|
+In a second terminal:
+
+```bash
+cd frontend && npm install && npm run dev
+```
+
+Open `http://localhost:5173`. The SPA proxies `/api` to the gateway at `http://localhost:8080`.
+
+## Current status — v1 complete
+
+| Week | Focus | Status |
+|------|-------|--------|
 | 1 | Foundation, auth, catalog, branding, product browse | Complete |
-| 2 | Cart, addresses, checkout, seasonal offers, order history | Day 10 complete — Week 3 next |
-| 3 | Wishlist, reviews, admin dashboards, audit UI, tests, CI, polish | Not started |
+| 2 | Cart, addresses, checkout, offers, order history | Complete |
+| 3 | Wishlist, reviews, admin console, audit log, CI, polish | Complete |
 
-Completed user paths include registration/login, refresh/logout, public catalog browse, product images, admin store settings, cart, address CRUD with pincode lookup, mock checkout, order detail, and seasonal offer pricing. The next planned work is Day 10: notification outbox plus order history/admin order screens.
+Demo seed data (Flyway `V8__demo_seed.sql`) includes **15 visible products**, **2 active offers**, and **sample reviews** (approved on the storefront plus one pending item for admin moderation).
 
-## Feature Overview
+## Screenshots
 
-- Storefront: themed React app, dynamic store branding, product listing/detail pages, image gallery, featured products, active deals banner, cart badge, cart page, checkout stepper, coupon field, and order success/detail page.
-- Authentication: email/password registration, login, JWT access tokens, HTTP-only refresh token cookie, silent refresh, logout, `/me`, profile update, and admin/customer roles.
-- Catalog: categories, products, public reads, admin CRUD foundation, visibility filtering, local product image uploads, store settings, active/expired offers, product/category discounts, coupon-aware effective pricing, and audit log entries for admin changes.
-- Orders: one cart per user, add/update/remove cart items, address CRUD, India pincode proxy/cache, mock payment methods, checkout stock validation, order/item/payment snapshots, and cart clearing on success.
-- Platform: Spring Cloud Gateway on `:8080`, service-owned MySQL schemas, Flyway migrations, Docker Compose for the backend stack, Vite dev server for the frontend.
+| Storefront home | Admin dashboard |
+|-----------------|-----------------|
+| ![Storefront home](docs/images/storefront-home.svg) | ![Admin dashboard](docs/images/admin-dashboard.svg) |
+
+Replace the SVG mockups with PNG captures from your local run when preparing a portfolio submission.
+
+## 3-minute demo script
+
+1. **Start stack (30s)** — Run `docker compose up --build`, then `cd frontend && npm run dev`. Confirm `http://localhost:8080/actuator/health` is UP.
+2. **Storefront (45s)** — Open home, note the deals banner and offer badges. Browse `/products`, open a product detail page, read seeded reviews, toggle wishlist (customer login required).
+3. **Customer checkout (60s)** — Sign in as `customer@pixelmart.local` / `Customer@123`, add a fashion item to cart, go to checkout, enter coupon `STYLE15`, choose mock card, place order, open order detail.
+4. **Admin console (45s)** — Sign in as `admin@pixelmart.local` / `Admin@123`, open `/admin` dashboard, toggle product visibility, approve the pending review, browse audit log filters, tweak primary color in settings and confirm the storefront theme updates.
+
+## Feature overview
+
+- **Storefront:** themed React app, dynamic store branding, product listing/detail pages, image gallery, featured products, active deals banner, cart badge, cart page, checkout stepper, coupon field, wishlist, reviews, and order success/detail page.
+- **Authentication:** email/password registration, login, JWT access tokens, HTTP-only refresh token cookie, silent refresh, logout, `/me`, profile update, and admin/customer roles.
+- **Catalog:** categories, products, public reads, admin CRUD, visibility filtering, local product image uploads, store settings, active offers, coupon-aware effective pricing, wishlist, moderated reviews, and audit log entries for admin changes.
+- **Orders:** one cart per user, add/update/remove cart items, address CRUD, India pincode proxy/cache, mock payment methods, checkout stock validation, order/item/payment snapshots, and cart clearing on success.
+- **Platform:** Spring Cloud Gateway on `:8080`, service-owned MySQL schemas, Flyway migrations, Docker Compose for the backend stack, GitHub Actions CI, and Vite dev server for the frontend.
 
 ## Architecture
 
@@ -43,31 +71,22 @@ flowchart LR
 |---------|------|--------|----------------|
 | `gateway` | `8080` | N/A | API routing, JWT validation, user/role forwarding |
 | `auth-service` | `8081` | `auth` | Users, roles, access/refresh token lifecycle |
-| `catalog-service` | `8082` | `catalog` | Products, categories, images, settings, offers, audit log |
+| `catalog-service` | `8082` | `catalog` | Products, categories, images, settings, offers, reviews, wishlist, audit log |
 | `order-service` | `8083` | `orders` | Carts, addresses, pincode cache, checkout, orders, payments |
-| `notification-service` | `8084` | `notify` | Notification/outbox foundation |
-| `frontend` | `5173` | N/A | React storefront and admin pages |
+| `notification-service` | `8084` | `notify` | Email outbox / order confirmation |
+| `frontend` | `5173` | N/A | React storefront and admin console |
 
-## Tech Stack
+See [docs/architecture.md](docs/architecture.md) for more detail.
 
-- Backend: Java 21, Spring Boot 3.4.2, Spring Cloud 2024.0, Spring Security, Spring Data JPA, Flyway, MySQL 8.4.
-- Frontend: React 19, Vite 6, TypeScript, Redux Toolkit, RTK Query, React Router 7, React Hook Form, Zod.
-- Local runtime: Docker Compose for MySQL, gateway, and backend services; Vite dev server for the frontend.
+## Tech stack
 
-## Setup Plan
+- **Backend:** Java 21, Spring Boot 3.4.2, Spring Cloud 2024.0, Spring Security, Spring Data JPA, Flyway, MySQL 8.4, springdoc OpenAPI.
+- **Frontend:** React 19, Vite 6, TypeScript, Redux Toolkit, RTK Query, React Router 7, MUI 9 (admin), React Hook Form, Zod.
+- **Local runtime:** Docker Compose for MySQL, gateway, and backend services; Vite dev server for the frontend.
 
-Use this plan for a clean local setup or when onboarding a new machine.
+## Quick start
 
-1. Install prerequisites: Docker Desktop, Node.js 20+, Java 21, and Maven 3.9+ if you want local backend builds outside Docker.
-2. Create local environment values from `.env.example`.
-3. Start the backend stack with Docker Compose and wait for MySQL plus all services to become healthy/routable.
-4. Install frontend dependencies and run the Vite dev server.
-5. Verify gateway health, login with seeded users, browse products, add to cart, and complete a mock checkout.
-6. For development, run focused Maven module builds and `npm run build` before committing.
-
-## Quick Start
-
-### 1. Clone And Configure
+### 1. Clone and configure
 
 ```bash
 git clone <repo-url>
@@ -75,21 +94,11 @@ cd pixelmart
 cp .env.example .env
 ```
 
-On Windows PowerShell, use:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-The checked-in `.env.example` is safe for local development only. Change `JWT_SECRET`, database credentials, and SMTP settings before any production-like deployment.
-
-### 2. Start Backend Stack
+### 2. Start backend stack
 
 ```bash
 docker compose up --build
 ```
-
-This starts MySQL, the four backend services, and the API gateway. Keep this terminal running while using the app.
 
 Useful backend URLs:
 
@@ -98,14 +107,8 @@ Useful backend URLs:
 | `http://localhost:8080/actuator/health` | Gateway health |
 | `http://localhost:8080/api/auth/health` | Auth service through gateway |
 | `http://localhost:8080/api/catalog/health` | Catalog service through gateway |
-| `http://localhost:8081/actuator/health` | Auth service direct health |
-| `http://localhost:8082/actuator/health` | Catalog service direct health |
-| `http://localhost:8083/actuator/health` | Order service direct health |
-| `http://localhost:8084/actuator/health` | Notification service direct health |
 
-### 3. Start Frontend
-
-In a second terminal:
+### 3. Start frontend
 
 ```bash
 cd frontend
@@ -113,125 +116,77 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173`. Vite proxies `/api` to the gateway at `http://localhost:8080`.
-
-### 4. Seeded Accounts
-
-Flyway seeds two local users:
+### 4. Seeded accounts
 
 | Role | Email | Password |
 |------|-------|----------|
 | Admin | `admin@pixelmart.local` | `Admin@123` |
 | Customer | `customer@pixelmart.local` | `Customer@123` |
 
-Use the admin account for `/admin`, store settings, product image uploads, and offer management. Use the customer account for cart, address, and checkout flows.
+Active demo coupon: `STYLE15` (fashion category, 15% off).
 
-## Validation Commands
+## OpenAPI / Swagger UI
 
-Backend full build:
+OpenAPI is generated per service on its **direct port** (not through the gateway):
 
-```bash
-mvn clean package
-```
+| Service | Swagger UI | OpenAPI JSON |
+|---------|------------|--------------|
+| auth-service | http://localhost:8081/swagger-ui/index.html | http://localhost:8081/v3/api-docs |
+| catalog-service | http://localhost:8082/swagger-ui/index.html | http://localhost:8082/v3/api-docs |
+| order-service | http://localhost:8083/swagger-ui/index.html | http://localhost:8083/v3/api-docs |
+| notification-service | http://localhost:8084/swagger-ui/index.html | http://localhost:8084/v3/api-docs |
 
-Focused backend build for catalog and orders:
+## Storage profiles
 
-```bash
-mvn -pl services/catalog-service,services/order-service -am test
-```
+| Profile | Config | Notes |
+|---------|--------|-------|
+| **Local (default)** | `STORAGE_TYPE=local`, `STORAGE_LOCAL_PATH=./data/uploads` | Product images and logos stored on disk; Docker Compose mounts a `catalog_uploads` volume. |
+| **S3 (placeholder)** | `STORAGE_TYPE=s3` | Adapter stub in `S3StorageService`; returns a clear error until AWS SDK wiring is added. Set `AWS_REGION`, `AWS_S3_BUCKET`, and credentials in `.env` when implementing production media. |
 
-Frontend production build:
-
-```bash
-cd frontend
-npm run build
-```
-
-Frontend lint:
+## Validation commands
 
 ```bash
-cd frontend
-npm run lint
+mvn verify
+cd frontend && npm run build
 ```
 
-If Maven reports an invalid `JAVA_HOME`, point it at an installed JDK 21 directory. For example, in PowerShell:
+CI runs the same checks on push/PR via `.github/workflows/ci.yml`.
 
-```powershell
-$env:JAVA_HOME = "C:\Program Files\Java\jdk-21.0.11"
-mvn -v
-```
-
-## Common Development Workflow
-
-1. Start the backend stack: `docker compose up --build`.
-2. Start the frontend: `cd frontend && npm run dev`.
-3. Make service or UI changes.
-4. Run the smallest useful verification command.
-5. Check `docs/DAILY_TARGETS.md` and update completion status only when the Definition of Done is satisfied.
-
-For a clean database reset:
+Reset local database and uploads:
 
 ```bash
 docker compose down -v
 docker compose up --build
 ```
 
-This deletes MySQL and upload volumes, then reruns all Flyway migrations and seed data.
+## API route map
 
-## Project Structure
-
-```text
-pixelmart/
-├── gateway/                       # Spring Cloud Gateway :8080
-├── services/
-│   ├── auth-service/              # Auth, users, roles, refresh tokens :8081
-│   ├── catalog-service/           # Catalog, settings, images, offers :8082
-│   ├── order-service/             # Cart, addresses, checkout, orders :8083
-│   └── notification-service/      # Notification/outbox foundation :8084
-├── frontend/                      # React SPA and admin UI :5173
-├── docker/mysql/init/             # MySQL schema bootstrap scripts
-├── docs/                          # Product spec, targets, architecture
-├── docker-compose.yml             # Local backend stack
-└── .env.example                   # Local environment template
-```
-
-## API Route Map
-
-All browser-facing requests should go through the gateway on `:8080`.
-
-| Prefix | Routed To |
+| Prefix | Routed to |
 |--------|-----------|
-| `/api/auth/**` | `auth-service` |
-| `/api/catalog/**` | `catalog-service` |
-| `/api/admin/categories/**` | `catalog-service` |
-| `/api/admin/products/**` | `catalog-service` |
-| `/api/admin/offers/**` | `catalog-service` |
-| `/api/admin/settings/**` | `catalog-service` |
-| `/api/orders/**` | `order-service` |
-| `/api/admin/orders/**` | `order-service` |
-| `/api/internal/**` | `notification-service` |
+| `/api/auth/**` | auth-service |
+| `/api/catalog/**` | catalog-service |
+| `/api/admin/**` | catalog-service or order-service (see gateway routes) |
+| `/api/orders/**` | order-service |
+| `/api/internal/**` | notification-service |
 
-## Environment Variables
+## Environment variables
 
 | Variable | Purpose |
 |----------|---------|
-| `MYSQL_ROOT_PASSWORD` | MySQL root password for local compose |
-| `MYSQL_DATABASE` | Initial database name used by the compose image |
-| `MYSQL_USER` / `MYSQL_PASSWORD` | App database credentials |
+| `MYSQL_*` | Database credentials for compose |
 | `JWT_SECRET` | Shared auth/gateway JWT signing secret |
-| `JWT_ACCESS_EXPIRATION_MS` | Access token lifetime |
-| `JWT_REFRESH_EXPIRATION_MS` | Refresh token lifetime |
-| `STORAGE_TYPE` | Storage adapter selector, currently local |
-| `STORAGE_LOCAL_PATH` | Local upload path for catalog media |
-| `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM` | Notification-service Gmail/SMTP settings (set in `.env`) |
+| `JWT_ACCESS_EXPIRATION_MS` / `JWT_REFRESH_EXPIRATION_MS` | Token lifetimes |
+| `STORAGE_TYPE` | `local` (default) or `s3` placeholder |
+| `STORAGE_LOCAL_PATH` | Local upload directory |
+| `AWS_REGION`, `AWS_S3_BUCKET`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | Future S3 media profile |
+| `MAIL_*` | Notification-service SMTP settings |
 
 ## Troubleshooting
 
-- `JAVA_HOME environment variable is not defined correctly`: set `JAVA_HOME` to a real JDK 21 install and retry Maven.
-- `Port already allocated`: stop other local services on `3306`, `8080`-`8084`, or `5173`, or change compose/application ports.
-- Frontend API calls fail: confirm `docker compose up --build` is still running and `http://localhost:8080/actuator/health` responds.
-- Login fails after schema changes: reset local volumes with `docker compose down -v`, then rebuild.
-- Product images disappear after reset: uploaded media is stored in the `catalog_uploads` Docker volume, which is deleted by `down -v`.
+- **`JAVA_HOME` invalid:** point at JDK 21, then rerun Maven.
+- **Port already allocated:** stop services on `3306`, `8080`–`8084`, or `5173`.
+- **Frontend API failures:** confirm compose is running and gateway health responds.
+- **Images missing after reset:** `docker compose down -v` deletes the upload volume.
 
 ## Documentation
 

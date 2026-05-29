@@ -57,7 +57,7 @@ export function LoginPage() {
         {registered && (
           <div className={styles.bannerSuccess}>Account created. Please sign in.</div>
         )}
-        {serverError && <div className={styles.bannerError}>{serverError}</div>}
+        {serverError && <div className={styles.bannerError} role="alert">{serverError}</div>}
 
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className={styles.field}>
