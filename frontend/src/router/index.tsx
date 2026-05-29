@@ -1,8 +1,10 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { RequireAuth } from '../components/auth/RequireAuth';
 import { RequireRole } from '../components/auth/RequireRole';
+import { AdminLayout } from '../components/admin/AdminLayout';
 import { AppLayout } from '../components/layout/AppLayout';
-import { AdminPage } from '../pages/AdminPage';
+import { AdminCategoriesPage } from '../pages/AdminCategoriesPage';
+import { AdminDashboardPage } from '../pages/AdminDashboardPage';
 import { AdminReviewsPage } from '../pages/AdminReviewsPage';
 import { AdminOffersPage } from '../pages/AdminOffersPage';
 import { AdminProductsPage } from '../pages/AdminProductsPage';
@@ -78,60 +80,19 @@ export const router = createBrowserRouter([
         element: (
           <RequireAuth>
             <RequireRole role="ADMIN">
-              <AdminPage />
+              <AdminLayout />
             </RequireRole>
           </RequireAuth>
         ),
-      },
-      {
-        path: 'admin/orders',
-        element: (
-          <RequireAuth>
-            <RequireRole role="ADMIN">
-              <AdminOrdersPage />
-            </RequireRole>
-          </RequireAuth>
-        ),
-      },
-      {
-        path: 'admin/reviews',
-        element: (
-          <RequireAuth>
-            <RequireRole role="ADMIN">
-              <AdminReviewsPage />
-            </RequireRole>
-          </RequireAuth>
-        ),
-      },
-      {
-        path: 'admin/offers',
-        element: (
-          <RequireAuth>
-            <RequireRole role="ADMIN">
-              <AdminOffersPage />
-            </RequireRole>
-          </RequireAuth>
-        ),
-      },
-      {
-        path: 'admin/products',
-        element: (
-          <RequireAuth>
-            <RequireRole role="ADMIN">
-              <AdminProductsPage />
-            </RequireRole>
-          </RequireAuth>
-        ),
-      },
-      {
-        path: 'admin/settings',
-        element: (
-          <RequireAuth>
-            <RequireRole role="ADMIN">
-              <AdminSettingsPage />
-            </RequireRole>
-          </RequireAuth>
-        ),
+        children: [
+          { index: true, element: <AdminDashboardPage /> },
+          { path: 'products', element: <AdminProductsPage /> },
+          { path: 'categories', element: <AdminCategoriesPage /> },
+          { path: 'offers', element: <AdminOffersPage /> },
+          { path: 'orders', element: <AdminOrdersPage /> },
+          { path: 'reviews', element: <AdminReviewsPage /> },
+          { path: 'settings', element: <AdminSettingsPage /> },
+        ],
       },
     ],
   },

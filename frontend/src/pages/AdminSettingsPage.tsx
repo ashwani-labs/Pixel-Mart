@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { Typography } from '@mui/material';
 import {
   useGetAdminStoreSettingsQuery,
   useUpdateStoreSettingsMutation,
   useUploadStoreLogoMutation,
 } from '../store/api/settingsApi';
-import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../store';
 import { setPublicSettings } from '../store/slices/settingsSlice';
 import { setAdminPrimaryOverride } from '../store/slices/themeSlice';
@@ -120,9 +120,12 @@ export function AdminSettingsPage() {
 
   return (
     <div className={styles.page}>
-      <Link to="/admin">← Admin home</Link>
-      <h1>Store settings</h1>
-      <p className={styles.subtitle}>Branding and market defaults (Week 1 Day 5).</p>
+      <Typography variant="h4" gutterBottom>
+        Store settings
+      </Typography>
+      <Typography color="text.secondary" sx={{ mb: 2 }}>
+        Branding, market currency/locale, and tax defaults for checkout.
+      </Typography>
 
       <div className={styles.layout}>
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>

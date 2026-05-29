@@ -4,6 +4,7 @@ import type {
   Cart,
   CheckoutRequest,
   Order,
+  OrderDashboardStats,
   UpdateCartItemRequest,
 } from '../../types/order';
 import { baseApi } from './baseApi';
@@ -113,7 +114,11 @@ export const orderApi = baseApi.injectEndpoints({
         method: 'PATCH',
         body: { status },
       }),
-      invalidatesTags: ['Order'],
+      invalidatesTags: ['Order', 'Dashboard'],
+    }),
+    getOrderDashboardStats: build.query<OrderDashboardStats, void>({
+      query: () => '/admin/dashboard/orders',
+      providesTags: ['Dashboard'],
     }),
   }),
 });
@@ -135,4 +140,5 @@ export const {
   useGetOrderQuery,
   useGetAdminOrdersQuery,
   useUpdateAdminOrderStatusMutation,
+  useGetOrderDashboardStatsQuery,
 } = orderApi;

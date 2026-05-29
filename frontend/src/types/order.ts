@@ -70,3 +70,8 @@ export interface Order {
   items: OrderItem[];
   payment: Payment;
 }
+
+export interface OrderDashboardStats {
+  ordersToday: number;
+  revenueToday: number;
+}

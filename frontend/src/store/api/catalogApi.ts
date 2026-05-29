@@ -1,11 +1,13 @@
 import type {
   Category,
+  CatalogDashboardStats,
   Offer,
   PageResponse,
   Product,
   ProductDetail,
   Review,
   SubmitReviewRequest,
+  UpsertCategoryRequest,
   UpsertOfferRequest,
 } from '../../types/catalog';
 import { baseApi } from './baseApi';
@@ -23,6 +25,72 @@ export const catalogApi = baseApi.injectEndpoints({
     getCategories: build.query<Category[], void>({
       query: () => '/catalog/categories',
       providesTags: ['Category'],
+    }),
+    getAdminCategories: build.query<Category[], void>({
+      query: () => '/admin/categories',
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map((category) => ({ type: 'Category' as const, id: category.id })),
+              { type: 'Category', id: 'LIST' },
+            ]
+          : [{ type: 'Category', id: 'LIST' }],
+    }),
+    createCategory: build.mutation<Category, UpsertCategoryRequest>({
+      query: (body) => ({
+        url: '/admin/categories',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: [{ type: 'Category', id: 'LIST' }],
+    }),
+    updateCategory: build.mutation<Category, { id: string; body: UpsertCategoryRequest }>({
+      query: ({ id, body }) => ({
+        url: `/admin/categories/${id}`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: (_r, _e, { id }) => [
+        { type: 'Category', id },
+        { type: 'Category', id: 'LIST' },
+      ],
+    }),
+    deleteCategory: build.mutation<void, string>({
+      query: (id) => ({
+        url: `/admin/categories/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: [{ type: 'Category', id: 'LIST' }],
+    }),
+    getAdminProducts: build.query<PageResponse<Product>, { page?: number; size?: number } | void>({
+      query: ({ page = 0, size = 100 } = {}) => ({
+        url: '/admin/products',
+        params: { page, size },
+      }),
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.content.map((product) => ({ type: 'Product' as const, id: product.id })),
+              { type: 'ProductList', id: 'ADMIN' },
+            ]
+          : [{ type: 'ProductList', id: 'ADMIN' }],
+    }),
+    updateProductVisibility: build.mutation<Product, { id: string; visible: boolean }>({
+      query: ({ id, visible }) => ({
+        url: `/admin/products/${id}/visibility`,
+        method: 'PATCH',
+        body: { visible },
+      }),
+      invalidatesTags: (_r, _e, { id }) => [
+        { type: 'Product', id },
+        { type: 'ProductList', id: 'ADMIN' },
+        { type: 'ProductList', id: 'LIST' },
+        'Dashboard',
+      ],
+    }),
+    getCatalogDashboardStats: build.query<CatalogDashboardStats, void>({
+      query: () => '/admin/dashboard/catalog',
+      providesTags: ['Dashboard'],
     }),
     getProducts: build.query<PageResponse<Product>, ProductListParams>({
       query: ({ page = 0, size = 12, categoryId, search, featured }) => ({
@@ -171,6 +239,13 @@ export const catalogApi = baseApi.injectEndpoints({
 
 export const {
   useGetCategoriesQuery,
+  useGetAdminCategoriesQuery,
+  useCreateCategoryMutation,
+  useUpdateCategoryMutation,
+  useDeleteCategoryMutation,
+  useGetAdminProductsQuery,
+  useUpdateProductVisibilityMutation,
+  useGetCatalogDashboardStatsQuery,
   useGetProductsQuery,
   useGetProductBySlugQuery,
   useGetActiveOffersQuery,

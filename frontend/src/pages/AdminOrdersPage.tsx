@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store';
 import {
@@ -72,8 +71,6 @@ export function AdminOrdersPage() {
       ) : (
         <p>No orders yet.</p>
       )}
-
-      <Link to="/admin">← Admin home</Link>
     </div>
   );
 }

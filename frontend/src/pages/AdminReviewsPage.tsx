@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { useGetAdminReviewsQuery, useModerateReviewMutation } from '../store/api/catalogApi';
 import styles from './PlaceholderPage.module.css';
 import formStyles from './AdminProductsPage.module.css';
@@ -56,10 +55,6 @@ export function AdminReviewsPage() {
       ) : (
         <p>No pending reviews.</p>
       )}
-
-      <p>
-        <Link to="/admin">← Back to admin</Link>
-      </p>
     </div>
   );
 }

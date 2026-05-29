@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
   useCreateOfferMutation,
   useDeleteOfferMutation,
@@ -161,8 +160,6 @@ export function AdminOffersPage() {
           <p>No offers yet.</p>
         )}
       </section>
-
-      <Link to="/admin">← Admin home</Link>
     </div>
   );
 }

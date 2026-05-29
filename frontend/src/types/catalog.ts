@@ -104,3 +104,17 @@ export interface SubmitReviewRequest {
   title?: string;
   body: string;
 }
+
+export interface UpsertCategoryRequest {
+  name: string;
+  slug?: string;
+  parentId?: string | null;
+  sortOrder: number;
+  active: boolean;
+}
+
+export interface CatalogDashboardStats {
+  lowStockThreshold: number;
+  lowStockCount: number;
+  lowStockProducts: Product[];
+}
