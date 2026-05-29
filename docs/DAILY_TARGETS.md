@@ -476,7 +476,9 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 #### Definition of Done (D13)
 
-- [ ] Admin can manage full catalog without curl
+- [x] Admin can manage full catalog without curl
+
+> **D13 status: COMPLETE** (verified: catalog/order Maven build, frontend production build).
 
 ---
 
@@ -531,7 +533,7 @@ Track progress by checking off each day's **Definition of Done**. Full product s
 
 | Week | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9 | D10 | D11 | D12 | D13 | D14 | D15 |
 |------|----|----|----|----|----|----|----|----|----|-----|-----|-----|-----|-----|-----|
-| Status | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⬜ | ⬜ | ⬜ |
+| Status | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⬜ | ⬜ |
 
 Replace ⬜ with ✅ as each day completes.
 
