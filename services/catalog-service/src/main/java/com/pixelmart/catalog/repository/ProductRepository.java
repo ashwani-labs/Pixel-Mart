@@ -52,4 +52,8 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     Page<Product> findByVisibleTrueAndFeaturedTrue(Pageable pageable);
 
     List<Product> findByIdInAndVisibleTrue(Collection<String> ids);
+
+    long countByStockQtyLessThanEqual(int stockQty);
+
+    List<Product> findByStockQtyLessThanEqualOrderByStockQtyAscNameAsc(int stockQty, Pageable pageable);
 }
