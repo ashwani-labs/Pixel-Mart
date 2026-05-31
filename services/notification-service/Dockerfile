@@ -12,10 +12,12 @@ COPY gateway gateway
 COPY services/auth-service/pom.xml services/auth-service/
 COPY services/catalog-service/pom.xml services/catalog-service/
 COPY services/order-service/pom.xml services/order-service/
-COPY services/notification-service services/notification-service
+COPY services/notification-service/pom.xml services/notification-service/
+COPY services/notification-service/src services/notification-service/src
 RUN mvn -B -pl services/notification-service -am package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
+RUN apk add --no-cache curl
 WORKDIR /app
 COPY --from=build /app/services/notification-service/target/notification-service-*.jar app.jar
 EXPOSE 8084

@@ -16,6 +16,7 @@ COPY services/notification-service/pom.xml services/notification-service/
 RUN mvn -B -pl gateway -am package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
+RUN apk add --no-cache curl
 WORKDIR /app
 COPY --from=build /app/gateway/target/gateway-*.jar app.jar
 EXPOSE 8080

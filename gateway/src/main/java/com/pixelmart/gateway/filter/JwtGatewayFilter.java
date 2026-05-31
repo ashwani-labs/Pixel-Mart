@@ -44,7 +44,7 @@ public class JwtGatewayFilter implements GlobalFilter, Ordered {
         String path = request.getPath().value();
 
         if (isPublic(path, request.getMethod())) {
-            return chain.filter(exchange);
+            return chain.filter(maybeEnrichWithUser(exchange, request));
         }
 
         String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
@@ -53,17 +53,34 @@ public class JwtGatewayFilter implements GlobalFilter, Ordered {
         }
 
         try {
-            var claims = jwtService.parseAccessToken(authHeader.substring(7));
-            String userId = claims.getSubject();
-            String roles = String.join(",", jwtService.roles(claims));
-
-            ServerHttpRequest mutated = request.mutate()
-                    .header("X-User-Id", userId)
-                    .header("X-Roles", roles)
-                    .build();
-            return chain.filter(exchange.mutate().request(mutated).build());
+            return chain.filter(exchange.mutate().request(enrichRequest(request, authHeader)).build());
         } catch (JwtException | IllegalArgumentException ex) {
             return unauthorized(exchange, path);
+        }
+    }
+
+    private ServerHttpRequest enrichRequest(ServerHttpRequest request, String authHeader) {
+        var claims = jwtService.parseAccessToken(authHeader.substring(7));
+        String userId = claims.getSubject();
+        String roles = String.join(",", jwtService.roles(claims));
+
+        return request.mutate()
+                .header("X-User-Id", userId)
+                .header("X-Roles", roles)
+                .build();
+    }
+
+    private ServerWebExchange maybeEnrichWithUser(ServerWebExchange exchange, ServerHttpRequest request) {
+        String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return exchange;
+        }
+
+        try {
+            ServerHttpRequest enriched = enrichRequest(request, authHeader);
+            return exchange.mutate().request(enriched).build();
+        } catch (JwtException | IllegalArgumentException ex) {
+            return exchange;
         }
     }
 
@@ -78,7 +95,7 @@ public class JwtGatewayFilter implements GlobalFilter, Ordered {
             return true;
         }
         if (method == HttpMethod.GET && path.startsWith("/api/catalog/")) {
-            return true;
+            return !path.startsWith("/api/catalog/wishlist");
         }
         return false;
     }

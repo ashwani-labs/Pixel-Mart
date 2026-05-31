@@ -1,129 +1,165 @@
-services:
-  mysql:
-    image: mysql:8.4
-    container_name: pixelmart-mysql
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-pixelmart_root}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-pixelmart}
-      MYSQL_USER: ${MYSQL_USER:-pixelmart}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pixelmart}
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-pixelmart_root}"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
-
-  auth-service:
-    build:
-      context: .
-      dockerfile: services/auth-service/Dockerfile
-    container_name: pixelmart-auth
-    depends_on:
-      mysql:
-        condition: service_healthy
-    environment:
-      MYSQL_HOST: mysql
-      MYSQL_PORT: 3306
-      MYSQL_USER: ${MYSQL_USER:-pixelmart}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pixelmart}
-      JWT_SECRET: ${JWT_SECRET:-pixelmart-dev-secret-key-min-32-chars-long!!}
-      JWT_ACCESS_EXPIRATION_MS: ${JWT_ACCESS_EXPIRATION_MS:-900000}
-      JWT_REFRESH_EXPIRATION_MS: ${JWT_REFRESH_EXPIRATION_MS:-604800000}
-      PIXELMART_INTERNAL_ALLOWED_SERVICES: order-service,catalog-service
-    ports:
-      - "8081:8081"
-
-  catalog-service:
-    build:
-      context: .
-      dockerfile: services/catalog-service/Dockerfile
-    container_name: pixelmart-catalog
-    depends_on:
-      mysql:
-        condition: service_healthy
-      order-service:
-        condition: service_started
-    environment:
-      MYSQL_HOST: mysql
-      MYSQL_PORT: 3306
-      MYSQL_USER: ${MYSQL_USER:-pixelmart}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pixelmart}
-      STORAGE_LOCAL_PATH: /app/data/uploads
-      ORDER_SERVICE_URL: http://order-service:8083
-      AUTH_SERVICE_URL: http://auth-service:8081
-    volumes:
-      - catalog_uploads:/app/data/uploads
-    ports:
-      - "8082:8082"
-
-  order-service:
-    build:
-      context: .
-      dockerfile: services/order-service/Dockerfile
-    container_name: pixelmart-order
-    depends_on:
-      mysql:
-        condition: service_healthy
-      catalog-service:
-        condition: service_started
-    environment:
-      MYSQL_HOST: mysql
-      MYSQL_PORT: 3306
-      MYSQL_USER: ${MYSQL_USER:-pixelmart}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pixelmart}
-      CATALOG_SERVICE_URL: http://catalog-service:8082
-      AUTH_SERVICE_URL: http://auth-service:8081
-      NOTIFICATION_SERVICE_URL: http://notification-service:8084
-    ports:
-      - "8083:8083"
-
-  notification-service:
-    build:
-      context: .
-      dockerfile: services/notification-service/Dockerfile
-    container_name: pixelmart-notification
-    depends_on:
-      mysql:
-        condition: service_healthy
-    environment:
-      MYSQL_HOST: mysql
-      MYSQL_PORT: 3306
-      MYSQL_USER: ${MYSQL_USER:-pixelmart}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pixelmart}
-      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
-      MAIL_PORT: ${MAIL_PORT:-587}
-      MAIL_USERNAME: ${MAIL_USERNAME}
-      MAIL_PASSWORD: ${MAIL_PASSWORD}
-      MAIL_FROM: ${MAIL_FROM}
-    ports:
-      - "8084:8084"
-
-  api-gateway:
-    build:
-      context: .
-      dockerfile: gateway/Dockerfile
-    container_name: pixelmart-gateway
-    depends_on:
-      - auth-service
-      - catalog-service
-      - order-service
-      - notification-service
-    environment:
-      AUTH_SERVICE_URL: http://auth-service:8081
-      CATALOG_SERVICE_URL: http://catalog-service:8082
-      ORDER_SERVICE_URL: http://order-service:8083
-      NOTIFICATION_SERVICE_URL: http://notification-service:8084
-      JWT_SECRET: ${JWT_SECRET:-pixelmart-dev-secret-key-min-32-chars-long!!}
-    ports:
-      - "8080:8080"
-
-volumes:
-  mysql_data:
-  catalog_uploads:
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: pixelmart-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-pixelmart_root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-pixelmart}
+      MYSQL_USER: ${MYSQL_USER:-pixelmart}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pixelmart}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-pixelmart_root}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    container_name: pixelmart-auth
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: ${MYSQL_USER:-pixelmart}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pixelmart}
+      JWT_SECRET: ${JWT_SECRET:-pixelmart-dev-secret-key-min-32-chars-long!!}
+      JWT_ACCESS_EXPIRATION_MS: ${JWT_ACCESS_EXPIRATION_MS:-900000}
+      JWT_REFRESH_EXPIRATION_MS: ${JWT_REFRESH_EXPIRATION_MS:-604800000}
+      PIXELMART_INTERNAL_ALLOWED_SERVICES: order-service,catalog-service
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/api/auth/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 45s
+
+  catalog-service:
+    build:
+      context: .
+      dockerfile: services/catalog-service/Dockerfile
+    container_name: pixelmart-catalog
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: ${MYSQL_USER:-pixelmart}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pixelmart}
+      STORAGE_LOCAL_PATH: /app/data/uploads
+      ORDER_SERVICE_URL: http://order-service:8083
+      AUTH_SERVICE_URL: http://auth-service:8081
+    volumes:
+      - catalog_uploads:/app/data/uploads
+    ports:
+      - "8082:8082"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/api/catalog/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 45s
+
+  order-service:
+    build:
+      context: .
+      dockerfile: services/order-service/Dockerfile
+    container_name: pixelmart-order
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: ${MYSQL_USER:-pixelmart}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pixelmart}
+      CATALOG_SERVICE_URL: http://catalog-service:8082
+      AUTH_SERVICE_URL: http://auth-service:8081
+      NOTIFICATION_SERVICE_URL: http://notification-service:8084
+    ports:
+      - "8083:8083"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/api/orders/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 45s
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: services/notification-service/Dockerfile
+    container_name: pixelmart-notification
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: ${MYSQL_USER:-pixelmart}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pixelmart}
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_FROM: ${MAIL_FROM}
+    ports:
+      - "8084:8084"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/api/internal/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 45s
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    container_name: pixelmart-gateway
+    restart: unless-stopped
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      catalog-service:
+        condition: service_healthy
+      order-service:
+        condition: service_healthy
+      notification-service:
+        condition: service_healthy
+    environment:
+      AUTH_SERVICE_URL: http://auth-service:8081
+      CATALOG_SERVICE_URL: http://catalog-service:8082
+      ORDER_SERVICE_URL: http://order-service:8083
+      NOTIFICATION_SERVICE_URL: http://notification-service:8084
+      JWT_SECRET: ${JWT_SECRET:-pixelmart-dev-secret-key-min-32-chars-long!!}
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+volumes:
+  mysql_data:
+  catalog_uploads:
+

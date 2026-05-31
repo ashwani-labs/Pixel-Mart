@@ -10,12 +10,14 @@ RUN mvn -B -pl services/catalog-service -am dependency:go-offline -DskipTests
 
 COPY gateway gateway
 COPY services/auth-service/pom.xml services/auth-service/
-COPY services/catalog-service services/catalog-service
+COPY services/catalog-service/pom.xml services/catalog-service/
+COPY services/catalog-service/src services/catalog-service/src
 COPY services/order-service/pom.xml services/order-service/
 COPY services/notification-service/pom.xml services/notification-service/
 RUN mvn -B -pl services/catalog-service -am package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
+RUN apk add --no-cache curl
 WORKDIR /app
 COPY --from=build /app/services/catalog-service/target/catalog-service-*.jar app.jar
 EXPOSE 8082

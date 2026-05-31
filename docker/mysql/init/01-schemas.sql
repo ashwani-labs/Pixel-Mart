@@ -7,4 +7,8 @@ CREATE SCHEMA IF NOT EXISTS orders;
 CREATE SCHEMA IF NOT EXISTS notify;
 
 GRANT ALL PRIVILEGES ON pixelmart.* TO 'pixelmart'@'%';
+GRANT ALL PRIVILEGES ON auth.* TO 'pixelmart'@'%';
+GRANT ALL PRIVILEGES ON catalog.* TO 'pixelmart'@'%';
+GRANT ALL PRIVILEGES ON orders.* TO 'pixelmart'@'%';
+GRANT ALL PRIVILEGES ON notify.* TO 'pixelmart'@'%';
 FLUSH PRIVILEGES;

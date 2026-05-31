@@ -5,7 +5,7 @@ spring:
   application:
     name: order-service
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/pixelmart?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/orders?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
     username: ${MYSQL_USER:pixelmart}
     password: ${MYSQL_PASSWORD:pixelmart}
   jpa:
