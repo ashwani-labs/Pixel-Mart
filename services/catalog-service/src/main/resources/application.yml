@@ -38,6 +38,10 @@ pixelmart:
     type: ${STORAGE_TYPE:local}
     local:
       base-path: ${STORAGE_LOCAL_PATH:./data/uploads}
+    s3:
+      region: ${AWS_REGION:us-east-1}
+      bucket: ${AWS_S3_BUCKET:}
+      prefix: ${AWS_S3_PREFIX:pixelmart}
 
 management:
   endpoints:

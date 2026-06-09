@@ -40,4 +40,18 @@ public interface OfferRepository extends JpaRepository<Offer, String> {
             @Param("couponCode") String couponCode,
             @Param("now") Instant now
     );
+
+    @Query("""
+            SELECT o FROM Offer o
+            WHERE o.active = true
+              AND o.startsAt <= :now
+              AND (o.endsAt IS NULL OR o.endsAt >= :now)
+              AND o.scope = com.pixelmart.catalog.domain.OfferScope.CART
+              AND (o.couponCode IS NULL
+                   OR (:couponCode IS NOT NULL AND UPPER(o.couponCode) = UPPER(:couponCode)))
+            """)
+    List<Offer> findActiveCartOffers(
+            @Param("couponCode") String couponCode,
+            @Param("now") Instant now
+    );
 }

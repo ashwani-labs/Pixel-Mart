@@ -6,17 +6,10 @@ import com.pixelmart.catalog.exception.BadRequestException;
 import com.pixelmart.catalog.exception.ResourceNotFoundException;
 import com.pixelmart.catalog.repository.ProductImageRepository;
 import com.pixelmart.catalog.storage.StorageService;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 
 @Service
@@ -82,23 +75,13 @@ public class ProductImageService {
     }
 
     private MediaResource toMediaResource(String storageKey) {
-        Path path = storageService.resolve(storageKey);
-        if (!Files.exists(path)) {
-            throw new ResourceNotFoundException("Media", storageKey);
-        }
         try {
-            Resource resource = new UrlResource(path.toUri());
-            String contentType = Files.probeContentType(path);
-            if (contentType == null) {
-                contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
-            }
-            return new MediaResource(resource, contentType);
-        } catch (MalformedURLException e) {
-            throw new BadRequestException("Invalid media path");
-        } catch (IOException e) {
-            throw new BadRequestException("Cannot read media file");
+            StorageService.StoredContent content = storageService.load(storageKey);
+            return new MediaResource(content.resource(), content.contentType());
+        } catch (BadRequestException ex) {
+            throw new ResourceNotFoundException("Media", storageKey);
         }
     }
 
-    public record MediaResource(Resource resource, String contentType) {}
+    public record MediaResource(org.springframework.core.io.Resource resource, String contentType) {}
 }

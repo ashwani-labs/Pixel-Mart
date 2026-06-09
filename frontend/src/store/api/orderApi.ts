@@ -11,8 +11,11 @@ import { baseApi } from './baseApi';
 
 export const orderApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    getCart: build.query<Cart, void>({
-      query: () => '/orders/cart/items',
+    getCart: build.query<Cart, string | void>({
+      query: (couponCode) => ({
+        url: '/orders/cart/items',
+        params: couponCode ? { couponCode } : undefined,
+      }),
       providesTags: ['Cart'],
     }),
     addCartItem: build.mutation<Cart, AddCartItemRequest>({

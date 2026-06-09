@@ -160,7 +160,44 @@ public class OfferService {
             offer.setProductId(null);
             return;
         }
-        throw new BadRequestException("Cart-level offers are not supported yet");
+        offer.setProductId(null);
+        offer.setCategoryId(null);
+    }
+
+    @Transactional(readOnly = true)
+    public CartOfferPricing cartDiscount(BigDecimal subtotal, String couponCode) {
+        String normalizedCoupon = normalizeCoupon(couponCode);
+        BigDecimal normalizedSubtotal = subtotal.setScale(2, RoundingMode.HALF_UP);
+        List<Offer> offers = offerRepository.findActiveCartOffers(normalizedCoupon, Instant.now());
+        boolean couponMatched = normalizedCoupon != null && offers.stream()
+                .anyMatch(offer -> normalizedCoupon.equalsIgnoreCase(offer.getCouponCode()));
+
+        Offer best = offers.stream()
+                .max(Comparator.comparing(offer -> cartDiscountAmount(normalizedSubtotal, offer)))
+                .orElse(null);
+        if (best == null) {
+            return new CartOfferPricing(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP), null, null, couponMatched);
+        }
+
+        BigDecimal discountTotal = cartDiscountAmount(normalizedSubtotal, best);
+        if (discountTotal.compareTo(BigDecimal.ZERO) <= 0) {
+            return new CartOfferPricing(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP), null, null, couponMatched);
+        }
+        return new CartOfferPricing(
+                discountTotal,
+                best.getName(),
+                best.getCouponCode(),
+                couponMatched
+        );
+    }
+
+    private BigDecimal cartDiscountAmount(BigDecimal subtotal, Offer offer) {
+        BigDecimal discount = switch (offer.getType()) {
+            case PERCENT -> subtotal.multiply(offer.getValue())
+                    .divide(ONE_HUNDRED, 2, RoundingMode.HALF_UP);
+            case FIXED -> offer.getValue().min(subtotal);
+        };
+        return discount.max(BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP);
     }
 
     private OfferPricing bestPrice(Product product, List<Offer> offers, boolean couponMatched) {

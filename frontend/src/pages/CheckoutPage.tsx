@@ -28,20 +28,24 @@ export function CheckoutPage() {
   const taxEnabled = useSelector((s: RootState) => s.settings.taxEnabled);
   const taxRatePercent = useSelector((s: RootState) => s.settings.taxRatePercent);
   const taxLabel = useSelector((s: RootState) => s.settings.taxLabel);
-  const { data: cart, isLoading: loadingCart } = useGetCartQuery();
-  const { data: addresses, isLoading: loadingAddresses } = useGetAddressesQuery();
-  const [checkout, { isLoading: placingOrder }] = useCheckoutMutation();
   const [addressId, setAddressId] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('MOCK_CARD');
   const [couponCode, setCouponCode] = useState('');
+  const { data: cart, isLoading: loadingCart } = useGetCartQuery(couponCode.trim() || undefined);
+  const { data: addresses, isLoading: loadingAddresses } = useGetAddressesQuery();
+  const [checkout, { isLoading: placingOrder }] = useCheckoutMutation();
   const [error, setError] = useState<string | null>(null);
 
   const items = cart?.items ?? [];
   const defaultAddress = addresses?.find((address) => address.isDefault) ?? addresses?.[0];
   const selectedAddressId = addressId || defaultAddress?.id || '';
   const subtotal = cart?.subtotal ?? 0;
-  const taxTotal = taxEnabled ? Number(((subtotal * taxRatePercent) / 100).toFixed(2)) : 0;
-  const grandTotal = subtotal + taxTotal;
+  const discountTotal = cart?.discountTotal ?? 0;
+  const discountedSubtotal = Math.max(0, subtotal - discountTotal);
+  const taxTotal = taxEnabled
+    ? Number(((discountedSubtotal * taxRatePercent) / 100).toFixed(2))
+    : 0;
+  const grandTotal = discountedSubtotal + taxTotal;
 
   useEffect(() => {
     if (!addressId && defaultAddress) {
@@ -174,6 +178,12 @@ export function CheckoutPage() {
             <span>Subtotal</span>
             <strong>{formatPrice(subtotal, marketLocale, marketCurrencyCode)}</strong>
           </p>
+          {discountTotal > 0 && (
+            <p>
+              <span>{cart?.discountLabel ?? 'Cart discount'}</span>
+              <strong>-{formatPrice(discountTotal, marketLocale, marketCurrencyCode)}</strong>
+            </p>
+          )}
           <p>
             <span>
               {taxLabel} {taxEnabled ? `(${taxRatePercent}%)` : ''}

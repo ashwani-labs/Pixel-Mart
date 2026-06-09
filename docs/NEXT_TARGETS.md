@@ -7,6 +7,7 @@ v1 is **complete**. This is the only planning doc — work through items below f
 | Milestone | State |
 |-----------|--------|
 | P0 + P1 (auth, catalog, checkout, admin, CI, wishlist, reviews, audit log) | Done |
+| P2 #1 cart offers, #2 SMTP, #3 S3, #4 idempotency, #5 rate limit | Done |
 | Items below | Backlog |
 
 ---
@@ -17,25 +18,25 @@ v1 is **complete**. This is the only planning doc — work through items below f
 
 | # | Target | Notes |
 |---|--------|--------|
-| 1 | **Cart-level offers** | Implement `OfferScope.CART`; admin form + checkout discount line |
-| 2 | **Real SMTP send** | Wire notification-service to send when `MAIL_*` configured; keep outbox fallback |
-| 3 | **S3 storage** | Replace `S3StorageService` placeholder with AWS SDK upload/download |
+| 1 | ~~**Cart-level offers**~~ | Done — `OfferScope.CART`, admin form, checkout discount line |
+| 2 | ~~**Real SMTP send**~~ | Done — sends when `MAIL_USERNAME` + `MAIL_PASSWORD` set; outbox fallback otherwise |
+| 3 | ~~**S3 storage**~~ | Done — AWS SDK upload/download via `STORAGE_TYPE=s3` |
 
 ### Production hardening
 
 | # | Target | Notes |
 |---|--------|--------|
-| 4 | **Checkout idempotency** | Honor `Idempotency-Key` on `POST /api/orders/checkout` |
-| 5 | **Gateway rate limiting** | Throttle `/api/auth/login` and `/register` |
-| 6 | **More integration tests** | Pincode `110001`, checkout 401, order price snapshots |
-| 7 | **E2E smoke suite** | Playwright: login → cart → checkout → admin audit log |
+| 4 | ~~**Checkout idempotency**~~ | Done — `Idempotency-Key` on `POST /api/orders/checkout` |
+| 5 | ~~**Gateway rate limiting**~~ | Done — 20 req/min per IP on `/api/auth/login` and `/register` |
+| 6 | ~~**More integration tests**~~ | Done — pincode `110001`, checkout 401, order price snapshots |
+| 7 | ~~**E2E smoke suite**~~ | Done — Playwright smoke in `e2e/` + CI job |
 
 ### Platform & DevOps
 
 | # | Target | Notes |
 |---|--------|--------|
-| 8 | **Frontend in Docker Compose** | nginx SPA + `/api` proxy → true one-command stack |
-| 9 | **Compose healthchecks** | Wait for gateway healthy before marking stack up |
+| 8 | ~~**Frontend in Docker Compose**~~ | Done — nginx on `:3000`, proxies `/api` → gateway |
+| 9 | ~~**Compose healthchecks**~~ | Done — frontend waits for gateway healthy |
 | 10 | **Push CI green** | Confirm GitHub Actions on `main`; optional deploy workflow |
 
 ### UI & portfolio
@@ -63,12 +64,12 @@ v1 is **complete**. This is the only planning doc — work through items below f
 
 ## Definition of Done (v1.1)
 
-- [ ] Cart-level offer applies at checkout
-- [ ] S3 profile stores and serves product images in a test bucket
-- [ ] Checkout idempotency prevents duplicate orders on retry
-- [ ] Gateway rate limit returns 429 on auth abuse
-- [ ] E2E smoke passes in CI
-- [ ] `docker compose up` includes frontend (no separate `npm run dev` required)
+- [x] Cart-level offer applies at checkout
+- [x] S3 profile stores and serves product images in a test bucket
+- [x] Checkout idempotency prevents duplicate orders on retry
+- [x] Gateway rate limit returns 429 on auth abuse
+- [x] E2E smoke passes in CI
+- [x] `docker compose up` includes frontend (no separate `npm run dev` required)
 
 ---
 

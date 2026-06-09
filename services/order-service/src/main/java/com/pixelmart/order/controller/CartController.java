@@ -19,8 +19,8 @@ public class CartController {
     }
 
     @GetMapping
-    public CartResponse list() {
-        return cartService.getCart();
+    public CartResponse list(@RequestParam(required = false) String couponCode) {
+        return cartService.getCart(couponCode);
     }
 
     @PostMapping

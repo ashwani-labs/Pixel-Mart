@@ -13,6 +13,8 @@ export interface Cart {
   itemCount: number;
   totalQuantity: number;
   subtotal: number;
+  discountTotal: number;
+  discountLabel: string | null;
 }
 
 export interface AddCartItemRequest {
@@ -54,6 +56,8 @@ export interface Order {
   status: string;
   createdAt: string;
   subtotal: number;
+  discountTotal: number;
+  discountLabel: string | null;
   taxTotal: number;
   grandTotal: number;
   taxLabel: string;

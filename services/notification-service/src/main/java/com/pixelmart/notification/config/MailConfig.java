@@ -1,6 +1,6 @@
 package com.pixelmart.notification.config;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -10,19 +10,15 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 public class MailConfig {
 
     @Bean
-    @ConditionalOnProperty(name = "spring.mail.host")
+    @ConditionalOnExpression(
+            "'${spring.mail.username:}'.trim().length() > 0 && '${spring.mail.password:}'.trim().length() > 0"
+    )
     JavaMailSender javaMailSender(org.springframework.core.env.Environment env) {
         JavaMailSenderImpl sender = new JavaMailSenderImpl();
-        sender.setHost(env.getRequiredProperty("spring.mail.host"));
+        sender.setHost(env.getProperty("spring.mail.host", "smtp.gmail.com"));
         sender.setPort(env.getProperty("spring.mail.port", Integer.class, 587));
-        String username = env.getProperty("spring.mail.username");
-        if (username != null && !username.isBlank()) {
-            sender.setUsername(username);
-        }
-        String password = env.getProperty("spring.mail.password");
-        if (password != null && !password.isBlank()) {
-            sender.setPassword(password);
-        }
+        sender.setUsername(env.getRequiredProperty("spring.mail.username"));
+        sender.setPassword(env.getRequiredProperty("spring.mail.password"));
         return sender;
     }
 }

@@ -28,6 +28,12 @@ public class Order {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal subtotal;
 
+    @Column(name = "discount_total", nullable = false, precision = 12, scale = 2)
+    private BigDecimal discountTotal = BigDecimal.ZERO;
+
+    @Column(name = "discount_label")
+    private String discountLabel;
+
     @Column(name = "tax_total", nullable = false, precision = 12, scale = 2)
     private BigDecimal taxTotal;
 
@@ -138,6 +144,22 @@ public class Order {
 
     public void setSubtotal(BigDecimal subtotal) {
         this.subtotal = subtotal;
+    }
+
+    public BigDecimal getDiscountTotal() {
+        return discountTotal;
+    }
+
+    public void setDiscountTotal(BigDecimal discountTotal) {
+        this.discountTotal = discountTotal;
+    }
+
+    public String getDiscountLabel() {
+        return discountLabel;
+    }
+
+    public void setDiscountLabel(String discountLabel) {
+        this.discountLabel = discountLabel;
     }
 
     public BigDecimal getTaxTotal() {

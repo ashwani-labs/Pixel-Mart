@@ -54,7 +54,24 @@ public final class CartDtos {
             List<CartItemResponse> items,
             int itemCount,
             int totalQuantity,
-            BigDecimal subtotal
+            BigDecimal subtotal,
+            BigDecimal discountTotal,
+            String discountLabel
     ) {
+        public static CartResponse withoutDiscount(
+                List<CartItemResponse> items,
+                int itemCount,
+                int totalQuantity,
+                BigDecimal subtotal
+        ) {
+            return new CartResponse(
+                    items,
+                    itemCount,
+                    totalQuantity,
+                    subtotal,
+                    BigDecimal.ZERO.setScale(2),
+                    null
+            );
+        }
     }
 }

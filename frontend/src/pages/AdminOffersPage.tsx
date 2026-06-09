@@ -64,7 +64,7 @@ export function AdminOffersPage() {
   return (
     <div className={styles.page}>
       <h1>Admin — Offers</h1>
-      <p>Create product or category discounts. Cart-level offers are reserved for a later version.</p>
+      <p>Create product, category, or whole-cart discounts.</p>
 
       <form className={formStyles.uploadForm} onSubmit={handleCreate}>
         <label>
@@ -83,9 +83,14 @@ export function AdminOffersPage() {
           <select value={scope} onChange={(e) => setScope(e.target.value as OfferScope)}>
             <option value="CATEGORY">Category</option>
             <option value="PRODUCT">Product</option>
+            <option value="CART">Cart</option>
           </select>
         </label>
-        {scope === 'CATEGORY' ? (
+        {scope === 'CART' ? (
+          <p className={formStyles.message}>
+            Cart offers apply to the order subtotal at checkout. Use a coupon code for code-based cart discounts.
+          </p>
+        ) : scope === 'CATEGORY' ? (
           <label>
             Category
             <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} required>

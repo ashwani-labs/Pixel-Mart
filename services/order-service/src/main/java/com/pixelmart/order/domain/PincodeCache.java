@@ -11,7 +11,7 @@ public class PincodeCache {
     @Column(length = 6, nullable = false)
     private String pincode;
 
-    @Column(name = "payload_json", nullable = false, columnDefinition = "JSON")
+    @Column(name = "payload_json", nullable = false, length = 16_384)
     private String payloadJson;
 
     @Column(name = "cached_at", nullable = false)

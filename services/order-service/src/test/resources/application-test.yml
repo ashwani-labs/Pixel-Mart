@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:orders;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE;INIT=CREATE SCHEMA IF NOT EXISTS orders\;SET SCHEMA orders
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        default_schema: orders
+  flyway:
+    enabled: false
+
+pixelmart:
+  internal:
+    allowed-service: catalog-service
+  catalog:
+    base-url: http://localhost:8082
+    internal-service-name: order-service
+  auth:
+    base-url: http://localhost:8081
+    internal-service-name: order-service
+  notification:
+    base-url: http://localhost:8084
+    internal-service-name: order-service
+  pincode:
+    api-base-url: http://localhost:59999
+    cache-ttl-hours: 24

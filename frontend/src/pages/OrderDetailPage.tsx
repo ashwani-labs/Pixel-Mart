@@ -63,6 +63,12 @@ export function OrderDetailPage() {
             <span>Subtotal</span>
             <strong>{formatPrice(order.subtotal, marketLocale, marketCurrencyCode)}</strong>
           </p>
+          {order.discountTotal > 0 && (
+            <p>
+              <span>{order.discountLabel ?? 'Cart discount'}</span>
+              <strong>-{formatPrice(order.discountTotal, marketLocale, marketCurrencyCode)}</strong>
+            </p>
+          )}
           <p>
             <span>
               {order.taxLabel} ({order.taxRatePercent}%)

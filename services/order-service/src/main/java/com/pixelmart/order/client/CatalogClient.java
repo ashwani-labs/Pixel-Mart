@@ -11,6 +11,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Component
@@ -74,6 +75,27 @@ public class CatalogClient {
         }
     }
 
+    public CatalogCartDiscountSnapshot getCartDiscount(BigDecimal subtotal, String couponCode) {
+        String url = properties.getBaseUrl() + "/api/catalog/internal/offers/cart-discount";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-Internal-Service", properties.getInternalServiceName());
+        try {
+            ResponseEntity<CatalogCartDiscountSnapshot> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(new CartDiscountRequest(subtotal, couponCode), headers),
+                    CatalogCartDiscountSnapshot.class
+            );
+            CatalogCartDiscountSnapshot body = response.getBody();
+            if (body == null) {
+                throw new BadRequestException("Unable to calculate cart discount");
+            }
+            return body;
+        } catch (HttpStatusCodeException ex) {
+            throw new BadRequestException("Unable to calculate cart discount");
+        }
+    }
+
     public void reserveStock(List<ReserveStockLine> items) {
         String url = properties.getBaseUrl() + "/api/catalog/internal/products/reserve-stock";
         HttpHeaders headers = new HttpHeaders();
@@ -88,6 +110,9 @@ public class CatalogClient {
         } catch (HttpStatusCodeException ex) {
             throw new BadRequestException("Unable to reserve product stock");
         }
+    }
+
+    public record CartDiscountRequest(BigDecimal subtotal, String couponCode) {
     }
 
     public record ReserveStockRequest(List<ReserveStockLine> items) {

@@ -2,6 +2,7 @@ package com.pixelmart.order.service;
 
 import com.pixelmart.order.client.AuthClient;
 import com.pixelmart.order.client.AuthUserSnapshot;
+import com.pixelmart.order.client.CatalogCartDiscountSnapshot;
 import com.pixelmart.order.client.CatalogClient;
 import com.pixelmart.order.client.CatalogClient.ReserveStockLine;
 import com.pixelmart.order.client.CatalogProductSnapshot;
@@ -92,24 +93,29 @@ public class CheckoutService {
 
         String couponCode = normalizeCoupon(request.couponCode());
         Map<String, CatalogProductSnapshot> products = loadProducts(cartItems, couponCode);
-        validateCoupon(couponCode, products);
+        CatalogStoreSettings settings = catalogClient.getStoreSettings();
+        BigDecimal subtotal = subtotal(cartItems, products);
+        CatalogCartDiscountSnapshot cartDiscount = catalogClient.getCartDiscount(subtotal, couponCode);
+        validateCoupon(couponCode, products, cartDiscount);
         List<ReserveStockLine> stockLines = cartItems.stream()
                 .map(item -> new ReserveStockLine(item.getProductId(), item.getQuantity()))
                 .toList();
         catalogClient.reserveStock(stockLines);
 
-        CatalogStoreSettings settings = catalogClient.getStoreSettings();
-        BigDecimal subtotal = subtotal(cartItems, products);
+        BigDecimal discountTotal = cartDiscount.discountTotal();
+        BigDecimal taxableSubtotal = subtotal.subtract(discountTotal);
         BigDecimal taxRate = settings.effectiveTaxRate();
-        BigDecimal taxTotal = subtotal.multiply(taxRate)
+        BigDecimal taxTotal = taxableSubtotal.multiply(taxRate)
                 .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-        BigDecimal grandTotal = subtotal.add(taxTotal);
+        BigDecimal grandTotal = taxableSubtotal.add(taxTotal);
 
         Order order = orderRepository.save(buildOrder(
                 userId,
                 address,
                 request.paymentMethod(),
                 subtotal,
+                discountTotal,
+                cartDiscount.offerName(),
                 taxTotal,
                 grandTotal,
                 settings
@@ -185,6 +191,8 @@ public class CheckoutService {
             Address address,
             PaymentMethod method,
             BigDecimal subtotal,
+            BigDecimal discountTotal,
+            String discountLabel,
             BigDecimal taxTotal,
             BigDecimal grandTotal,
             CatalogStoreSettings settings
@@ -195,6 +203,8 @@ public class CheckoutService {
         order.setAddressId(address.getId());
         order.setStatus(method == PaymentMethod.MOCK_COD ? "PENDING" : "CONFIRMED");
         order.setSubtotal(subtotal);
+        order.setDiscountTotal(discountTotal);
+        order.setDiscountLabel(discountLabel);
         order.setTaxTotal(taxTotal);
         order.setGrandTotal(grandTotal);
         order.setTaxLabel(settings.effectiveTaxLabel());
@@ -232,12 +242,16 @@ public class CheckoutService {
         }).toList();
     }
 
-    private void validateCoupon(String couponCode, Map<String, CatalogProductSnapshot> products) {
+    private void validateCoupon(
+            String couponCode,
+            Map<String, CatalogProductSnapshot> products,
+            CatalogCartDiscountSnapshot cartDiscount
+    ) {
         if (couponCode == null) {
             return;
         }
-        boolean matchedCart = products.values().stream().anyMatch(CatalogProductSnapshot::couponMatched);
-        if (!matchedCart) {
+        boolean productMatched = products.values().stream().anyMatch(CatalogProductSnapshot::couponMatched);
+        if (!productMatched && !cartDiscount.couponMatched()) {
             throw new BadRequestException("Coupon is not valid for this cart");
         }
     }

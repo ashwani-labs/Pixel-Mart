@@ -2,6 +2,9 @@ package com.pixelmart.catalog.storage;
 
 import com.pixelmart.catalog.exception.BadRequestException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -50,6 +53,24 @@ public class LocalStorageService implements StorageService {
             throw new BadRequestException("Failed to store file: " + e.getMessage());
         }
         return new StoredObject(storageKey, contentType);
+    }
+
+    @Override
+    public StoredContent load(String storageKey) {
+        Path path = resolve(storageKey);
+        if (!Files.exists(path)) {
+            throw new BadRequestException("Media not found");
+        }
+        try {
+            Resource resource = new UrlResource(path.toUri());
+            String contentType = Files.probeContentType(path);
+            if (contentType == null) {
+                contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+            }
+            return new StoredContent(resource, contentType);
+        } catch (IOException e) {
+            throw new BadRequestException("Cannot read media file: " + e.getMessage());
+        }
     }
 
     @Override

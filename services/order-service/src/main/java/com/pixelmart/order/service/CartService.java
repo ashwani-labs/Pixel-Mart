@@ -1,5 +1,6 @@
 package com.pixelmart.order.service;
 
+import com.pixelmart.order.client.CatalogCartDiscountSnapshot;
 import com.pixelmart.order.client.CatalogClient;
 import com.pixelmart.order.client.CatalogProductSnapshot;
 import com.pixelmart.order.domain.Cart;
@@ -40,7 +41,12 @@ public class CartService {
 
     @Transactional(readOnly = true)
     public CartResponse getCart() {
-        return buildResponse(findOrEmptyItems());
+        return getCart(null);
+    }
+
+    @Transactional(readOnly = true)
+    public CartResponse getCart(String couponCode) {
+        return buildResponse(findOrEmptyItems(), couponCode);
     }
 
     @Transactional
@@ -77,7 +83,7 @@ public class CartService {
             created.setQuantity(quantity);
             cartItemRepository.save(created);
         }
-        return buildResponse(cartItemRepository.findByCartIdOrderByCreatedAtAsc(cart.getId()));
+        return buildResponse(cartItemRepository.findByCartIdOrderByCreatedAtAsc(cart.getId()), null);
     }
 
     @Transactional
@@ -97,7 +103,7 @@ public class CartService {
         item.setQuantity(request.quantity());
         item.setUnitPrice(product.effectivePrice());
         cartItemRepository.save(item);
-        return buildResponse(cartItemRepository.findByCartIdOrderByCreatedAtAsc(cart.getId()));
+        return buildResponse(cartItemRepository.findByCartIdOrderByCreatedAtAsc(cart.getId()), null);
     }
 
     @Transactional
@@ -106,7 +112,7 @@ public class CartService {
         CartItem item = cartItemRepository.findByIdAndCartId(itemId, cart.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("CartItem", itemId));
         cartItemRepository.delete(item);
-        return buildResponse(cartItemRepository.findByCartIdOrderByCreatedAtAsc(cart.getId()));
+        return buildResponse(cartItemRepository.findByCartIdOrderByCreatedAtAsc(cart.getId()), null);
     }
 
     private List<CartItem> findOrEmptyItems() {
@@ -125,13 +131,31 @@ public class CartService {
                 });
     }
 
-    private CartResponse buildResponse(List<CartItem> items) {
+    private CartResponse buildResponse(List<CartItem> items, String couponCode) {
         List<CartItemResponse> responses = items.stream().map(CartItemResponse::from).toList();
         int totalQuantity = items.stream().mapToInt(CartItem::getQuantity).sum();
         BigDecimal subtotal = responses.stream()
                 .map(CartItemResponse::lineTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return new CartResponse(responses, responses.size(), totalQuantity, subtotal);
+        if (items.isEmpty()) {
+            return CartResponse.withoutDiscount(responses, responses.size(), totalQuantity, subtotal);
+        }
+        CatalogCartDiscountSnapshot discount = catalogClient.getCartDiscount(subtotal, normalizeCoupon(couponCode));
+        return new CartResponse(
+                responses,
+                responses.size(),
+                totalQuantity,
+                subtotal,
+                discount.discountTotal(),
+                discount.offerName()
+        );
+    }
+
+    private String normalizeCoupon(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.trim().toUpperCase();
     }
 
     private String currentUserId() {
