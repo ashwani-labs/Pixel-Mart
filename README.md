@@ -1,5 +1,7 @@
 # PixelMart
 
+![CI](https://github.com/ashwani-labs/pixelmart/actions/workflows/ci.yml/badge.svg)
+
 PixelMart is a portfolio-grade e-commerce platform built as a Spring Boot microservices monorepo with a React storefront and MySQL persistence. v1 is complete; see [docs/NEXT_TARGETS.md](docs/NEXT_TARGETS.md) for the v1.1 backlog.
 
 ## One-command local start
@@ -9,13 +11,15 @@ cp .env.example .env   # Windows: Copy-Item .env.example .env
 docker compose up --build
 ```
 
-In a second terminal:
+Open **`http://localhost:3000`**. The nginx frontend proxies `/api` to the gateway at `http://localhost:8080`.
+
+For hot-reload frontend development only:
 
 ```bash
 cd frontend && npm install && npm run dev
 ```
 
-Open `http://localhost:5173`. The SPA proxies `/api` to the gateway at `http://localhost:8080`.
+Open `http://localhost:5173` (Vite dev server with `/api` proxy).
 
 ## Current status — v1 complete
 
@@ -29,7 +33,7 @@ Demo seed data (Flyway `V8__demo_seed.sql`) includes **15 visible products**, **
 
 ## 3-minute demo script
 
-1. **Start stack (30s)** — Run `docker compose up --build`, then `cd frontend && npm run dev`. Confirm `http://localhost:8080/actuator/health` is UP.
+1. **Start stack (30s)** — Run `docker compose up --build`. Open `http://localhost:3000` and confirm `http://localhost:8080/actuator/health` is UP.
 2. **Storefront (45s)** — Open home, note the deals banner and offer badges. Browse `/products`, open a product detail page, read seeded reviews, toggle wishlist (customer login required).
 3. **Customer checkout (60s)** — Sign in as `customer@pixelmart.local` / `Customer@123`, add a fashion item to cart, go to checkout, enter coupon `STYLE15`, choose mock card, place order, open order detail.
 4. **Admin console (45s)** — Sign in as `admin@pixelmart.local` / `Admin@123`, open `/admin` dashboard, toggle product visibility, approve the pending review, browse audit log filters, tweak primary color in settings and confirm the storefront theme updates.
@@ -66,7 +70,7 @@ flowchart LR
 | `catalog-service` | `8082` | `catalog` | Products, categories, images, settings, offers, reviews, wishlist, audit log |
 | `order-service` | `8083` | `orders` | Carts, addresses, pincode cache, checkout, orders, payments |
 | `notification-service` | `8084` | `notify` | Email outbox / order confirmation |
-| `frontend` | `5173` | N/A | React storefront and admin console |
+| `frontend` | `3000` (compose) / `5173` (dev) | N/A | React storefront and admin console |
 
 ## Tech stack
 
@@ -131,7 +135,22 @@ OpenAPI is generated per service on its **direct port** (not through the gateway
 | Profile | Config | Notes |
 |---------|--------|-------|
 | **Local (default)** | `STORAGE_TYPE=local`, `STORAGE_LOCAL_PATH=./data/uploads` | Product images and logos stored on disk; Docker Compose mounts a `catalog_uploads` volume. |
-| **S3 (placeholder)** | `STORAGE_TYPE=s3` | Adapter stub in `S3StorageService`; returns a clear error until AWS SDK wiring is added. Set `AWS_REGION`, `AWS_S3_BUCKET`, and credentials in `.env` when implementing production media. |
+| **S3** | `STORAGE_TYPE=s3` | AWS SDK upload/download via `S3StorageService`. Set `AWS_REGION`, `AWS_S3_BUCKET`, `AWS_S3_PREFIX`, and credentials in `.env`. |
+
+## Screenshots
+
+Regenerate portfolio captures after UI changes (requires running compose stack):
+
+```bash
+docker compose up --build -d --wait
+cd e2e && npm ci && npx playwright install chromium && npm run screenshots
+```
+
+Outputs land in `docs/screenshots/` (`01-home.png` … `05-admin-audit-log.png`).
+
+## Demo video
+
+Recording script and timing cues: [docs/DEMO_VIDEO.md](docs/DEMO_VIDEO.md).
 
 ## Validation commands
 

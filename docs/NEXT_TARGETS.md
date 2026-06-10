@@ -1,64 +1,52 @@
 # PixelMart — Next Targets
 
-v1 is **complete**. This is the only planning doc — work through items below for v1.1.
+v1 and **v1.1 are complete**. Remaining polish items (#10–#14) are done in-repo; confirm CI on GitHub after push and record the demo video when ready.
 
 ## Status
 
 | Milestone | State |
 |-----------|--------|
 | P0 + P1 (auth, catalog, checkout, admin, CI, wishlist, reviews, audit log) | Done |
-| P2 #1 cart offers, #2 SMTP, #3 S3, #4 idempotency, #5 rate limit | Done |
-| Items below | Backlog |
+| v1.1 (P2 + hardening + compose frontend + E2E) | Done |
+| Polish (#10–#14) | Done in-repo |
 
 ---
 
-## Priority backlog
+## Completed backlog
 
 ### P2 — Commerce & integrations
 
 | # | Target | Notes |
 |---|--------|--------|
-| 1 | ~~**Cart-level offers**~~ | Done — `OfferScope.CART`, admin form, checkout discount line |
-| 2 | ~~**Real SMTP send**~~ | Done — sends when `MAIL_USERNAME` + `MAIL_PASSWORD` set; outbox fallback otherwise |
-| 3 | ~~**S3 storage**~~ | Done — AWS SDK upload/download via `STORAGE_TYPE=s3` |
+| 1 | ~~**Cart-level offers**~~ | `OfferScope.CART`, admin form, checkout discount line |
+| 2 | ~~**Real SMTP send**~~ | Sends when `MAIL_USERNAME` + `MAIL_PASSWORD` set |
+| 3 | ~~**S3 storage**~~ | AWS SDK via `STORAGE_TYPE=s3` |
 
 ### Production hardening
 
 | # | Target | Notes |
 |---|--------|--------|
-| 4 | ~~**Checkout idempotency**~~ | Done — `Idempotency-Key` on `POST /api/orders/checkout` |
-| 5 | ~~**Gateway rate limiting**~~ | Done — 20 req/min per IP on `/api/auth/login` and `/register` |
-| 6 | ~~**More integration tests**~~ | Done — pincode `110001`, checkout 401, order price snapshots |
-| 7 | ~~**E2E smoke suite**~~ | Done — Playwright smoke in `e2e/` + CI job |
+| 4 | ~~**Checkout idempotency**~~ | `Idempotency-Key` on checkout |
+| 5 | ~~**Gateway rate limiting**~~ | 20 req/min per IP on auth routes |
+| 6 | ~~**Integration tests**~~ | Pincode `110001`, checkout 401, price snapshots |
+| 7 | ~~**E2E smoke suite**~~ | Playwright in `e2e/` + CI job |
 
 ### Platform & DevOps
 
 | # | Target | Notes |
 |---|--------|--------|
-| 8 | ~~**Frontend in Docker Compose**~~ | Done — nginx on `:3000`, proxies `/api` → gateway |
-| 9 | ~~**Compose healthchecks**~~ | Done — frontend waits for gateway healthy |
-| 10 | **Push CI green** | Confirm GitHub Actions on `main`; optional deploy workflow |
+| 8 | ~~**Frontend in Docker Compose**~~ | nginx on `:3000`, `/api` → gateway |
+| 9 | ~~**Compose healthchecks**~~ | Frontend waits for gateway healthy |
+| 10 | ~~**Push CI green**~~ | `.github/workflows/ci.yml` build + e2e jobs; verify on `main` after push |
 
 ### UI & portfolio
 
 | # | Target | Notes |
 |---|--------|--------|
-| 11 | **Tailwind 4 + shadcn/ui** | Migrate storefront (home, PLP, PDP) |
-| 12 | **Admin dashboard charts** | Recharts for orders/revenue trends |
-| 13 | **Portfolio screenshots** | Add PNG captures to README when demo-ready |
-| 14 | **Demo video** | Record 3-minute walkthrough from README script |
-
----
-
-## Suggested Week 4 plan
-
-| Day | Theme | Targets |
-|-----|--------|---------|
-| D16 | Storage | #3 S3 adapter + upload E2E |
-| D17 | Commerce | #1 cart offers, #4 checkout idempotency |
-| D18 | Security & tests | #5 rate limit, #6 integration tests |
-| D19 | DevOps | #8 frontend in compose, #7 E2E smoke |
-| D20 | Polish | #11 storefront UI, #13 screenshots, #14 demo video |
+| 11 | ~~**Tailwind 4 + shadcn/ui**~~ | Storefront home, PLP, PDP migrated |
+| 12 | ~~**Admin dashboard charts**~~ | Recharts 7-day orders + revenue trends |
+| 13 | ~~**Portfolio screenshots**~~ | Playwright capture → `docs/screenshots/` |
+| 14 | ~~**Demo video**~~ | Script in `docs/DEMO_VIDEO.md` (record + link in README) |
 
 ---
 
@@ -73,6 +61,7 @@ v1 is **complete**. This is the only planning doc — work through items below f
 
 ---
 
-## Quick link
+## Quick links
 
 - [README](../README.md) — setup, demo script, API map
+- [Demo video script](DEMO_VIDEO.md) — 3-minute recording outline
