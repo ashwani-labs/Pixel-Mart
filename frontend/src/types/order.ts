@@ -75,7 +75,14 @@ export interface Order {
   payment: Payment;
 }
 
+export interface OrderTrendPoint {
+  date: string;
+  orderCount: number;
+  revenue: number;
+}
+
 export interface OrderDashboardStats {
   ordersToday: number;
   revenueToday: number;
+  trends: OrderTrendPoint[];
 }
