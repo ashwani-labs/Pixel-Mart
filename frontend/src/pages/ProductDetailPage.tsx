@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { ProductImageGallery } from '../components/product/ProductImageGallery';
 import { ProductReviews } from '../components/product/ProductReviews';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   useAddWishlistItemMutation,
   useGetProductBySlugQuery,
@@ -12,7 +14,6 @@ import {
 import { useAddCartItemMutation } from '../store/api/orderApi';
 import type { RootState } from '../store';
 import { selectIsAuthenticated } from '../store/slices/authSlice';
-import styles from './ProductsPage.module.css';
 
 function formatPrice(value: number) {
   return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(value);
@@ -33,16 +34,14 @@ export function ProductDetailPage() {
 
   if (isLoading) {
     return (
-      <div className={styles.page}>
-        <div className={styles.skeleton} style={{ minHeight: 320 }} />
-      </div>
+      <div className="h-80 animate-shimmer rounded-xl bg-gradient-to-r from-muted via-card to-muted" />
     );
   }
 
   if (isError || !product) {
     return (
-      <div className={styles.page}>
-        <p className={styles.empty}>Product not found.</p>
+      <div className="flex flex-col gap-3">
+        <p className="text-muted-foreground">Product not found.</p>
         <Link to="/products">← Back to products</Link>
       </div>
     );
@@ -63,27 +62,28 @@ export function ProductDetailPage() {
   };
 
   return (
-    <div className={styles.page}>
+    <div className="flex flex-col gap-6">
       <Link to="/products">← Back to products</Link>
-      <div className={styles.pdpLayout}>
+      <div className="grid gap-8 md:grid-cols-2">
         <ProductImageGallery images={product.images} productName={product.name} />
         <div>
-          {product.featured && <span className={styles.badge}>Featured</span>}
-          {product.offerName && <span className={styles.offerBadge}>{product.offerName}</span>}
-          <h1 className={styles.pdpTitle}>{product.name}</h1>
-          <div className={styles.priceRow}>
-            <span className={styles.price} style={{ fontSize: '1.5rem' }}>
-              {formatPrice(product.effectivePrice)}
-            </span>
+          <div className="mb-3 flex flex-wrap gap-2">
+            {product.featured && <Badge>Featured</Badge>}
+            {product.offerName && <Badge variant="success">{product.offerName}</Badge>}
+          </div>
+          <h1 className="m-0 mb-2 text-3xl font-bold">{product.name}</h1>
+          <div className="mb-4 flex items-baseline gap-2">
+            <span className="text-2xl font-bold text-primary">{formatPrice(product.effectivePrice)}</span>
             {product.compareAtPrice && (
-              <span className={styles.compare}>{formatPrice(product.compareAtPrice)}</span>
+              <span className="text-muted-foreground line-through">
+                {formatPrice(product.compareAtPrice)}
+              </span>
             )}
           </div>
-          <p className={styles.pdpDesc}>{product.description ?? 'No description available.'}</p>
-          <p className={styles.subtitle}>In stock: {product.stockQty}</p>
-          <button
-            type="button"
-            className={styles.addBtnActive}
+          <p className="text-muted-foreground">{product.description ?? 'No description available.'}</p>
+          <p className="text-sm text-muted-foreground">In stock: {product.stockQty}</p>
+          <Button
+            className="mt-5"
             disabled={adding || product.stockQty < 1}
             onClick={async () => {
               setCartMessage(null);
@@ -100,13 +100,13 @@ export function ProductDetailPage() {
             }}
           >
             {adding ? 'Adding…' : 'Add to cart'}
-          </button>
-          <button type="button" className={styles.wishlistSecondaryBtn} onClick={handleWishlistToggle}>
+          </Button>
+          <Button type="button" variant="outline" className="mt-3" onClick={handleWishlistToggle}>
             {isWishlisted ? '♥ Remove from wishlist' : '♡ Add to wishlist'}
-          </button>
-          {cartMessage && <p className={styles.cartMsg}>{cartMessage}</p>}
+          </Button>
+          {cartMessage && <p className="mt-2 text-sm text-primary">{cartMessage}</p>}
           {isAuthenticated && (
-            <Link to="/cart" className={styles.viewCartLink}>
+            <Link to="/cart" className="mt-2 inline-block text-sm">
               View cart
             </Link>
           )}

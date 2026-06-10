@@ -1,6 +1,9 @@
 import { useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ProductCard } from '@/components/storefront/ProductCard';
 import {
   useAddWishlistItemMutation,
   useGetCategoriesQuery,
@@ -10,8 +13,6 @@ import {
 } from '../store/api/catalogApi';
 import type { RootState } from '../store';
 import { selectIsAuthenticated } from '../store/slices/authSlice';
-import styles from './ProductsPage.module.css';
-
 function formatPrice(value: number) {
   return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(value);
 }
@@ -65,124 +66,97 @@ export function ProductListPage() {
   };
 
   return (
-    <div className={styles.page}>
-      <div className={styles.header}>
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className={styles.title}>Shop all products</h1>
-          <p className={styles.subtitle}>
+          <h1 className="m-0 text-3xl font-bold">Shop all products</h1>
+          <p className="mt-1 text-muted-foreground">
             {data ? `${data.totalElements} products` : 'Browse our catalog'}
           </p>
         </div>
-        <div className={styles.filters}>
+        <div className="flex flex-wrap gap-2">
           <label className="sr-only" htmlFor="product-search">
             Search products
           </label>
-          <input
+          <Input
             id="product-search"
-            className={styles.search}
+            className="min-w-56"
             placeholder="Search products…"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && applySearch()}
           />
-          <button type="button" className={styles.pageBtn} onClick={applySearch}>
+          <Button type="button" variant="outline" onClick={applySearch}>
             Search
-          </button>
+          </Button>
         </div>
       </div>
 
-      <div className={styles.filters} role="group" aria-label="Filter by category">
-        <button
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by category">
+        <Button
           type="button"
-          className={`${styles.chip} ${!categoryId ? styles.chipActive : ''}`}
+          variant={!categoryId ? 'default' : 'outline'}
+          size="sm"
           onClick={() => setCategory(undefined)}
         >
           All
-        </button>
+        </Button>
         {categories?.map((cat) => (
-          <button
+          <Button
             key={cat.id}
             type="button"
-            className={`${styles.chip} ${categoryId === cat.id ? styles.chipActive : ''}`}
+            variant={categoryId === cat.id ? 'default' : 'outline'}
+            size="sm"
             onClick={() => setCategory(cat.id)}
           >
             {cat.name}
-          </button>
+          </Button>
         ))}
       </div>
 
       {isLoading || isFetching ? (
-        <div className={styles.grid}>
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className={styles.skeleton} />
+            <div
+              key={i}
+              className="h-64 animate-shimmer rounded-xl bg-gradient-to-r from-muted via-card to-muted"
+            />
           ))}
         </div>
       ) : data && data.content.length > 0 ? (
         <>
-          <div className={styles.grid}>
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4">
             {data.content.map((product) => (
-              <div key={product.id} className={styles.card}>
-                <Link to={`/products/${product.slug}`} className={styles.cardImage}>
-                  ◆
-                </Link>
-                <div className={styles.cardBody}>
-                  <div className={styles.cardTopRow}>
-                    <div className={styles.badges}>
-                      {product.featured && <span className={styles.badge}>Featured</span>}
-                      {product.offerName && <span className={styles.offerBadge}>{product.offerName}</span>}
-                    </div>
-                    {isAuthenticated && (
-                      <button
-                        type="button"
-                        className={styles.wishlistBtn}
-                        aria-label={wishlistIds.has(product.id) ? 'Remove from wishlist' : 'Add to wishlist'}
-                        onClick={() =>
-                          wishlistIds.has(product.id)
-                            ? removeWishlistItem(product.id)
-                            : addWishlistItem(product.id)
-                        }
-                      >
-                        {wishlistIds.has(product.id) ? '♥' : '♡'}
-                      </button>
-                    )}
-                  </div>
-                  <Link to={`/products/${product.slug}`} className={styles.productNameLink}>
-                    <h2 className={styles.cardName}>{product.name}</h2>
-                  </Link>
-                  <div className={styles.priceRow}>
-                    <span className={styles.price}>{formatPrice(product.effectivePrice)}</span>
-                    {product.compareAtPrice && (
-                      <span className={styles.compare}>{formatPrice(product.compareAtPrice)}</span>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <ProductCard
+                key={product.id}
+                product={product}
+                formatPrice={formatPrice}
+                showWishlist={isAuthenticated}
+                isWishlisted={wishlistIds.has(product.id)}
+                onWishlistToggle={() =>
+                  wishlistIds.has(product.id)
+                    ? removeWishlistItem(product.id)
+                    : addWishlistItem(product.id)
+                }
+              />
             ))}
           </div>
-          <div className={styles.pagination}>
-            <button
-              type="button"
-              className={styles.pageBtn}
-              disabled={page <= 0}
-              onClick={() => setPage(page - 1)}
-            >
+          <div className="flex items-center justify-center gap-3">
+            <Button type="button" variant="outline" disabled={page <= 0} onClick={() => setPage(page - 1)}>
               Previous
-            </button>
-            <span>
+            </Button>
+            <span className="text-sm text-muted-foreground">
               Page {page + 1} of {data.totalPages}
             </span>
-            <button
-              type="button"
-              className={styles.pageBtn}
-              disabled={data.last}
-              onClick={() => setPage(page + 1)}
-            >
+            <Button type="button" variant="outline" disabled={data.last} onClick={() => setPage(page + 1)}>
               Next
-            </button>
+            </Button>
           </div>
         </>
       ) : (
-        <p className={styles.empty}>No products found. Try another category or search.</p>
+        <p className="py-12 text-center text-muted-foreground">
+          No products found. Try another category or search.
+        </p>
       )}
     </div>
   );

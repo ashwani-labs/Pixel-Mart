@@ -10,4 +10,6 @@ export function applyTheme(presetId: ThemePresetId, mode: ThemeMode, primaryOver
   const primary = primaryOverride ?? colors.primary;
   document.documentElement.style.setProperty('--primary', primary);
   document.documentElement.style.setProperty('--primary-foreground', colors.primaryForeground);
+  document.documentElement.style.setProperty('--color-primary', primary);
+  document.documentElement.style.setProperty('--color-primary-foreground', colors.primaryForeground);
 }

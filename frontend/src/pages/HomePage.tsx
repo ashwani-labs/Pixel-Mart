@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { ProductCard } from '@/components/storefront/ProductCard';
 import {
   useGetActiveOffersQuery,
   useGetCategoriesQuery,
   useGetProductsQuery,
 } from '../store/api/catalogApi';
-import styles from './HomePage.module.css';
-import productStyles from './ProductsPage.module.css';
 
 function formatPrice(value: number) {
   return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(value);
@@ -17,77 +18,64 @@ export function HomePage() {
   const { data: activeOffers } = useGetActiveOffersQuery();
 
   return (
-    <div className={styles.page}>
-      <section className={styles.hero}>
-        <p className={styles.eyebrow}>Production-grade e-commerce</p>
-        <h1>Welcome to the store</h1>
-        <p className={styles.lead}>
+    <div className="flex flex-col gap-10">
+      <section className="rounded-xl border border-border bg-gradient-to-br from-primary/15 to-card p-10">
+        <p className="m-0 mb-3 text-xs font-semibold uppercase tracking-widest text-primary">
+          Production-grade e-commerce
+        </p>
+        <h1 className="m-0 mb-3 text-4xl font-bold leading-tight">Welcome to the store</h1>
+        <p className="mb-5 max-w-2xl text-muted-foreground">
           Discover curated electronics, fashion, and home essentials. Branding and product images are
           admin-configurable.
         </p>
-        <Link to="/products" className={styles.cta}>
-          Shop all products
-        </Link>
+        <Button asChild>
+          <Link to="/products" className="no-underline hover:no-underline">
+            Shop all products
+          </Link>
+        </Button>
       </section>
 
       {activeOffers && activeOffers.length > 0 && (
-        <section className={styles.dealsBanner}>
-          <strong>Deals live now:</strong> {activeOffers.map((offer) => offer.name).join(', ')}
-        </section>
+        <Card className="border-primary/35 bg-primary/10">
+          <CardContent className="p-4">
+            <strong>Deals live now:</strong> {activeOffers.map((offer) => offer.name).join(', ')}
+          </CardContent>
+        </Card>
       )}
 
       {categories && categories.length > 0 && (
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Shop by category</h2>
-          <div className={productStyles.filters}>
+        <section className="flex flex-col gap-4">
+          <h2 className="m-0 text-xl font-semibold">Shop by category</h2>
+          <div className="flex flex-wrap gap-2">
             {categories.map((cat) => (
-              <Link
-                key={cat.id}
-                to={`/products?categoryId=${cat.id}`}
-                className={productStyles.chip}
-              >
-                {cat.name}
-              </Link>
+              <Button key={cat.id} variant="outline" size="sm" asChild>
+                <Link to={`/products?categoryId=${cat.id}`} className="no-underline hover:no-underline">
+                  {cat.name}
+                </Link>
+              </Button>
             ))}
           </div>
         </section>
       )}
 
-      <section className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Featured products</h2>
+      <section className="flex flex-col gap-4">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="m-0 text-xl font-semibold">Featured products</h2>
           <Link to="/products">View all →</Link>
         </div>
         {isLoading ? (
-          <div className={productStyles.grid}>
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className={productStyles.skeleton} />
+              <div
+                key={i}
+                className="h-64 animate-shimmer rounded-xl bg-gradient-to-r from-muted via-card to-muted"
+              />
             ))}
           </div>
         ) : (
-          <div className={productStyles.grid}>
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4">
             {featured?.content.map((product) => (
-              <Link
-                key={product.id}
-                to={`/products/${product.slug}`}
-                className={productStyles.card}
-              >
-                <div className={productStyles.cardImage}>◆</div>
-                <div className={productStyles.cardBody}>
-                  <h3 className={productStyles.cardName}>{product.name}</h3>
-                  {product.offerName && (
-                    <span className={productStyles.offerBadge}>{product.offerName}</span>
-                  )}
-                  <div className={productStyles.priceRow}>
-                    <span className={productStyles.price}>{formatPrice(product.effectivePrice)}</span>
-                    {product.compareAtPrice && (
-                      <span className={productStyles.compare}>
-                        {formatPrice(product.compareAtPrice)}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Link>
+              <ProductCard key={product.id} product={product} formatPrice={formatPrice} />
             ))}
           </div>
         )}
