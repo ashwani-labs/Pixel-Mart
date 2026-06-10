@@ -22,4 +22,6 @@ public interface OrderRepository extends JpaRepository<Order, String> {
 
     @Query("SELECT COALESCE(SUM(o.grandTotal), 0) FROM Order o WHERE o.createdAt >= :since")
     BigDecimal sumGrandTotalSince(@Param("since") Instant since);
+
+    List<Order> findByCreatedAtGreaterThanEqualOrderByCreatedAtAsc(Instant since);
 }
