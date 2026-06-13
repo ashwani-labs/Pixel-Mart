@@ -19,11 +19,11 @@
     <description>Production-grade e-commerce monorepo</description>
 
     <modules>
-        <module>gateway</module>
-        <module>services/auth-service</module>
-        <module>services/catalog-service</module>
-        <module>services/order-service</module>
-        <module>services/notification-service</module>
+        <module>e-commerce-backend/gateway</module>
+        <module>e-commerce-backend/auth-service</module>
+        <module>e-commerce-backend/catalog-service</module>
+        <module>e-commerce-backend/order-service</module>
+        <module>e-commerce-backend/notification-service</module>
     </modules>
 
     <properties>

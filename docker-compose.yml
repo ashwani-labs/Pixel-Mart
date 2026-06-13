@@ -23,7 +23,7 @@ services:
   auth-service:
     build:
       context: .
-      dockerfile: services/auth-service/Dockerfile
+      dockerfile: e-commerce-backend/auth-service/Dockerfile
     container_name: pixelmart-auth
     restart: unless-stopped
     depends_on:
@@ -50,7 +50,7 @@ services:
   catalog-service:
     build:
       context: .
-      dockerfile: services/catalog-service/Dockerfile
+      dockerfile: e-commerce-backend/catalog-service/Dockerfile
     container_name: pixelmart-catalog
     restart: unless-stopped
     depends_on:
@@ -82,7 +82,7 @@ services:
   order-service:
     build:
       context: .
-      dockerfile: services/order-service/Dockerfile
+      dockerfile: e-commerce-backend/order-service/Dockerfile
     container_name: pixelmart-order
     restart: unless-stopped
     depends_on:
@@ -108,7 +108,7 @@ services:
   notification-service:
     build:
       context: .
-      dockerfile: services/notification-service/Dockerfile
+      dockerfile: e-commerce-backend/notification-service/Dockerfile
     container_name: pixelmart-notification
     restart: unless-stopped
     depends_on:
@@ -136,7 +136,7 @@ services:
   api-gateway:
     build:
       context: .
-      dockerfile: gateway/Dockerfile
+      dockerfile: e-commerce-backend/gateway/Dockerfile
     container_name: pixelmart-gateway
     restart: unless-stopped
     depends_on:
