@@ -38,6 +38,7 @@ public class PublicCatalogController {
     @GetMapping("/products")
     public PageResponse<ProductResponse> products(
             @RequestParam(required = false) String categoryId,
+            @RequestParam(required = false) String superCategoryId,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) Boolean featured,
             @PageableDefault(size = 12, sort = "name", direction = Sort.Direction.ASC) Pageable pageable
@@ -45,7 +46,7 @@ public class PublicCatalogController {
         if (Boolean.TRUE.equals(featured)) {
             return PageResponse.from(productService.listFeatured(pageable));
         }
-        return PageResponse.from(productService.listPublic(categoryId, search, pageable));
+        return PageResponse.from(productService.listPublic(categoryId, superCategoryId, search, pageable));
     }
 
     @GetMapping("/products/{slug}")

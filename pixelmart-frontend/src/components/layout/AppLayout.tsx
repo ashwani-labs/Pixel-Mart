@@ -4,20 +4,14 @@ import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { RootState } from '../../store';
-import { useGetCategoriesQuery } from '../../store/api/catalogApi';
+import { FALLBACK_SUPER_CATEGORIES } from '../../lib/catalogFallbacks';
+import { useGetSuperCategoriesQuery } from '../../store/api/catalogApi';
 import { useLogoutMutation } from '../../store/api/authApi';
 import { useGetCartQuery } from '../../store/api/orderApi';
 import { clearCredentials, selectAuthUser, selectHasRole, selectIsAuthenticated } from '../../store/slices/authSlice';
 import { ThemeSwitcher } from '../theme/ThemeSwitcher';
 
-const FALLBACK_CATEGORIES = [
-  { id: 'cat-electronics', name: 'Gadgets & Tech', slug: 'electronics' },
-  { id: 'cat-fashion', name: 'Clothing', slug: 'clothing' },
-  { id: 'cat-staples', name: 'Rice, Flour & Pulses', slug: 'staples' },
-  { id: 'cat-skincare', name: 'Skin Care', slug: 'skin-care' },
-  { id: 'cat-footwear', name: 'Footwear', slug: 'footwear' },
-  { id: 'cat-toys', name: 'Toys & Games', slug: 'toys-games' },
-];
+const FALLBACK_AISLES = FALLBACK_SUPER_CATEGORIES;
 
 export function AppLayout() {
   const dispatch = useDispatch();
@@ -29,8 +23,8 @@ export function AppLayout() {
   const logoUrl = useSelector((s: RootState) => s.settings.logoUrl);
   const [logoutApi] = useLogoutMutation();
   const { data: cart } = useGetCartQuery(undefined, { skip: !isAuthenticated });
-  const { data: categories } = useGetCategoriesQuery();
-  const navCategories = categories?.length ? categories : FALLBACK_CATEGORIES;
+  const { data: superCategories } = useGetSuperCategoriesQuery();
+  const navAisles = superCategories?.length ? superCategories : FALLBACK_AISLES;
   const cartQty = cart?.totalQuantity ?? 0;
   const [search, setSearch] = useState('');
 
@@ -117,17 +111,21 @@ export function AppLayout() {
           </div>
         </div>
 
-        <nav className="border-t border-white/20 bg-brand-dark" aria-label="Shop categories">
-          <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-1 px-4 py-2">
+        <nav className="border-t border-white/20 bg-brand-dark" aria-label="Shop aisles">
+          <div className="mx-auto flex max-w-6xl items-center gap-1 overflow-x-auto px-4 py-2">
             <NavLink to="/" end className={navLinkClass}>
               Home
             </NavLink>
             <NavLink to="/products" className={navLinkClass}>
               All Products
             </NavLink>
-            {navCategories.map((cat) => (
-              <NavLink key={cat.id} to={`/products?categoryId=${cat.id}`} className={navLinkClass}>
-                {cat.name}
+            {navAisles.map((aisle) => (
+              <NavLink
+                key={aisle.id}
+                to={`/products?superCategoryId=${aisle.id}`}
+                className={navLinkClass}
+              >
+                {aisle.name}
               </NavLink>
             ))}
             {isAuthenticated && (

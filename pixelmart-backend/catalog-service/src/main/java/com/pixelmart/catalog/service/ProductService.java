@@ -50,8 +50,13 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ProductResponse> listPublic(String categoryId, String search, Pageable pageable) {
-        return productRepository.findPublicProducts(normalize(categoryId), normalize(search), pageable)
+    public Page<ProductResponse> listPublic(String categoryId, String superCategoryId, String search, Pageable pageable) {
+        return productRepository.findPublicProducts(
+                        normalize(categoryId),
+                        normalize(superCategoryId),
+                        normalize(search),
+                        pageable
+                )
                 .map(product -> ProductResponse.fromPublic(product, offerService.price(product)));
     }
 

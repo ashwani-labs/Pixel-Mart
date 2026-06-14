@@ -19,6 +19,7 @@ export interface ProductListParams {
   page?: number;
   size?: number;
   categoryId?: string;
+  superCategoryId?: string;
   search?: string;
   featured?: boolean;
 }
@@ -136,12 +137,13 @@ export const catalogApi = baseApi.injectEndpoints({
       providesTags: ['Dashboard'],
     }),
     getProducts: build.query<PageResponse<Product>, ProductListParams>({
-      query: ({ page = 0, size = 12, categoryId, search, featured }) => ({
+      query: ({ page = 0, size = 12, categoryId, superCategoryId, search, featured }) => ({
         url: '/catalog/products',
         params: {
           page,
           size,
           categoryId: categoryId || undefined,
+          superCategoryId: superCategoryId || undefined,
           search: search || undefined,
           featured: featured ?? undefined,
         },

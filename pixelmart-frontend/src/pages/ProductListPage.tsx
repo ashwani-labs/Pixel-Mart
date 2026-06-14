@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import {
   useAddWishlistItemMutation,
   useGetCategoriesQuery,
   useGetProductsQuery,
+  useGetSuperCategoriesQuery,
   useGetWishlistQuery,
   useRemoveWishlistItemMutation,
 } from '../store/api/catalogApi';
@@ -23,11 +24,13 @@ export function ProductListPage() {
   const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryId = searchParams.get('categoryId') ?? undefined;
+  const superCategoryId = searchParams.get('superCategoryId') ?? undefined;
   const search = searchParams.get('search') ?? '';
   const page = Number(searchParams.get('page') ?? '0');
   const [searchInput, setSearchInput] = useState(search);
 
-  const { data: categories } = useGetCategoriesQuery();
+  const { data: superCategories = [] } = useGetSuperCategoriesQuery();
+  const { data: subCategories = [] } = useGetCategoriesQuery();
   const { data: wishlist = [] } = useGetWishlistQuery(undefined, { skip: !isAuthenticated });
   const [addWishlistItem] = useAddWishlistItemMutation();
   const [removeWishlistItem] = useRemoveWishlistItemMutation();
@@ -35,10 +38,27 @@ export function ProductListPage() {
     page,
     size: 16,
     categoryId,
+    superCategoryId: categoryId ? undefined : superCategoryId,
     search: search || undefined,
   });
   const wishlistIds = new Set(wishlist.map((item) => item.id));
-  const activeCategory = categories?.find((c) => c.id === categoryId);
+
+  const subCategoriesBySuper = useMemo(() => {
+    const grouped = new Map<string, typeof subCategories>();
+    for (const sub of subCategories) {
+      if (!sub.parentId) continue;
+      const list = grouped.get(sub.parentId) ?? [];
+      list.push(sub);
+      grouped.set(sub.parentId, list);
+    }
+    return grouped;
+  }, [subCategories]);
+
+  const activeSubCategory = subCategories.find((c) => c.id === categoryId);
+  const activeSuperCategory = superCategories.find(
+    (c) => c.id === superCategoryId || c.id === activeSubCategory?.parentId,
+  );
+  const resolvedSuperId = activeSuperCategory?.id ?? superCategoryId;
 
   const applySearch = () => {
     const next = new URLSearchParams(searchParams);
@@ -51,10 +71,15 @@ export function ProductListPage() {
     setSearchParams(next);
   };
 
-  const setCategory = (id?: string) => {
+  const setFilters = (nextSuperId?: string, nextCategoryId?: string) => {
     const next = new URLSearchParams(searchParams);
-    if (id) {
-      next.set('categoryId', id);
+    if (nextSuperId) {
+      next.set('superCategoryId', nextSuperId);
+    } else {
+      next.delete('superCategoryId');
+    }
+    if (nextCategoryId) {
+      next.set('categoryId', nextCategoryId);
     } else {
       next.delete('categoryId');
     }
@@ -68,39 +93,62 @@ export function ProductListPage() {
     setSearchParams(next);
   };
 
+  const pageTitle = activeSubCategory?.name ?? activeSuperCategory?.name ?? 'All products';
+
   return (
     <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-      <aside className="w-full shrink-0 lg:w-56">
+      <aside className="w-full shrink-0 lg:w-60">
         <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
           <h2 className="m-0 mb-3 text-sm font-bold uppercase tracking-wide text-muted-foreground">
             Departments
           </h2>
-          <ul className="m-0 flex flex-row flex-wrap gap-2 p-0 lg:flex-col lg:gap-1">
+          <ul className="m-0 flex flex-col gap-1 p-0">
             <li className="list-none">
               <Button
                 type="button"
-                variant={!categoryId ? 'default' : 'ghost'}
+                variant={!categoryId && !superCategoryId ? 'default' : 'ghost'}
                 size="sm"
                 className="w-full justify-start"
-                onClick={() => setCategory(undefined)}
+                onClick={() => setFilters(undefined, undefined)}
               >
                 All products
               </Button>
             </li>
-            {categories?.map((cat) => {
-              const visual = getCategoryVisual(cat.id);
+            {superCategories.map((superCat) => {
+              const visual = getCategoryVisual(superCat.id);
+              const isSuperActive = resolvedSuperId === superCat.id && !categoryId;
+              const children = subCategoriesBySuper.get(superCat.id) ?? [];
+              const isExpanded = resolvedSuperId === superCat.id;
+
               return (
-                <li key={cat.id} className="list-none">
+                <li key={superCat.id} className="list-none">
                   <Button
                     type="button"
-                    variant={categoryId === cat.id ? 'default' : 'ghost'}
+                    variant={isSuperActive ? 'default' : 'ghost'}
                     size="sm"
                     className="w-full justify-start gap-2"
-                    onClick={() => setCategory(cat.id)}
+                    onClick={() => setFilters(superCat.id, undefined)}
                   >
                     <span aria-hidden>{visual.emoji}</span>
-                    {cat.name}
+                    {superCat.name}
                   </Button>
+                  {isExpanded && children.length > 0 && (
+                    <ul className="m-0 mt-1 flex flex-col gap-0.5 border-l-2 border-border pl-2">
+                      {children.map((sub) => (
+                        <li key={sub.id} className="list-none">
+                          <Button
+                            type="button"
+                            variant={categoryId === sub.id ? 'secondary' : 'ghost'}
+                            size="sm"
+                            className="h-8 w-full justify-start text-xs"
+                            onClick={() => setFilters(superCat.id, sub.id)}
+                          >
+                            {sub.name}
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </li>
               );
             })}
@@ -112,11 +160,10 @@ export function ProductListPage() {
         <div className="mb-6 rounded-xl border border-border bg-card p-4">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h1 className="m-0 text-2xl font-bold text-foreground">
-                {activeCategory ? activeCategory.name : 'All products'}
-              </h1>
+              <h1 className="m-0 text-2xl font-bold text-foreground">{pageTitle}</h1>
               <p className="mt-1 text-sm text-muted-foreground">
                 {data ? `${data.totalElements} items` : 'Browse our value range'}
+                {activeSuperCategory && activeSubCategory && ` · ${activeSuperCategory.name}`}
                 {search && ` · “${search}”`}
               </p>
             </div>
@@ -137,6 +184,30 @@ export function ProductListPage() {
               </Button>
             </div>
           </div>
+
+          {resolvedSuperId && (subCategoriesBySuper.get(resolvedSuperId) ?? []).length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-4">
+              <Button
+                type="button"
+                size="sm"
+                variant={!categoryId ? 'default' : 'outline'}
+                onClick={() => setFilters(resolvedSuperId, undefined)}
+              >
+                All in {activeSuperCategory?.name ?? 'aisle'}
+              </Button>
+              {(subCategoriesBySuper.get(resolvedSuperId) ?? []).map((sub) => (
+                <Button
+                  key={sub.id}
+                  type="button"
+                  size="sm"
+                  variant={categoryId === sub.id ? 'default' : 'outline'}
+                  onClick={() => setFilters(resolvedSuperId, sub.id)}
+                >
+                  {getCategoryVisual(sub.id).emoji} {sub.name}
+                </Button>
+              ))}
+            </div>
+          )}
         </div>
 
         {isLoading || isFetching ? (

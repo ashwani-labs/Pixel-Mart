@@ -25,11 +25,15 @@ public interface ProductRepository extends JpaRepository<Product, String> {
             SELECT p FROM Product p
             WHERE p.visible = true
               AND (:categoryId IS NULL OR p.categoryId = :categoryId)
+              AND (:superCategoryId IS NULL OR p.categoryId IN (
+                  SELECT c.id FROM Category c WHERE c.parentId = :superCategoryId
+              ))
               AND (:search IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%'))
                    OR LOWER(p.description) LIKE LOWER(CONCAT('%', :search, '%')))
             """)
     Page<Product> findPublicProducts(
             @Param("categoryId") String categoryId,
+            @Param("superCategoryId") String superCategoryId,
             @Param("search") String search,
             Pageable pageable
     );

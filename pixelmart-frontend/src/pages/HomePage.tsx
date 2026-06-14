@@ -4,23 +4,15 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ProductCard } from '@/components/storefront/ProductCard';
+import { FALLBACK_SUPER_CATEGORIES } from '@/lib/catalogFallbacks';
 import { getCategoryVisual } from '@/lib/categoryStyle';
 import {
   useGetActiveOffersQuery,
-  useGetCategoriesQuery,
   useGetProductsQuery,
+  useGetSuperCategoriesQuery,
 } from '../store/api/catalogApi';
 import type { RootState } from '../store';
 import { selectIsAuthenticated } from '../store/slices/authSlice';
-
-const FALLBACK_CATEGORIES = [
-  { id: 'cat-electronics', name: 'Gadgets & Tech', slug: 'electronics' },
-  { id: 'cat-fashion', name: 'Clothing', slug: 'clothing' },
-  { id: 'cat-staples', name: 'Rice, Flour & Pulses', slug: 'staples' },
-  { id: 'cat-skincare', name: 'Skin Care', slug: 'skin-care' },
-  { id: 'cat-footwear', name: 'Footwear', slug: 'footwear' },
-  { id: 'cat-toys', name: 'Toys & Games', slug: 'toys-games' },
-];
 
 function formatPrice(value: number) {
   return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(value);
@@ -28,10 +20,10 @@ function formatPrice(value: number) {
 
 export function HomePage() {
   const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
-  const { data: categories } = useGetCategoriesQuery();
+  const { data: superCategories } = useGetSuperCategoriesQuery();
   const { data: featured, isLoading } = useGetProductsQuery({ page: 0, size: 12, featured: true });
   const { data: activeOffers } = useGetActiveOffersQuery();
-  const displayCategories = categories?.length ? categories : FALLBACK_CATEGORIES;
+  const aisles = superCategories?.length ? superCategories : FALLBACK_SUPER_CATEGORIES;
 
   return (
     <div className="flex flex-col gap-6">
@@ -43,7 +35,7 @@ export function HomePage() {
           Shop smarter. Save more.
         </h1>
         <p className="mt-2 max-w-md text-sm opacity-90 sm:text-base">
-          Electronics, fashion and home essentials — clear pricing, fast checkout.
+          Electronics, groceries, fashion and more — clear pricing, fast checkout.
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           <Button variant="accent" size="lg" asChild>
@@ -62,10 +54,13 @@ export function HomePage() {
       </section>
 
       <div className="flex flex-wrap gap-2">
-        {displayCategories.map((cat) => (
-          <Button key={cat.id} variant="outline" size="sm" asChild>
-            <Link to={`/products?categoryId=${cat.id}`} className="no-underline hover:no-underline">
-              {getCategoryVisual(cat.id).emoji} {cat.name}
+        {aisles.map((aisle) => (
+          <Button key={aisle.id} variant="outline" size="sm" asChild>
+            <Link
+              to={`/products?superCategoryId=${aisle.id}`}
+              className="no-underline hover:no-underline"
+            >
+              {getCategoryVisual(aisle.id).emoji} {aisle.name}
             </Link>
           </Button>
         ))}
@@ -120,25 +115,25 @@ export function HomePage() {
       </section>
 
       <section>
-        <h2 className="m-0 mb-4 text-lg font-bold text-foreground">Shop by category</h2>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {displayCategories.map((cat) => {
-            const visual = getCategoryVisual(cat.id);
+        <h2 className="m-0 mb-4 text-lg font-bold text-foreground">Shop by aisle</h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          {aisles.map((aisle) => {
+            const visual = getCategoryVisual(aisle.id);
             return (
               <Link
-                key={cat.id}
-                to={`/products?categoryId=${cat.id}`}
+                key={aisle.id}
+                to={`/products?superCategoryId=${aisle.id}`}
                 className="no-underline hover:no-underline"
               >
-                <Card className="transition hover:border-primary/50 hover:shadow-md">
-                  <CardContent className="flex items-center gap-4 p-5">
+                <Card className="h-full transition hover:border-primary/50 hover:shadow-md">
+                  <CardContent className="flex items-center gap-3 p-4">
                     <span
-                      className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br text-2xl ${visual.gradient}`}
+                      className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-xl ${visual.gradient}`}
                     >
                       {visual.emoji}
                     </span>
-                    <div>
-                      <p className="m-0 font-bold text-card-foreground">{cat.name}</p>
+                    <div className="min-w-0">
+                      <p className="m-0 truncate font-bold text-card-foreground">{aisle.name}</p>
                       <p className="m-0 mt-0.5 text-xs text-muted-foreground">Browse aisle →</p>
                     </div>
                   </CardContent>
