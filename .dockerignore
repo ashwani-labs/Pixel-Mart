@@ -3,7 +3,7 @@
 **/.vscode
 **/target
 **/node_modules
-frontend
+pixelmart-frontend
 data
 *.md
 .env

@@ -19,11 +19,11 @@
     <description>Production-grade e-commerce monorepo</description>
 
     <modules>
-        <module>e-commerce-backend/gateway</module>
-        <module>e-commerce-backend/auth-service</module>
-        <module>e-commerce-backend/catalog-service</module>
-        <module>e-commerce-backend/order-service</module>
-        <module>e-commerce-backend/notification-service</module>
+        <module>pixelmart-backend/gateway</module>
+        <module>pixelmart-backend/auth-service</module>
+        <module>pixelmart-backend/catalog-service</module>
+        <module>pixelmart-backend/order-service</module>
+        <module>pixelmart-backend/notification-service</module>
     </modules>
 
     <properties>

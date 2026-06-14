@@ -16,7 +16,7 @@ Open **`http://localhost:3000`**. The nginx frontend proxies `/api` to the gatew
 For hot-reload frontend development only:
 
 ```bash
-cd frontend && npm install && npm run dev
+cd pixelmart-frontend && npm install && npm run dev
 ```
 
 Open `http://localhost:5173` (Vite dev server with `/api` proxy).
@@ -105,7 +105,7 @@ Useful backend URLs:
 ### 3. Start frontend
 
 ```bash
-cd frontend
+cd pixelmart-frontend
 npm install
 npm run dev
 ```
@@ -156,7 +156,7 @@ Recording script and timing cues: [docs/DEMO_VIDEO.md](docs/DEMO_VIDEO.md).
 
 ```bash
 mvn verify
-cd frontend && npm run build
+cd pixelmart-frontend && npm run build
 ```
 
 CI runs the same checks on push/PR via `.github/workflows/ci.yml`.
