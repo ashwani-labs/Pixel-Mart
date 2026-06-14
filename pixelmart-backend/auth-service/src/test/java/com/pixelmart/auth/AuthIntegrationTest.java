@@ -71,13 +71,26 @@ class AuthIntegrationTest {
     }
 
     @Test
-    void loginWithSeededAdminReturnsAccessToken() throws Exception {
+    void loginWithSeededAdminOnCustomerLoginIsRejected() throws Exception {
         Map<String, String> body = Map.of(
                 "email", "admin@pixelmart.local",
                 "password", "Admin@123"
         );
 
         mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(body)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void adminLoginWithSeededAdminReturnsAccessToken() throws Exception {
+        Map<String, String> body = Map.of(
+                "email", "admin@pixelmart.local",
+                "password", "Admin@123"
+        );
+
+        mockMvc.perform(post("/api/auth/admin-login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isOk())

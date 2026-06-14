@@ -23,6 +23,13 @@ export const authApi = baseApi.injectEndpoints({
         body,
       }),
     }),
+    adminLogin: build.mutation<AuthResponse, LoginRequest>({
+      query: (body) => ({
+        url: '/auth/admin-login',
+        method: 'POST',
+        body,
+      }),
+    }),
     refresh: build.mutation<AuthResponse, void>({
       query: () => ({
         url: '/auth/refresh',
@@ -53,6 +60,7 @@ export const authApi = baseApi.injectEndpoints({
 export const {
   useRegisterMutation,
   useLoginMutation,
+  useAdminLoginMutation,
   useRefreshMutation,
   useLogoutMutation,
   useMeQuery,

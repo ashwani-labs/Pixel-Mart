@@ -59,7 +59,24 @@ public class AuthService {
     }
 
     @Transactional
-    public AuthTokens login(LoginRequest request) {
+    public AuthTokens loginCustomer(LoginRequest request) {
+        User user = authenticate(request);
+        if (user.getRoles().contains(Role.ADMIN)) {
+            throw new InvalidCredentialsException();
+        }
+        return issueTokens(user);
+    }
+
+    @Transactional
+    public AuthTokens loginAdmin(LoginRequest request) {
+        User user = authenticate(request);
+        if (!user.getRoles().contains(Role.ADMIN)) {
+            throw new InvalidCredentialsException();
+        }
+        return issueTokens(user);
+    }
+
+    private User authenticate(LoginRequest request) {
         User user = userRepository.findByEmailIgnoreCase(request.email().trim())
                 .filter(User::isEnabled)
                 .orElseThrow(InvalidCredentialsException::new);
@@ -68,7 +85,7 @@ public class AuthService {
             throw new InvalidCredentialsException();
         }
 
-        return issueTokens(user);
+        return user;
     }
 
     @Transactional

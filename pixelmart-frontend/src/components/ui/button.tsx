@@ -13,6 +13,8 @@ const buttonVariants = cva(
         outline: 'border border-border bg-card text-card-foreground hover:bg-muted hover:text-foreground',
         ghost: 'text-foreground hover:bg-muted',
         onBrand: 'bg-transparent text-on-brand hover:bg-white/15',
+        brandOutline:
+          'shrink-0 border border-white/55 bg-white/10 text-on-brand shadow-sm hover:bg-white/20 hover:text-on-brand',
         secondary: 'bg-muted text-foreground hover:bg-muted/80',
       },
       size: {

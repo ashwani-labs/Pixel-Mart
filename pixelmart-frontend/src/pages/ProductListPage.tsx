@@ -34,6 +34,7 @@ export function ProductListPage() {
   const superCategoryId = searchParams.get('superCategoryId') ?? undefined;
   const search = searchParams.get('search') ?? '';
   const sort = searchParams.get('sort') ?? 'name,asc';
+  const featured = searchParams.get('featured') === 'true';
   const page = Number(searchParams.get('page') ?? '0');
   const [searchInput, setSearchInput] = useState(search);
 
@@ -48,6 +49,7 @@ export function ProductListPage() {
     categoryId,
     superCategoryId: categoryId ? undefined : superCategoryId,
     search: search || undefined,
+    featured: featured || undefined,
     sort,
   });
   const wishlistIds = new Set(wishlist.map((item) => item.id));
@@ -109,7 +111,9 @@ export function ProductListPage() {
     setSearchParams(next);
   };
 
-  const pageTitle = activeSubCategory?.name ?? activeSuperCategory?.name ?? 'All products';
+  const pageTitle = featured
+    ? 'Featured products'
+    : activeSubCategory?.name ?? activeSuperCategory?.name ?? 'All products';
 
   return (
     <div className="flex flex-col gap-6 lg:flex-row lg:items-start">

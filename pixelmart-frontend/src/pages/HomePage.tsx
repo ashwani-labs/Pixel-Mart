@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { HeroCarousel } from '@/components/storefront/HeroCarousel';
 import { ProductCard } from '@/components/storefront/ProductCard';
 import { FALLBACK_SUPER_CATEGORIES } from '@/lib/catalogFallbacks';
 import { getCategoryVisual } from '@/lib/categoryStyle';
@@ -11,8 +11,6 @@ import {
   useGetProductsQuery,
   useGetSuperCategoriesQuery,
 } from '../store/api/catalogApi';
-import type { RootState } from '../store';
-import { selectIsAuthenticated } from '../store/slices/authSlice';
 
 function formatPrice(value: number) {
   return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(value);
@@ -21,7 +19,6 @@ function formatPrice(value: number) {
 const SPOTLIGHT_AISLES = ['super-grocery', 'super-electronics', 'super-fashion'] as const;
 
 export function HomePage() {
-  const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
   const { data: superCategories } = useGetSuperCategoriesQuery();
   const { data: featured, isLoading } = useGetProductsQuery({ page: 0, size: 12, featured: true });
   const { data: groceryDeals } = useGetProductsQuery({
@@ -38,37 +35,7 @@ export function HomePage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <section className="overflow-hidden rounded-2xl bg-gradient-to-r from-brand to-brand-dark px-6 py-8 text-on-brand shadow-md sm:px-10">
-        <Badge className="mb-3 border-0 bg-accent text-accent-foreground">Everyday savings</Badge>
-        <h1 className="m-0 max-w-lg text-3xl font-bold leading-tight sm:text-4xl">
-          Shop smarter. Save more.
-        </h1>
-        <p className="mt-2 max-w-md text-sm opacity-90 sm:text-base">
-          Electronics, groceries, fashion and more — clear pricing, fast checkout.
-        </p>
-        <div className="mt-5 flex flex-wrap gap-3">
-          <Button variant="accent" size="lg" asChild>
-            <Link to="/products" className="no-underline hover:no-underline">
-              Browse products
-            </Link>
-          </Button>
-          <Button variant="onBrand" size="lg" asChild>
-            <Link
-              to="/products?superCategoryId=super-grocery"
-              className="no-underline hover:no-underline"
-            >
-              Shop groceries
-            </Link>
-          </Button>
-          {!isAuthenticated && (
-            <Button variant="onBrand" size="lg" asChild>
-              <Link to="/register" className="no-underline hover:no-underline">
-                Join free
-              </Link>
-            </Button>
-          )}
-        </div>
-      </section>
+      <HeroCarousel />
 
       {spotlightAisles.length > 0 && (
         <section className="grid grid-cols-1 gap-3 sm:grid-cols-3">

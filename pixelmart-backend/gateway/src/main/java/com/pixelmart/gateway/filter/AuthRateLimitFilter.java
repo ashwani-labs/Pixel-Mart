@@ -38,7 +38,9 @@ public class AuthRateLimitFilter implements GlobalFilter, Ordered {
     }
 
     private boolean isAuthPath(String path) {
-        return "/api/auth/login".equals(path) || "/api/auth/register".equals(path);
+        return "/api/auth/login".equals(path)
+                || "/api/auth/admin-login".equals(path)
+                || "/api/auth/register".equals(path);
     }
 
     private String clientKey(ServerWebExchange exchange) {

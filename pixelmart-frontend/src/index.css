@@ -148,6 +148,16 @@ select option {
   background-size: 200% 100%;
 }
 
+/* Auth links in brand header — avoid theme primary color on brand bar */
+.bg-brand a.text-on-brand {
+  color: var(--color-on-brand);
+}
+
+.bg-brand a.text-on-brand:hover {
+  color: var(--color-on-brand);
+  text-decoration: none;
+}
+
 /* Search in brand header — always light field, dark text */
 .search-field-light {
   background-color: #ffffff !important;

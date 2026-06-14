@@ -1,0 +1,49 @@
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--primary) 8%, var(--background)) 0%,
+    var(--background) 45%,
+    color-mix(in srgb, var(--muted) 40%, var(--background)) 100%
+  );
+}
+
+.brand {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.brandTitle {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.brandSub {
+  margin: 0.35rem 0 0;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.panel {
+  width: 100%;
+  max-width: 420px;
+}
+
+.back {
+  margin-top: 1.25rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.back a {
+  color: var(--primary);
+  font-weight: 500;
+}

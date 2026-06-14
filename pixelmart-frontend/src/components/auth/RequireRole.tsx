@@ -12,7 +12,7 @@ export function RequireRole({ role, children }: RequireRoleProps) {
   const user = useSelector((s: RootState) => selectAuthUser(s));
 
   if (!user?.roles.includes(role)) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/admin-login" replace state={{ from: '/admin' }} />;
   }
 
   return <>{children}</>;

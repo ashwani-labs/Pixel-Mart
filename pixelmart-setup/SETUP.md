@@ -143,10 +143,12 @@ You should see `admin@pixelmart.local` and `customer@pixelmart.local`.
 
 ### Demo accounts (seeded in `02-auth-service.sql`)
 
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | `admin@pixelmart.local` | `Admin@123` |
-| Customer | `customer@pixelmart.local` | `Customer@123` |
+| Role | Email | Password | Sign in at |
+|------|-------|----------|------------|
+| Admin | `admin@pixelmart.local` | `Admin@123` | `/admin-login` |
+| Customer | `customer@pixelmart.local` | `Customer@123` | `/login` |
+
+Admin credentials are rejected on the customer `/login` page. Use `/admin-login` for store management.
 
 Demo coupon: **`STYLE15`** (15% off fashion category). Also try **`GLOW12`** (12% off skin care).
 

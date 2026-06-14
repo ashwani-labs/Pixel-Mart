@@ -44,7 +44,7 @@ export function LoginPage() {
       navigate(from, { replace: true });
     } catch (err) {
       const apiErr = err as { data?: ApiErrorBody };
-      setServerError(apiErr.data?.message ?? 'Login failed. Please try again.');
+      setServerError(apiErr.data?.message ?? 'Invalid credentials.');
     }
   };
 
@@ -80,7 +80,7 @@ export function LoginPage() {
         </p>
 
         <div className={styles.hint}>
-          <strong>Demo:</strong> admin@pixelmart.local / Admin@123
+          <strong>Demo customer:</strong> customer@pixelmart.local / Customer@123
         </div>
       </div>
     </div>

@@ -8,7 +8,7 @@ import { FALLBACK_SUPER_CATEGORIES } from '../../lib/catalogFallbacks';
 import { useGetSuperCategoriesQuery } from '../../store/api/catalogApi';
 import { useLogoutMutation } from '../../store/api/authApi';
 import { useGetCartQuery } from '../../store/api/orderApi';
-import { clearCredentials, selectAuthUser, selectHasRole, selectIsAuthenticated } from '../../store/slices/authSlice';
+import { clearCredentials, selectAuthUser, selectIsAuthenticated } from '../../store/slices/authSlice';
 import { TrustBar } from '../storefront/TrustBar';
 import { ThemeSwitcher } from '../theme/ThemeSwitcher';
 import { StoreFooter } from './StoreFooter';
@@ -20,7 +20,6 @@ export function AppLayout() {
   const navigate = useNavigate();
   const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
   const user = useSelector((s: RootState) => selectAuthUser(s));
-  const isAdmin = useSelector((s: RootState) => selectHasRole('ADMIN')(s));
   const storeName = useSelector((s: RootState) => s.settings.storeName);
   const logoUrl = useSelector((s: RootState) => s.settings.logoUrl);
   const [logoutApi] = useLogoutMutation();
@@ -82,20 +81,20 @@ export function AppLayout() {
             </Button>
           </form>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <ThemeSwitcher compact />
             {isAuthenticated ? (
               <>
                 <span className="hidden text-sm text-on-brand sm:inline">
                   Hi, <strong>{user?.name?.split(' ')[0]}</strong>
                 </span>
-                <Button type="button" variant="onBrand" size="sm" onClick={handleLogout}>
+                <Button type="button" variant="brandOutline" size="sm" onClick={handleLogout}>
                   Logout
                 </Button>
               </>
             ) : (
-              <Button variant="onBrand" size="sm" asChild>
-                <Link to="/login" className="no-underline hover:no-underline">
+              <Button variant="brandOutline" size="sm" asChild>
+                <Link to="/login" className="text-on-brand no-underline hover:no-underline hover:text-on-brand">
                   Sign in
                 </Link>
               </Button>
@@ -139,11 +138,6 @@ export function AppLayout() {
                 <NavLink to="/orders" className={navLinkClass}>
                   Orders
                 </NavLink>
-                {isAdmin && (
-                  <NavLink to="/admin" className={navLinkClass}>
-                    Admin
-                  </NavLink>
-                )}
               </>
             )}
           </div>

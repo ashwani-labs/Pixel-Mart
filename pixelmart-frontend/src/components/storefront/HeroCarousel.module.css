@@ -1,0 +1,182 @@
+.carousel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  min-height: 280px;
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--foreground) 12%, transparent);
+}
+
+@media (min-width: 640px) {
+  .carousel {
+    min-height: 340px;
+  }
+}
+
+.viewport {
+  position: absolute;
+  inset: 0;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.7s ease-in-out;
+}
+
+.slideActive {
+  opacity: 1;
+  z-index: 1;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    color-mix(in srgb, var(--color-brand-dark) 92%, transparent) 0%,
+    color-mix(in srgb, var(--color-brand) 75%, transparent) 45%,
+    color-mix(in srgb, var(--color-brand-dark) 35%, transparent) 100%
+  );
+}
+
+.badge {
+  align-self: flex-start;
+  width: fit-content;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 280px;
+  padding: 1.5rem;
+  color: var(--color-on-brand);
+}
+
+@media (min-width: 640px) {
+  .content {
+    min-height: 340px;
+    padding: 2rem 2.5rem;
+  }
+}
+
+.title {
+  margin: 0;
+  max-width: 32rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-shadow: 0 2px 12px color-mix(in srgb, #000 35%, transparent);
+}
+
+@media (min-width: 640px) {
+  .title {
+    font-size: 2.25rem;
+  }
+}
+
+.subtitle {
+  margin: 0.5rem 0 0;
+  max-width: 28rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  opacity: 0.95;
+  text-shadow: 0 1px 8px color-mix(in srgb, #000 30%, transparent);
+}
+
+@media (min-width: 640px) {
+  .subtitle {
+    font-size: 1rem;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.secondaryBtn {
+  border-color: color-mix(in srgb, var(--color-on-brand) 55%, transparent);
+  background: color-mix(in srgb, var(--color-on-brand) 12%, transparent);
+  color: var(--color-on-brand);
+}
+
+.secondaryBtn:hover {
+  background: color-mix(in srgb, var(--color-on-brand) 22%, transparent);
+  color: var(--color-on-brand);
+}
+
+.navBtn {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin-top: -1.125rem;
+  border: 1px solid color-mix(in srgb, var(--color-on-brand) 45%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, #000 35%, transparent);
+  color: var(--color-on-brand);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.navBtn:hover {
+  background: color-mix(in srgb, #000 55%, transparent);
+}
+
+.navPrev {
+  left: 0.75rem;
+}
+
+.navNext {
+  right: 0.75rem;
+}
+
+.dots {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 3;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-on-brand) 40%, transparent);
+  cursor: pointer;
+  transition: width 0.2s ease, background 0.2s ease;
+}
+
+.dotActive {
+  width: 1.25rem;
+  background: var(--color-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide {
+    transition: none;
+  }
+}

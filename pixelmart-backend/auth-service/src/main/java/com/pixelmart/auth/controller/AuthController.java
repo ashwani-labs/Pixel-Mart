@@ -43,7 +43,12 @@ public class AuthController {
 
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
-        return writeTokens(authService.login(request), response);
+        return writeTokens(authService.loginCustomer(request), response);
+    }
+
+    @PostMapping("/admin-login")
+    public AuthResponse adminLogin(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
+        return writeTokens(authService.loginAdmin(request), response);
     }
 
     @PostMapping("/refresh")
