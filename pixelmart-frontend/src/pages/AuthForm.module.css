@@ -55,22 +55,22 @@
 
 .error {
   font-size: 0.8125rem;
-  color: #dc2626;
+  color: var(--destructive);
 }
 
 .bannerError {
   padding: 0.65rem 0.75rem;
   border-radius: calc(var(--radius) - 4px);
-  background: color-mix(in srgb, #dc2626 12%, transparent);
-  color: #b91c1c;
+  background: color-mix(in srgb, var(--destructive) 14%, var(--card));
+  color: var(--destructive);
   font-size: 0.875rem;
 }
 
 .bannerSuccess {
   padding: 0.65rem 0.75rem;
   border-radius: calc(var(--radius) - 4px);
-  background: color-mix(in srgb, #16a34a 12%, transparent);
-  color: #15803d;
+  background: color-mix(in srgb, var(--color-success) 14%, var(--card));
+  color: var(--color-success);
   font-size: 0.875rem;
   margin-bottom: 0.5rem;
 }

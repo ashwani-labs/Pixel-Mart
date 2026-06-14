@@ -114,8 +114,8 @@
 
 .wishlistBtn {
   border: 1px solid var(--border);
-  background: var(--background);
-  color: #dc2626;
+  background: var(--card);
+  color: var(--destructive);
   border-radius: 999px;
   width: 2rem;
   height: 2rem;
@@ -124,7 +124,7 @@
 }
 
 .wishlistBtn:hover {
-  border-color: #ef4444;
+  border-color: var(--destructive);
 }
 
 .productNameLink {
@@ -175,8 +175,8 @@
   letter-spacing: 0.06em;
   padding: 0.15rem 0.45rem;
   border-radius: 4px;
-  background: color-mix(in srgb, #16a34a 18%, transparent);
-  color: #15803d;
+  background: var(--color-success-bg);
+  color: var(--color-success);
 }
 
 .skeleton {

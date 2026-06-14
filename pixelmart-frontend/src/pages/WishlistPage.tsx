@@ -1,68 +1,81 @@
 import { Link } from 'react-router-dom';
-import { useGetWishlistQuery, useRemoveWishlistItemMutation } from '../store/api/catalogApi';
-import styles from './ProductsPage.module.css';
+import { useSelector } from 'react-redux';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { ProductCard } from '@/components/storefront/ProductCard';
+import {
+  useGetWishlistQuery,
+  useRemoveWishlistItemMutation,
+} from '../store/api/catalogApi';
+import type { RootState } from '../store';
+import { selectIsAuthenticated } from '../store/slices/authSlice';
 
 function formatPrice(value: number) {
   return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(value);
 }
 
 export function WishlistPage() {
-  const { data: wishlist = [], isLoading, isFetching } = useGetWishlistQuery();
+  const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
+  const { data: wishlist = [], isLoading, isFetching } = useGetWishlistQuery(undefined, {
+    skip: !isAuthenticated,
+  });
   const [removeWishlistItem] = useRemoveWishlistItemMutation();
 
+  if (!isAuthenticated) {
+    return null;
+  }
+
   return (
-    <div className={styles.page}>
-      <div className={styles.header}>
+    <div className="mx-auto max-w-6xl">
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className={styles.title}>My wishlist</h1>
-          <p className={styles.subtitle}>{wishlist.length} saved items</p>
+          <h1 className="m-0 text-2xl font-extrabold text-foreground">My wishlist</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{wishlist.length} saved items</p>
         </div>
+        <Button variant="outline" size="sm" asChild>
+          <Link to="/products" className="no-underline hover:no-underline">
+            Continue shopping
+          </Link>
+        </Button>
       </div>
 
       {isLoading || isFetching ? (
-        <div className={styles.grid}>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className={styles.skeleton} />
+            <div
+              key={i}
+              className="h-64 animate-shimmer rounded-xl bg-gradient-to-r from-muted via-card to-muted"
+            />
           ))}
         </div>
       ) : wishlist.length > 0 ? (
-        <div className={styles.grid}>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {wishlist.map((product) => (
-            <div key={product.id} className={styles.card}>
-              <Link to={`/products/${product.slug}`} className={styles.cardImage}>
-                ◆
-              </Link>
-              <div className={styles.cardBody}>
-                <h2 className={styles.cardName}>{product.name}</h2>
-                <div className={styles.priceRow}>
-                  <span className={styles.price}>{formatPrice(product.effectivePrice)}</span>
-                  {product.compareAtPrice && (
-                    <span className={styles.compare}>{formatPrice(product.compareAtPrice)}</span>
-                  )}
-                </div>
-                <div className={styles.wishlistActions}>
-                  <Link to={`/products/${product.slug}`} className={styles.pageBtn}>
-                    View
-                  </Link>
-                  <button
-                    type="button"
-                    className={styles.pageBtn}
-                    onClick={() => removeWishlistItem(product.id)}
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            </div>
+            <ProductCard
+              key={product.id}
+              product={product}
+              formatPrice={formatPrice}
+              showWishlist
+              isWishlisted
+              onWishlistToggle={() => removeWishlistItem(product.id)}
+              showAddToCart
+            />
           ))}
         </div>
       ) : (
-        <div className={styles.emptyState}>
-          <p className={styles.empty}>Your wishlist is empty.</p>
-          <Link to="/products" className={styles.pageBtn}>
-            Browse products
-          </Link>
-        </div>
+        <Card className="py-16 text-center">
+          <CardContent>
+            <p className="m-0 text-lg font-semibold text-card-foreground">Your wishlist is empty</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Tap ♡ on any product to save it for later.
+            </p>
+            <Button variant="accent" className="mt-6" asChild>
+              <Link to="/products" className="no-underline hover:no-underline">
+                Browse products
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

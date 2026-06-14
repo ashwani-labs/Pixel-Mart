@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where([data-theme-mode=dark], [data-theme-mode=dark] *));
+
 @theme {
   --font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
   --radius-lg: 0.625rem;
@@ -11,7 +13,7 @@
   --color-muted: #e8eef4;
   --color-muted-foreground: #5c6b7a;
   --color-border: #d4dde8;
-  /* Brand bar — always clearly blue, not near-black */
+  /* Brand bar — always clearly blue */
   --color-brand: #0875d4;
   --color-brand-dark: #065baa;
   --color-on-brand: #ffffff;
@@ -24,18 +26,20 @@
   --color-deal-foreground: #2e7d32;
   --color-success: #2e7d32;
   --color-success-bg: #e8f5e9;
+  --color-destructive: #dc2626;
+  --color-destructive-foreground: #ffffff;
   --color-input: #ffffff;
+  --color-ring: #0875d4;
 }
 
 [data-theme-mode='dark'] {
-  --color-background: #141c28;
+  --color-background: #0f1419;
   --color-foreground: #e8edf4;
-  --color-card: #1c2836;
+  --color-card: #1a2332;
   --color-card-foreground: #f1f5f9;
   --color-muted: #243044;
-  --color-muted-foreground: #9aa8b8;
-  --color-border: #344559;
-  /* Brand stays bright blue in dark mode */
+  --color-muted-foreground: #94a3b8;
+  --color-border: #3d4f66;
   --color-brand: #1a8fe8;
   --color-brand-dark: #0d74c2;
   --color-on-brand: #ffffff;
@@ -43,24 +47,32 @@
   --color-primary-foreground: #0f172a;
   --color-accent: #ffc107;
   --color-accent-foreground: #1a1a1a;
-  --color-deal: #1b4332;
+  --color-deal: #14532d;
   --color-deal-foreground: #86efac;
   --color-success: #86efac;
-  --color-success-bg: #1b4332;
+  --color-success-bg: #14532d;
+  --color-destructive: #f87171;
+  --color-destructive-foreground: #450a0a;
   --color-input: #243044;
+  --color-ring: #4db0f5;
 }
 
 :root {
+  --background: var(--color-background);
+  --foreground: var(--color-foreground);
+  --card: var(--color-card);
+  --card-foreground: var(--color-card-foreground);
+  --muted: var(--color-muted);
+  --muted-foreground: var(--color-muted-foreground);
+  --border: var(--color-border);
   --primary: var(--color-primary);
   --primary-foreground: var(--color-primary-foreground);
   --accent: var(--color-accent);
   --accent-foreground: var(--color-accent-foreground);
-  --foreground: var(--color-foreground);
-  --card: var(--color-card);
-  --card-foreground: var(--color-card-foreground);
-  --border: var(--color-border);
-  --muted: var(--color-muted);
-  --muted-foreground: var(--color-muted-foreground);
+  --destructive: var(--color-destructive);
+  --destructive-foreground: var(--color-destructive-foreground);
+  --input: var(--color-input);
+  --ring: var(--color-ring);
   --radius: 0.625rem;
 }
 
@@ -97,6 +109,17 @@ a:hover {
 button {
   font-family: inherit;
   cursor: pointer;
+}
+
+select {
+  font-family: inherit;
+  color: var(--color-card-foreground);
+  background-color: var(--color-card);
+}
+
+select option {
+  background-color: var(--color-card);
+  color: var(--color-card-foreground);
 }
 
 .sr-only {
@@ -138,4 +161,19 @@ button {
 [data-theme-mode='dark'] .search-field-light {
   background-color: #ffffff !important;
   color: #1e293b !important;
+}
+
+/* Scrollbar for aisle nav */
+.nav-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.nav-scroll a {
+  color: var(--color-on-brand);
+  white-space: nowrap;
+}
+
+.nav-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-on-brand) 35%, transparent);
+  border-radius: 4px;
 }

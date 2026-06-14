@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { getCategoryVisual, getProductEmoji } from '@/lib/categoryStyle';
 import { ProductImageGallery } from '../components/product/ProductImageGallery';
 import { ProductReviews } from '../components/product/ProductReviews';
 import { Badge } from '@/components/ui/badge';
@@ -63,9 +64,28 @@ export function ProductDetailPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <Link to="/products">← Back to products</Link>
+      <nav className="text-sm text-muted-foreground" aria-label="Breadcrumb">
+        <Link to="/" className="no-underline hover:text-primary hover:no-underline">
+          Home
+        </Link>
+        <span className="mx-2">/</span>
+        <Link to="/products" className="no-underline hover:text-primary hover:no-underline">
+          Products
+        </Link>
+        <span className="mx-2">/</span>
+        <span className="text-foreground">{product.name}</span>
+      </nav>
       <div className="grid gap-8 md:grid-cols-2">
-        <ProductImageGallery images={product.images} productName={product.name} />
+        {product.images.length > 0 ? (
+          <ProductImageGallery images={product.images} productName={product.name} />
+        ) : (
+          <div
+            className={`flex min-h-[280px] items-center justify-center rounded-xl border border-border bg-gradient-to-br text-7xl ${getCategoryVisual(product.categoryId).gradient}`}
+            aria-hidden
+          >
+            {getProductEmoji(product.slug, product.categoryId)}
+          </div>
+        )}
         <div>
           <div className="mb-3 flex flex-wrap gap-2">
             {product.featured && <Badge>Featured</Badge>}

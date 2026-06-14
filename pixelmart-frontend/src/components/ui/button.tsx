@@ -10,7 +10,7 @@ const buttonVariants = cva(
       variant: {
         default: 'bg-primary text-primary-foreground hover:brightness-110',
         accent: 'bg-accent text-accent-foreground hover:brightness-105 shadow-sm',
-        outline: 'border border-border bg-card text-card-foreground hover:bg-muted',
+        outline: 'border border-border bg-card text-card-foreground hover:bg-muted hover:text-foreground',
         ghost: 'text-foreground hover:bg-muted',
         onBrand: 'bg-transparent text-on-brand hover:bg-white/15',
         secondary: 'bg-muted text-foreground hover:bg-muted/80',

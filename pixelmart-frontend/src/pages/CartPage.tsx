@@ -90,7 +90,7 @@ export function CartPage() {
                         <input
                           type="number"
                           min={1}
-                          className="h-9 w-16 rounded-md border border-border bg-card px-2 text-center"
+                          className="h-9 w-16 rounded-md border border-border bg-input px-2 text-center text-foreground"
                           value={item.quantity}
                           onChange={async (e) => {
                             const qty = parseInt(e.target.value, 10);
@@ -107,7 +107,7 @@ export function CartPage() {
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="text-red-600"
+                        className="text-destructive hover:text-destructive"
                         onClick={() => removeItem(item.id)}
                       >
                         Remove

@@ -72,8 +72,8 @@ export function ProductCard({
           )}
         >
           <div className="absolute inset-0 opacity-30">
-            <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-white/60" />
-            <div className="absolute -bottom-6 -left-4 h-24 w-24 rounded-full bg-white/40" />
+            <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-white/50 dark:bg-white/10" />
+            <div className="absolute -bottom-6 -left-4 h-24 w-24 rounded-full bg-white/30 dark:bg-white/5" />
           </div>
 
           <div className="absolute left-2 top-2 flex flex-col gap-1">
@@ -109,7 +109,7 @@ export function ProductCard({
           {showWishlist && onWishlistToggle && (
             <button
               type="button"
-              className="shrink-0 border-0 bg-transparent p-0 text-base text-red-500"
+              className="shrink-0 border-0 bg-transparent p-0 text-base text-destructive hover:opacity-80"
               aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
               onClick={onWishlistToggle}
             >

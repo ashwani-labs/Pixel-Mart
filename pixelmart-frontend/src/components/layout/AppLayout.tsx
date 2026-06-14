@@ -9,7 +9,9 @@ import { useGetSuperCategoriesQuery } from '../../store/api/catalogApi';
 import { useLogoutMutation } from '../../store/api/authApi';
 import { useGetCartQuery } from '../../store/api/orderApi';
 import { clearCredentials, selectAuthUser, selectHasRole, selectIsAuthenticated } from '../../store/slices/authSlice';
+import { TrustBar } from '../storefront/TrustBar';
 import { ThemeSwitcher } from '../theme/ThemeSwitcher';
+import { StoreFooter } from './StoreFooter';
 
 const FALLBACK_AISLES = FALLBACK_SUPER_CATEGORIES;
 
@@ -45,7 +47,7 @@ export function AppLayout() {
   };
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `rounded-lg px-3 py-1.5 text-sm font-medium no-underline hover:no-underline ${
+    `shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium no-underline hover:no-underline ${
       isActive ? 'bg-white/25 text-on-brand' : 'text-on-brand/90 hover:bg-white/15 hover:text-on-brand'
     }`;
 
@@ -81,6 +83,7 @@ export function AppLayout() {
           </form>
 
           <div className="flex items-center gap-2">
+            <ThemeSwitcher compact />
             {isAuthenticated ? (
               <>
                 <span className="hidden text-sm text-on-brand sm:inline">
@@ -112,7 +115,7 @@ export function AppLayout() {
         </div>
 
         <nav className="border-t border-white/20 bg-brand-dark" aria-label="Shop aisles">
-          <div className="mx-auto flex max-w-6xl items-center gap-1 overflow-x-auto px-4 py-2">
+          <div className="nav-scroll mx-auto flex max-w-6xl flex-nowrap items-center gap-1 overflow-x-auto px-4 py-2">
             <NavLink to="/" end className={navLinkClass}>
               Home
             </NavLink>
@@ -147,29 +150,13 @@ export function AppLayout() {
         </nav>
       </header>
 
+      <TrustBar />
+
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
         <Outlet />
       </main>
 
-      <footer className="mt-auto border-t border-border bg-card">
-        <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="m-0 font-bold text-card-foreground">{storeName}</p>
-            <p className="m-0 mt-1 text-sm text-muted-foreground">
-              Quality products at honest prices.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-4 text-sm text-card-foreground">
-            <Link to="/products">Shop</Link>
-            <Link to="/orders">Orders</Link>
-            <Link to="/login">Account</Link>
-          </div>
-          <ThemeSwitcher />
-        </div>
-        <div className="border-t border-border py-3 text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} {storeName}
-        </div>
-      </footer>
+      <StoreFooter />
     </div>
   );
 }

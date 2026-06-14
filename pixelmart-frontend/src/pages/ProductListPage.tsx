@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
 import { ProductCard } from '@/components/storefront/ProductCard';
 import { getCategoryVisual } from '@/lib/categoryStyle';
 import {
@@ -20,12 +21,19 @@ function formatPrice(value: number) {
   return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(value);
 }
 
+const SORT_OPTIONS = [
+  { value: 'name,asc', label: 'Name A–Z' },
+  { value: 'basePrice,asc', label: 'Price: Low to high' },
+  { value: 'basePrice,desc', label: 'Price: High to low' },
+] as const;
+
 export function ProductListPage() {
   const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryId = searchParams.get('categoryId') ?? undefined;
   const superCategoryId = searchParams.get('superCategoryId') ?? undefined;
   const search = searchParams.get('search') ?? '';
+  const sort = searchParams.get('sort') ?? 'name,asc';
   const page = Number(searchParams.get('page') ?? '0');
   const [searchInput, setSearchInput] = useState(search);
 
@@ -40,6 +48,7 @@ export function ProductListPage() {
     categoryId,
     superCategoryId: categoryId ? undefined : superCategoryId,
     search: search || undefined,
+    sort,
   });
   const wishlistIds = new Set(wishlist.map((item) => item.id));
 
@@ -90,6 +99,13 @@ export function ProductListPage() {
   const setPage = (p: number) => {
     const next = new URLSearchParams(searchParams);
     next.set('page', String(p));
+    setSearchParams(next);
+  };
+
+  const setSort = (value: string) => {
+    const next = new URLSearchParams(searchParams);
+    next.set('sort', value);
+    next.set('page', '0');
     setSearchParams(next);
   };
 
@@ -167,21 +183,38 @@ export function ProductListPage() {
                 {search && ` · “${search}”`}
               </p>
             </div>
-            <div className="flex w-full max-w-md gap-0 sm:w-auto">
-              <label className="sr-only" htmlFor="product-search">
-                Search products
+            <div className="flex w-full max-w-md flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+              <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                Sort
+                <Select
+                  className="h-10 min-w-[10rem]"
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value)}
+                  aria-label="Sort products"
+                >
+                  {SORT_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Select>
               </label>
-              <Input
-                id="product-search"
-                className="h-10 flex-1 rounded-r-none"
-                placeholder="Search in store…"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && applySearch()}
-              />
-              <Button type="button" variant="accent" className="h-10 rounded-l-none px-4" onClick={applySearch}>
-                Go
-              </Button>
+              <div className="flex flex-1 gap-0">
+                <label className="sr-only" htmlFor="product-search">
+                  Search products
+                </label>
+                <Input
+                  id="product-search"
+                  className="h-10 flex-1 rounded-r-none"
+                  placeholder="Search in store…"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && applySearch()}
+                />
+                <Button type="button" variant="accent" className="h-10 rounded-l-none px-4" onClick={applySearch}>
+                  Go
+                </Button>
+              </div>
             </div>
           </div>
 
