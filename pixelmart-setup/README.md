@@ -1,6 +1,6 @@
 # PixelMart Setup
 
-Operations, Docker, SQL bootstrap, environment templates, E2E tests, and project docs.
+Operations, Docker, SQL bootstrap, environment templates, and E2E smoke tests.
 
 This is one of **three main project folders**:
 
@@ -16,8 +16,6 @@ This is one of **three main project folders**:
 |------|-------------|
 | [DOCKER.md](DOCKER.md) | Run the full stack with Docker Compose |
 | [SQL.md](SQL.md) | Database bootstrap, Flyway, no `ddl-auto` |
-| [docs/NEXT_TARGETS.md](docs/NEXT_TARGETS.md) | Backlog / milestone tracker |
-| [docs/DEMO_VIDEO.md](docs/DEMO_VIDEO.md) | Demo video script |
 
 ## Folder layout
 
@@ -31,7 +29,6 @@ pixelmart-setup/
 ├── sql/
 │   └── 01-schemas.sql
 ├── scripts/
-├── docs/
 └── e2e/
 ```
 

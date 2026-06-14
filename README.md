@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/ashwani-labs/pixelmart/actions/workflows/ci.yml/badge.svg)
 
-PixelMart is a portfolio-grade e-commerce platform built as a Spring Boot microservices monorepo with a React storefront and MySQL persistence. v1 is complete; see [pixelmart-setup/docs/NEXT_TARGETS.md](pixelmart-setup/docs/NEXT_TARGETS.md) for the v1.1 backlog.
+PixelMart is a portfolio-grade e-commerce platform built as a Spring Boot microservices monorepo with a React storefront and MySQL persistence.
 
 ## Repository layout
 
@@ -153,22 +153,6 @@ OpenAPI is generated per service on its **direct port** (not through the gateway
 | **Local (default)** | `STORAGE_TYPE=local`, `STORAGE_LOCAL_PATH=./data/uploads` | Product images and logos stored on disk; Docker Compose mounts a `catalog_uploads` volume. |
 | **S3** | `STORAGE_TYPE=s3` | AWS SDK upload/download via `S3StorageService`. Set `AWS_REGION`, `AWS_S3_BUCKET`, `AWS_S3_PREFIX`, and credentials in `.env`. |
 
-## Screenshots
-
-Regenerate portfolio captures after UI changes (requires running compose stack):
-
-```bash
-cd pixelmart-setup
-docker compose up --build -d --wait
-cd e2e && npm ci && npx playwright install chromium && npm run screenshots
-```
-
-Outputs land in `pixelmart-setup/docs/screenshots/` (`01-home.png` … `05-admin-audit-log.png`).
-
-## Demo video
-
-Recording script and timing cues: [pixelmart-setup/docs/DEMO_VIDEO.md](pixelmart-setup/docs/DEMO_VIDEO.md).
-
 ## Validation commands
 
 ```bash
@@ -217,7 +201,6 @@ docker compose up --build
 
 ## Documentation
 
-- [Next targets (v1.1 backlog)](pixelmart-setup/docs/NEXT_TARGETS.md)
 - [Docker setup](pixelmart-setup/DOCKER.md)
 - [SQL / Flyway setup](pixelmart-setup/SQL.md)
 
