@@ -12,7 +12,7 @@ services:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+      - ./sql:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-pixelmart_root}"]
       interval: 10s
@@ -22,7 +22,7 @@ services:
 
   auth-service:
     build:
-      context: .
+      context: ..
       dockerfile: pixelmart-backend/auth-service/Dockerfile
     container_name: pixelmart-auth
     restart: unless-stopped
@@ -49,7 +49,7 @@ services:
 
   catalog-service:
     build:
-      context: .
+      context: ..
       dockerfile: pixelmart-backend/catalog-service/Dockerfile
     container_name: pixelmart-catalog
     restart: unless-stopped
@@ -81,7 +81,7 @@ services:
 
   order-service:
     build:
-      context: .
+      context: ..
       dockerfile: pixelmart-backend/order-service/Dockerfile
     container_name: pixelmart-order
     restart: unless-stopped
@@ -107,7 +107,7 @@ services:
 
   notification-service:
     build:
-      context: .
+      context: ..
       dockerfile: pixelmart-backend/notification-service/Dockerfile
     container_name: pixelmart-notification
     restart: unless-stopped
@@ -135,7 +135,7 @@ services:
 
   api-gateway:
     build:
-      context: .
+      context: ..
       dockerfile: pixelmart-backend/gateway/Dockerfile
     container_name: pixelmart-gateway
     restart: unless-stopped
@@ -165,7 +165,7 @@ services:
 
   frontend:
     build:
-      context: ./pixelmart-frontend
+      context: ../pixelmart-frontend
       dockerfile: Dockerfile
     container_name: pixelmart-frontend
     restart: unless-stopped

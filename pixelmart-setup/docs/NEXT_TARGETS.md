@@ -46,7 +46,7 @@ v1 and **v1.1 are complete**. Remaining polish items (#10–#14) are done in-rep
 | 11 | ~~**Tailwind 4 + shadcn/ui**~~ | Storefront home, PLP, PDP migrated |
 | 12 | ~~**Admin dashboard charts**~~ | Recharts 7-day orders + revenue trends |
 | 13 | ~~**Portfolio screenshots**~~ | Playwright capture → `docs/screenshots/` |
-| 14 | ~~**Demo video**~~ | Script in `docs/DEMO_VIDEO.md` (record + link in README) |
+| 14 | ~~**Demo video**~~ | Script in `pixelmart-setup/docs/DEMO_VIDEO.md` (record + link in README) |
 
 ---
 

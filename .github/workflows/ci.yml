@@ -49,18 +49,20 @@ jobs:
           node-version: '20'
 
       - name: Start stack
+        working-directory: pixelmart-setup
         run: docker compose up --build -d --wait
 
       - name: Install Playwright
-        working-directory: e2e
+        working-directory: pixelmart-setup/e2e
         run: npm ci && npx playwright install --with-deps chromium
 
       - name: Run smoke tests
-        working-directory: e2e
+        working-directory: pixelmart-setup/e2e
         run: npm test
         env:
           PLAYWRIGHT_BASE_URL: http://localhost:3000
 
       - name: Stop stack
         if: always()
+        working-directory: pixelmart-setup
         run: docker compose down -v

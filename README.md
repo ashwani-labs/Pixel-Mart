@@ -2,11 +2,24 @@
 
 ![CI](https://github.com/ashwani-labs/pixelmart/actions/workflows/ci.yml/badge.svg)
 
-PixelMart is a portfolio-grade e-commerce platform built as a Spring Boot microservices monorepo with a React storefront and MySQL persistence. v1 is complete; see [docs/NEXT_TARGETS.md](docs/NEXT_TARGETS.md) for the v1.1 backlog.
+PixelMart is a portfolio-grade e-commerce platform built as a Spring Boot microservices monorepo with a React storefront and MySQL persistence. v1 is complete; see [pixelmart-setup/docs/NEXT_TARGETS.md](pixelmart-setup/docs/NEXT_TARGETS.md) for the v1.1 backlog.
+
+## Repository layout
+
+Three main folders:
+
+| Folder | Purpose |
+|--------|---------|
+| [`pixelmart-backend`](pixelmart-backend) | Spring Boot microservices + API gateway |
+| [`pixelmart-frontend`](pixelmart-frontend) | React storefront and admin console |
+| [`pixelmart-setup`](pixelmart-setup) | Docker Compose, SQL bootstrap, setup docs, E2E tests |
 
 ## One-command local start
 
+See **[pixelmart-setup/README.md](pixelmart-setup/README.md)** for Docker and SQL setup (no Hibernate DDL auto — Flyway only).
+
 ```bash
+cd pixelmart-setup
 cp .env.example .env   # Windows: Copy-Item .env.example .env
 docker compose up --build
 ```
@@ -33,7 +46,7 @@ Demo seed data (Flyway `V8__demo_seed.sql`) includes **15 visible products**, **
 
 ## 3-minute demo script
 
-1. **Start stack (30s)** — Run `docker compose up --build`. Open `http://localhost:3000` and confirm `http://localhost:8080/actuator/health` is UP.
+1. **Start stack (30s)** — Run `cd pixelmart-setup && docker compose up --build`. Open `http://localhost:3000` and confirm `http://localhost:8080/actuator/health` is UP.
 2. **Storefront (45s)** — Open home, note the deals banner and offer badges. Browse `/products`, open a product detail page, read seeded reviews, toggle wishlist (customer login required).
 3. **Customer checkout (60s)** — Sign in as `customer@pixelmart.local` / `Customer@123`, add a fashion item to cart, go to checkout, enter coupon `STYLE15`, choose mock card, place order, open order detail.
 4. **Admin console (45s)** — Sign in as `admin@pixelmart.local` / `Admin@123`, open `/admin` dashboard, toggle product visibility, approve the pending review, browse audit log filters, tweak primary color in settings and confirm the storefront theme updates.
@@ -84,13 +97,16 @@ flowchart LR
 
 ```bash
 git clone <repo-url>
-cd pixelmart
+cd pixelmart/pixelmart-setup
 cp .env.example .env
 ```
 
-### 2. Start backend stack
+Full setup guide: [pixelmart-setup/DOCKER.md](pixelmart-setup/DOCKER.md) · Database: [pixelmart-setup/SQL.md](pixelmart-setup/SQL.md)
+
+### 2. Start stack
 
 ```bash
+cd pixelmart-setup
 docker compose up --build
 ```
 
@@ -142,15 +158,16 @@ OpenAPI is generated per service on its **direct port** (not through the gateway
 Regenerate portfolio captures after UI changes (requires running compose stack):
 
 ```bash
+cd pixelmart-setup
 docker compose up --build -d --wait
 cd e2e && npm ci && npx playwright install chromium && npm run screenshots
 ```
 
-Outputs land in `docs/screenshots/` (`01-home.png` … `05-admin-audit-log.png`).
+Outputs land in `pixelmart-setup/docs/screenshots/` (`01-home.png` … `05-admin-audit-log.png`).
 
 ## Demo video
 
-Recording script and timing cues: [docs/DEMO_VIDEO.md](docs/DEMO_VIDEO.md).
+Recording script and timing cues: [pixelmart-setup/docs/DEMO_VIDEO.md](pixelmart-setup/docs/DEMO_VIDEO.md).
 
 ## Validation commands
 
@@ -164,6 +181,7 @@ CI runs the same checks on push/PR via `.github/workflows/ci.yml`.
 Reset local database and uploads:
 
 ```bash
+cd pixelmart-setup
 docker compose down -v
 docker compose up --build
 ```
@@ -199,7 +217,9 @@ docker compose up --build
 
 ## Documentation
 
-- [Next targets (v1.1 backlog)](docs/NEXT_TARGETS.md)
+- [Next targets (v1.1 backlog)](pixelmart-setup/docs/NEXT_TARGETS.md)
+- [Docker setup](pixelmart-setup/DOCKER.md)
+- [SQL / Flyway setup](pixelmart-setup/SQL.md)
 
 ## License
 
