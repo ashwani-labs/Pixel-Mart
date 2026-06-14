@@ -22,7 +22,7 @@ Integration tests use H2 with `ddl-auto: create-drop` in `application-test.yml` 
 ## Architecture
 
 ```
-MySQL 8.4 (database: pixelmart)
+MySQL 8.4 (main database: `pixelmart-db`; service databases: `auth`, `catalog`, `orders`, `notify`)
 ├── auth          ← auth-service
 ├── catalog       ← catalog-service
 ├── orders        ← order-service
@@ -52,9 +52,9 @@ Script executed: [`sql/01-schemas.sql`](sql/01-schemas.sql)
 
 It creates:
 
-- Database `pixelmart`
+- Database `pixelmart-db`
 - Schemas `auth`, `catalog`, `orders`, `notify`
-- Grants for user `pixelmart` (from `.env`)
+- Grants for user `root` / password `root` (from `.env`)
 
 **Important:** Init scripts run only when the MySQL data volume is new. To re-bootstrap:
 
@@ -78,8 +78,10 @@ mysql -h localhost -P 3306 -u root -p < sql/01-schemas.sql
 |----------|---------|---------|
 | `MYSQL_HOST` | `localhost` (Compose: `mysql`) | All services |
 | `MYSQL_PORT` | `3306` | All services |
-| `MYSQL_USER` | `pixelmart` | All services |
-| `MYSQL_PASSWORD` | `pixelmart` | All services |
+| `MYSQL_DATABASE` | `pixelmart-db` | MySQL container bootstrap |
+| `MYSQL_USER` | `root` | All services |
+| `MYSQL_PASSWORD` | `root` | All services |
+| `MYSQL_ROOT_PASSWORD` | `root` | MySQL container |
 
 Compose exposes MySQL on host port **3307** → container `3306`.
 
@@ -160,9 +162,9 @@ Docker Compose waits for MySQL health before starting services. Each service app
 ### Docker
 
 ```bash
-docker exec -it pixelmart-mysql mysql -u pixelmart -ppixelmart -e "SHOW DATABASES;"
-docker exec -it pixelmart-mysql mysql -u pixelmart -ppixelmart -e "USE auth; SHOW TABLES;"
-docker exec -it pixelmart-mysql mysql -u pixelmart -ppixelmart -e "SELECT * FROM auth.flyway_schema_history;"
+docker exec -it pixelmart-mysql mysql -u root -proot -e "SHOW DATABASES;"
+docker exec -it pixelmart-mysql mysql -u root -proot -e "USE auth; SHOW TABLES;"
+docker exec -it pixelmart-mysql mysql -u root -proot -e "SELECT * FROM auth.flyway_schema_history;"
 ```
 
 ### Check Flyway from logs

@@ -6,8 +6,8 @@ spring:
     name: catalog-service
   datasource:
     url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/catalog?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
-    username: ${MYSQL_USER:pixelmart}
-    password: ${MYSQL_PASSWORD:pixelmart}
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:root}
   jpa:
     hibernate:
       ddl-auto: none

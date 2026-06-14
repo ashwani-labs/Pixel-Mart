@@ -4,17 +4,15 @@ services:
     container_name: pixelmart-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-pixelmart_root}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-pixelmart}
-      MYSQL_USER: ${MYSQL_USER:-pixelmart}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pixelmart}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-pixelmart-db}
     ports:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./sql:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-pixelmart_root}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root}"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -32,8 +30,8 @@ services:
     environment:
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
-      MYSQL_USER: ${MYSQL_USER:-pixelmart}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pixelmart}
+      MYSQL_USER: ${MYSQL_USER:-root}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-root}
       JWT_SECRET: ${JWT_SECRET:-pixelmart-dev-secret-key-min-32-chars-long!!}
       JWT_ACCESS_EXPIRATION_MS: ${JWT_ACCESS_EXPIRATION_MS:-900000}
       JWT_REFRESH_EXPIRATION_MS: ${JWT_REFRESH_EXPIRATION_MS:-604800000}
@@ -59,8 +57,8 @@ services:
     environment:
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
-      MYSQL_USER: ${MYSQL_USER:-pixelmart}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pixelmart}
+      MYSQL_USER: ${MYSQL_USER:-root}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-root}
       STORAGE_TYPE: ${STORAGE_TYPE:-local}
       STORAGE_LOCAL_PATH: /app/data/uploads
       AWS_REGION: ${AWS_REGION:-us-east-1}
@@ -91,8 +89,8 @@ services:
     environment:
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
-      MYSQL_USER: ${MYSQL_USER:-pixelmart}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pixelmart}
+      MYSQL_USER: ${MYSQL_USER:-root}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-root}
       CATALOG_SERVICE_URL: http://catalog-service:8082
       AUTH_SERVICE_URL: http://auth-service:8081
       NOTIFICATION_SERVICE_URL: http://notification-service:8084
@@ -117,8 +115,8 @@ services:
     environment:
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
-      MYSQL_USER: ${MYSQL_USER:-pixelmart}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pixelmart}
+      MYSQL_USER: ${MYSQL_USER:-root}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-root}
       MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
       MAIL_PORT: ${MAIL_PORT:-587}
       MAIL_USERNAME: ${MAIL_USERNAME}
