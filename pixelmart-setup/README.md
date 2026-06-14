@@ -1,6 +1,6 @@
 # PixelMart Setup
 
-Operations, Docker, SQL bootstrap, environment templates, and E2E smoke tests.
+Operations, Docker, SQL bootstrap, and environment templates.
 
 This is one of **three main project folders**:
 
@@ -8,7 +8,7 @@ This is one of **three main project folders**:
 |--------|---------|
 | [`../pixelmart-backend`](../pixelmart-backend) | Spring Boot microservices + API gateway |
 | [`../pixelmart-frontend`](../pixelmart-frontend) | React storefront and admin console |
-| **`pixelmart-setup`** (this folder) | Docker Compose, SQL bootstrap, setup guides, E2E |
+| **`pixelmart-setup`** (this folder) | Docker Compose, SQL bootstrap, setup guides |
 
 ## Documents
 
@@ -28,8 +28,7 @@ pixelmart-setup/
 ├── .env.example
 ├── sql/
 │   └── 01-schemas.sql
-├── scripts/
-└── e2e/
+└── scripts/
 ```
 
 ## Quick start

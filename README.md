@@ -12,7 +12,7 @@ Three main folders:
 |--------|---------|
 | [`pixelmart-backend`](pixelmart-backend) | Spring Boot microservices + API gateway |
 | [`pixelmart-frontend`](pixelmart-frontend) | React storefront and admin console |
-| [`pixelmart-setup`](pixelmart-setup) | Docker Compose, SQL bootstrap, setup docs, E2E tests |
+| [`pixelmart-setup`](pixelmart-setup) | Docker Compose, SQL bootstrap, setup docs |
 
 ## One-command local start
 
