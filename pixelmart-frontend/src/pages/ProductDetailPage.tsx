@@ -71,7 +71,7 @@ export function ProductDetailPage() {
             {product.featured && <Badge>Featured</Badge>}
             {product.offerName && <Badge variant="success">{product.offerName}</Badge>}
           </div>
-          <h1 className="m-0 mb-2 text-3xl font-bold">{product.name}</h1>
+          <h1 className="m-0 mb-2 text-3xl font-bold text-foreground">{product.name}</h1>
           <div className="mb-4 flex items-baseline gap-2">
             <span className="text-2xl font-bold text-primary">{formatPrice(product.effectivePrice)}</span>
             {product.compareAtPrice && (
@@ -83,7 +83,9 @@ export function ProductDetailPage() {
           <p className="text-muted-foreground">{product.description ?? 'No description available.'}</p>
           <p className="text-sm text-muted-foreground">In stock: {product.stockQty}</p>
           <Button
-            className="mt-5"
+            variant="accent"
+            size="lg"
+            className="mt-5 min-w-[10rem]"
             disabled={adding || product.stockQty < 1}
             onClick={async () => {
               setCartMessage(null);
@@ -99,7 +101,7 @@ export function ProductDetailPage() {
               }
             }}
           >
-            {adding ? 'Adding…' : 'Add to cart'}
+            {adding ? 'Adding…' : 'ADD TO CART'}
           </Button>
           <Button type="button" variant="outline" className="mt-3" onClick={handleWishlistToggle}>
             {isWishlisted ? '♥ Remove from wishlist' : '♡ Add to wishlist'}

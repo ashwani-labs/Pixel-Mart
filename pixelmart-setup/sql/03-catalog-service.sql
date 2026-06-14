@@ -107,7 +107,7 @@ INSERT INTO store_settings (
     id, store_name, primary_color, market_currency_code, market_currency_symbol,
     market_locale, tax_enabled, tax_rate_percent, tax_label, support_email
 ) VALUES (
-    'default', 'PixelMart', '#6366f1', 'INR', '₹', 'en-IN', TRUE, 18.00, 'GST', 'support@pixelmart.local'
+    'default', 'PixelMart', '#0460a9', 'INR', '₹', 'en-IN', TRUE, 18.00, 'GST', 'support@pixelmart.local'
 );
 
 CREATE TABLE offers (

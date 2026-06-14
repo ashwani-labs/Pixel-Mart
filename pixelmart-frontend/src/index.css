@@ -2,26 +2,66 @@
 
 @theme {
   --font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --radius-lg: 0.75rem;
-  --color-background: #fafafa;
-  --color-foreground: #0f172a;
+  --radius-lg: 0.625rem;
+  /* Page */
+  --color-background: #f0f4f8;
+  --color-foreground: #1e293b;
   --color-card: #ffffff;
-  --color-card-foreground: #0f172a;
-  --color-primary: #6366f1;
+  --color-card-foreground: #1e293b;
+  --color-muted: #e8eef4;
+  --color-muted-foreground: #5c6b7a;
+  --color-border: #d4dde8;
+  /* Brand bar — always clearly blue, not near-black */
+  --color-brand: #0875d4;
+  --color-brand-dark: #065baa;
+  --color-on-brand: #ffffff;
+  /* Actions */
+  --color-primary: #0875d4;
   --color-primary-foreground: #ffffff;
-  --color-muted: #f1f5f9;
-  --color-muted-foreground: #64748b;
-  --color-border: #e2e8f0;
+  --color-accent: #ffc107;
+  --color-accent-foreground: #1a1a1a;
+  --color-deal: #e8f5e9;
+  --color-deal-foreground: #2e7d32;
+  --color-success: #2e7d32;
+  --color-success-bg: #e8f5e9;
+  --color-input: #ffffff;
 }
 
 [data-theme-mode='dark'] {
-  --color-background: #0b1020;
-  --color-foreground: #f1f5f9;
-  --color-card: #141b2d;
+  --color-background: #141c28;
+  --color-foreground: #e8edf4;
+  --color-card: #1c2836;
   --color-card-foreground: #f1f5f9;
-  --color-muted: #1e293b;
-  --color-muted-foreground: #94a3b8;
-  --color-border: #334155;
+  --color-muted: #243044;
+  --color-muted-foreground: #9aa8b8;
+  --color-border: #344559;
+  /* Brand stays bright blue in dark mode */
+  --color-brand: #1a8fe8;
+  --color-brand-dark: #0d74c2;
+  --color-on-brand: #ffffff;
+  --color-primary: #4db0f5;
+  --color-primary-foreground: #0f172a;
+  --color-accent: #ffc107;
+  --color-accent-foreground: #1a1a1a;
+  --color-deal: #1b4332;
+  --color-deal-foreground: #86efac;
+  --color-success: #86efac;
+  --color-success-bg: #1b4332;
+  --color-input: #243044;
+}
+
+:root {
+  --primary: var(--color-primary);
+  --primary-foreground: var(--color-primary-foreground);
+  --accent: var(--color-accent);
+  --accent-foreground: var(--color-accent-foreground);
+  --foreground: var(--color-foreground);
+  --card: var(--color-card);
+  --card-foreground: var(--color-card-foreground);
+  --border: var(--color-border);
+  --muted: var(--color-muted);
+  --muted-foreground: var(--color-muted-foreground);
+  --radius: 0.625rem;
 }
 
 *,
@@ -83,4 +123,19 @@ button {
 .animate-shimmer {
   animation: shimmer 1.2s infinite;
   background-size: 200% 100%;
+}
+
+/* Search in brand header — always light field, dark text */
+.search-field-light {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+}
+
+.search-field-light::placeholder {
+  color: #64748b !important;
+}
+
+[data-theme-mode='dark'] .search-field-light {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
 }

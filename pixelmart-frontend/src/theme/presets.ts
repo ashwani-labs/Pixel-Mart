@@ -1,4 +1,4 @@
-export type ThemePresetId = 'pixel' | 'ocean' | 'sunset' | 'forest' | 'mono';
+export type ThemePresetId = 'dmart' | 'pixel' | 'ocean' | 'sunset' | 'forest' | 'mono';
 export type ThemeMode = 'light' | 'dark';
 
 export interface ThemePreset {
@@ -9,6 +9,12 @@ export interface ThemePreset {
 }
 
 export const THEME_PRESETS: ThemePreset[] = [
+  {
+    id: 'dmart',
+    label: 'Retail Blue',
+    light: { primary: '#0460a9', primaryForeground: '#ffffff' },
+    dark: { primary: '#3b8fd4', primaryForeground: '#0f172a' },
+  },
   {
     id: 'pixel',
     label: 'Pixel',
@@ -41,5 +47,5 @@ export const THEME_PRESETS: ThemePreset[] = [
   },
 ];
 
-export const DEFAULT_PRESET_ID: ThemePresetId = 'pixel';
+export const DEFAULT_PRESET_ID: ThemePresetId = 'dmart';
 export const DEFAULT_MODE: ThemeMode = 'light';
