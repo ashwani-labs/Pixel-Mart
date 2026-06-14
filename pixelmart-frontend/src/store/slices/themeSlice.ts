@@ -23,7 +23,8 @@ const themeSlice = createSlice({
   reducers: {
     setPreset(state, action: PayloadAction<ThemePresetId>) {
       state.presetId = action.payload;
-      applyTheme(state.presetId, state.mode, state.adminPrimaryOverride ?? undefined);
+      state.adminPrimaryOverride = null;
+      applyTheme(state.presetId, state.mode);
       saveThemeToStorage(state.presetId, state.mode);
     },
     setMode(state, action: PayloadAction<ThemeMode>) {

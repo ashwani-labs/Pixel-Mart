@@ -1,10 +1,5 @@
 import { THEME_PRESETS, type ThemeMode, type ThemePresetId } from './presets';
 
-const BRAND = {
-  light: { brand: '#0875d4', brandDark: '#065baa', onBrand: '#ffffff' },
-  dark: { brand: '#1a8fe8', brandDark: '#0d74c2', onBrand: '#ffffff' },
-};
-
 const SURFACES = {
   light: {
     background: '#f0f4f8',
@@ -32,10 +27,27 @@ function setVar(root: HTMLElement, name: string, value: string) {
   root.style.setProperty(name, value);
 }
 
+/** Darken a #RRGGBB hex color by multiplying RGB channels (0–1 factor). */
+function darkenHex(hex: string, factor: number): string {
+  const normalized = hex.replace('#', '');
+  if (normalized.length !== 6) return hex;
+  const r = Math.round(parseInt(normalized.slice(0, 2), 16) * factor);
+  const g = Math.round(parseInt(normalized.slice(2, 4), 16) * factor);
+  const b = Math.round(parseInt(normalized.slice(4, 6), 16) * factor);
+  return `#${[r, g, b].map((c) => Math.min(255, Math.max(0, c)).toString(16).padStart(2, '0')).join('')}`;
+}
+
+function brandFromPrimary(primary: string) {
+  return {
+    brand: primary,
+    brandDark: darkenHex(primary, 0.78),
+    onBrand: '#ffffff',
+  };
+}
+
 export function applyTheme(presetId: ThemePresetId, mode: ThemeMode, primaryOverride?: string) {
   const preset = THEME_PRESETS.find((p) => p.id === presetId) ?? THEME_PRESETS[0];
   const colors = mode === 'dark' ? preset.dark : preset.light;
-  const brand = mode === 'dark' ? BRAND.dark : BRAND.light;
   const surface = mode === 'dark' ? SURFACES.dark : SURFACES.light;
 
   const root = document.documentElement;
@@ -43,8 +55,8 @@ export function applyTheme(presetId: ThemePresetId, mode: ThemeMode, primaryOver
   root.setAttribute('data-theme-mode', mode);
 
   const primary = primaryOverride ?? colors.primary;
-  const primaryFg =
-    mode === 'dark' && !primaryOverride ? colors.primaryForeground : '#ffffff';
+  const primaryFg = mode === 'dark' ? colors.primaryForeground : '#ffffff';
+  const brand = brandFromPrimary(primary);
 
   setVar(root, '--color-brand', brand.brand);
   setVar(root, '--color-brand-dark', brand.brandDark);

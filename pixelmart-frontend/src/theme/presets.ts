@@ -12,8 +12,8 @@ export const THEME_PRESETS: ThemePreset[] = [
   {
     id: 'dmart',
     label: 'Retail Blue',
-    light: { primary: '#0460a9', primaryForeground: '#ffffff' },
-    dark: { primary: '#3b8fd4', primaryForeground: '#0f172a' },
+    light: { primary: '#0875d4', primaryForeground: '#ffffff' },
+    dark: { primary: '#4db0f5', primaryForeground: '#0f172a' },
   },
   {
     id: 'pixel',

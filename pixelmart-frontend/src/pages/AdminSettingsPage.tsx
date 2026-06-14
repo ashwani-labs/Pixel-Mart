@@ -11,7 +11,6 @@ import {
 } from '../store/api/settingsApi';
 import type { RootState } from '../store';
 import { setPublicSettings } from '../store/slices/settingsSlice';
-import { setAdminPrimaryOverride } from '../store/slices/themeSlice';
 import { useGetPublicSettingsQuery } from '../store/api/settingsApi';
 import styles from './AdminSettingsPage.module.css';
 
@@ -88,7 +87,6 @@ export function AdminSettingsPage() {
       const publicResult = await refetchPublic();
       if (publicResult.data) {
         dispatch(setPublicSettings(publicResult.data));
-        dispatch(setAdminPrimaryOverride(publicResult.data.primaryColor));
         document.title = publicResult.data.storeName;
       }
       setMessage('Store settings saved.');
