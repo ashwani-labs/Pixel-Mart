@@ -148,7 +148,9 @@ You should see `admin@pixelmart.local` and `customer@pixelmart.local`.
 | Admin | `admin@pixelmart.local` | `Admin@123` |
 | Customer | `customer@pixelmart.local` | `Customer@123` |
 
-Demo coupon: **`STYLE15`** (15% off fashion category).
+Demo coupon: **`STYLE15`** (15% off fashion category). Also try **`GLOW12`** (12% off skin care).
+
+Catalog seed (`03-catalog-service.sql`): **8 super categories**, **26 sub-categories**, **86 products** (plus 1 hidden draft), sample offers and reviews.
 
 ---
 

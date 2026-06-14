@@ -25,6 +25,11 @@ public class PublicCatalogController {
         this.productService = productService;
     }
 
+    @GetMapping("/super-categories")
+    public List<CategoryResponse> superCategories() {
+        return categoryService.listPublicSuperCategories();
+    }
+
     @GetMapping("/categories")
     public List<CategoryResponse> categories() {
         return categoryService.listPublic();

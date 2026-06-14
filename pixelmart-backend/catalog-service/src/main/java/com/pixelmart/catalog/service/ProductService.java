@@ -12,7 +12,6 @@ import com.pixelmart.catalog.dto.ProductResponse;
 import com.pixelmart.catalog.exception.BadRequestException;
 import com.pixelmart.catalog.exception.ConflictException;
 import com.pixelmart.catalog.exception.ResourceNotFoundException;
-import com.pixelmart.catalog.repository.CategoryRepository;
 import com.pixelmart.catalog.repository.ProductRepository;
 import com.pixelmart.catalog.util.SlugUtil;
 import org.springframework.context.annotation.Lazy;
@@ -31,20 +30,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
     private final ProductImageService productImageService;
     private final AuditLogService auditLogService;
     private final OfferService offerService;
 
     public ProductService(
             ProductRepository productRepository,
-            CategoryRepository categoryRepository,
+            CategoryService categoryService,
             @Lazy ProductImageService productImageService,
             AuditLogService auditLogService,
             @Lazy OfferService offerService
     ) {
         this.productRepository = productRepository;
-        this.categoryRepository = categoryRepository;
+        this.categoryService = categoryService;
         this.productImageService = productImageService;
         this.auditLogService = auditLogService;
         this.offerService = offerService;
@@ -213,9 +212,7 @@ public class ProductService {
     }
 
     private void validateCategory(String categoryId) {
-        if (!categoryRepository.existsById(categoryId)) {
-            throw new ResourceNotFoundException("Category", categoryId);
-        }
+        categoryService.validateProductCategory(categoryId);
     }
 
     Product findProduct(String id) {

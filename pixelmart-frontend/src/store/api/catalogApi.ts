@@ -11,6 +11,7 @@ import type {
   SubmitReviewRequest,
   UpsertCategoryRequest,
   UpsertOfferRequest,
+  UpsertProductRequest,
 } from '../../types/catalog';
 import { baseApi } from './baseApi';
 
@@ -24,6 +25,10 @@ export interface ProductListParams {
 
 export const catalogApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
+    getSuperCategories: build.query<Category[], void>({
+      query: () => '/catalog/super-categories',
+      providesTags: ['Category'],
+    }),
     getCategories: build.query<Category[], void>({
       query: () => '/catalog/categories',
       providesTags: ['Category'],
@@ -85,6 +90,42 @@ export const catalogApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: (_r, _e, { id }) => [
         { type: 'Product', id },
+        { type: 'ProductList', id: 'ADMIN' },
+        { type: 'ProductList', id: 'LIST' },
+        'Dashboard',
+      ],
+    }),
+    createProduct: build.mutation<Product, UpsertProductRequest>({
+      query: (body) => ({
+        url: '/admin/products',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: [
+        { type: 'ProductList', id: 'ADMIN' },
+        { type: 'ProductList', id: 'LIST' },
+        'Dashboard',
+      ],
+    }),
+    updateProduct: build.mutation<Product, { id: string; body: UpsertProductRequest }>({
+      query: ({ id, body }) => ({
+        url: `/admin/products/${id}`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: (_r, _e, { id }) => [
+        { type: 'Product', id },
+        { type: 'ProductList', id: 'ADMIN' },
+        { type: 'ProductList', id: 'LIST' },
+        'Dashboard',
+      ],
+    }),
+    deleteProduct: build.mutation<void, string>({
+      query: (id) => ({
+        url: `/admin/products/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: [
         { type: 'ProductList', id: 'ADMIN' },
         { type: 'ProductList', id: 'LIST' },
         'Dashboard',
@@ -247,6 +288,7 @@ export const catalogApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useGetSuperCategoriesQuery,
   useGetCategoriesQuery,
   useGetAdminCategoriesQuery,
   useCreateCategoryMutation,
@@ -254,6 +296,9 @@ export const {
   useDeleteCategoryMutation,
   useGetAdminProductsQuery,
   useUpdateProductVisibilityMutation,
+  useCreateProductMutation,
+  useUpdateProductMutation,
+  useDeleteProductMutation,
   useGetCatalogDashboardStatsQuery,
   useGetProductsQuery,
   useGetProductBySlugQuery,

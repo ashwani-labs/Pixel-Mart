@@ -113,6 +113,26 @@ export interface UpsertCategoryRequest {
   active: boolean;
 }
 
+export interface UpsertProductRequest {
+  categoryId: string;
+  name: string;
+  slug?: string;
+  description?: string | null;
+  basePrice: number;
+  compareAtPrice?: number | null;
+  stockQty: number;
+  visible: boolean;
+  featured: boolean;
+}
+
+export function isSuperCategory(category: Category): boolean {
+  return !category.parentId;
+}
+
+export function isSubCategory(category: Category): boolean {
+  return Boolean(category.parentId);
+}
+
 export interface CatalogDashboardStats {
   lowStockThreshold: number;
   lowStockCount: number;

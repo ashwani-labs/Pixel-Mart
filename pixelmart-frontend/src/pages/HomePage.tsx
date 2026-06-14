@@ -14,9 +14,12 @@ import type { RootState } from '../store';
 import { selectIsAuthenticated } from '../store/slices/authSlice';
 
 const FALLBACK_CATEGORIES = [
-  { id: 'cat-electronics', name: 'Electronics', slug: 'electronics' },
-  { id: 'cat-fashion', name: 'Fashion', slug: 'fashion' },
-  { id: 'cat-home', name: 'Home & Living', slug: 'home-living' },
+  { id: 'cat-electronics', name: 'Gadgets & Tech', slug: 'electronics' },
+  { id: 'cat-fashion', name: 'Clothing', slug: 'clothing' },
+  { id: 'cat-staples', name: 'Rice, Flour & Pulses', slug: 'staples' },
+  { id: 'cat-skincare', name: 'Skin Care', slug: 'skin-care' },
+  { id: 'cat-footwear', name: 'Footwear', slug: 'footwear' },
+  { id: 'cat-toys', name: 'Toys & Games', slug: 'toys-games' },
 ];
 
 function formatPrice(value: number) {

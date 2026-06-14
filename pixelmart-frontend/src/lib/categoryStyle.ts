@@ -13,6 +13,54 @@ const DEFAULT: CategoryVisual = {
 };
 
 const BY_CATEGORY_ID: Record<string, CategoryVisual> = {
+  'super-electronics': {
+    emoji: '📱',
+    gradient: 'from-sky-100 via-blue-50 to-indigo-100',
+    thumbBg: 'bg-sky-50',
+    accent: 'text-sky-700',
+  },
+  'super-fashion': {
+    emoji: '👕',
+    gradient: 'from-rose-50 via-pink-50 to-fuchsia-100',
+    thumbBg: 'bg-rose-50',
+    accent: 'text-rose-700',
+  },
+  'super-home': {
+    emoji: '🏠',
+    gradient: 'from-amber-50 via-orange-50 to-yellow-100',
+    thumbBg: 'bg-amber-50',
+    accent: 'text-amber-800',
+  },
+  'super-grocery': {
+    emoji: '🛒',
+    gradient: 'from-lime-50 via-green-50 to-emerald-100',
+    thumbBg: 'bg-lime-50',
+    accent: 'text-green-800',
+  },
+  'super-beauty': {
+    emoji: '💄',
+    gradient: 'from-fuchsia-50 via-pink-50 to-rose-100',
+    thumbBg: 'bg-fuchsia-50',
+    accent: 'text-fuchsia-800',
+  },
+  'super-sports': {
+    emoji: '⚽',
+    gradient: 'from-teal-50 via-cyan-50 to-sky-100',
+    thumbBg: 'bg-teal-50',
+    accent: 'text-teal-800',
+  },
+  'super-books': {
+    emoji: '📚',
+    gradient: 'from-violet-50 via-purple-50 to-indigo-100',
+    thumbBg: 'bg-violet-50',
+    accent: 'text-violet-800',
+  },
+  'super-kids': {
+    emoji: '🧸',
+    gradient: 'from-yellow-50 via-amber-50 to-orange-100',
+    thumbBg: 'bg-yellow-50',
+    accent: 'text-amber-900',
+  },
   'cat-electronics': {
     emoji: '📱',
     gradient: 'from-sky-100 via-blue-50 to-indigo-100',
@@ -31,10 +79,49 @@ const BY_CATEGORY_ID: Record<string, CategoryVisual> = {
     thumbBg: 'bg-amber-50',
     accent: 'text-amber-800',
   },
+  'cat-staples': {
+    emoji: '🍚',
+    gradient: 'from-lime-50 via-green-50 to-emerald-100',
+    thumbBg: 'bg-lime-50',
+    accent: 'text-green-800',
+  },
+  'cat-snacks': {
+    emoji: '🍪',
+    gradient: 'from-orange-50 via-amber-50 to-yellow-100',
+    thumbBg: 'bg-orange-50',
+    accent: 'text-orange-800',
+  },
+  'cat-skincare': {
+    emoji: '✨',
+    gradient: 'from-fuchsia-50 via-pink-50 to-rose-100',
+    thumbBg: 'bg-fuchsia-50',
+    accent: 'text-fuchsia-800',
+  },
+  'cat-toys': {
+    emoji: '🎮',
+    gradient: 'from-yellow-50 via-amber-50 to-orange-100',
+    thumbBg: 'bg-yellow-50',
+    accent: 'text-amber-900',
+  },
 };
 
 const BY_SLUG: Record<string, CategoryVisual> = {
+  'super-electronics': BY_CATEGORY_ID['super-electronics'],
+  'super-fashion': BY_CATEGORY_ID['super-fashion'],
+  'super-home': BY_CATEGORY_ID['super-home'],
+  'super-grocery': BY_CATEGORY_ID['super-grocery'],
+  'super-beauty': BY_CATEGORY_ID['super-beauty'],
+  'super-sports': BY_CATEGORY_ID['super-sports'],
+  'super-books': BY_CATEGORY_ID['super-books'],
+  'super-kids': BY_CATEGORY_ID['super-kids'],
   electronics: BY_CATEGORY_ID['cat-electronics'],
+  clothing: BY_CATEGORY_ID['cat-fashion'],
+  footwear: BY_CATEGORY_ID['cat-footwear'],
+  'home-decor': BY_CATEGORY_ID['cat-home'],
+  staples: BY_CATEGORY_ID['cat-staples'],
+  'snacks-biscuits': BY_CATEGORY_ID['cat-snacks'],
+  'skin-care': BY_CATEGORY_ID['cat-skincare'],
+  'toys-games': BY_CATEGORY_ID['cat-toys'],
   fashion: BY_CATEGORY_ID['cat-fashion'],
   'home-living': BY_CATEGORY_ID['cat-home'],
 };
@@ -54,6 +141,13 @@ const PRODUCT_EMOJI: Record<string, string> = {
   'wireless-mouse-mini': '🖱️',
   'canvas-tote-bag': '👜',
   'scented-candle-set': '🕯️',
+  'pixelphone-14': '📱',
+  'basmati-rice-5kg': '🍚',
+  'vitamin-c-serum': '✨',
+  'yoga-mat-6mm': '🧘',
+  'atomic-habits-paperback': '📖',
+  'building-blocks-100pc': '🧱',
+  'nonstick-cookware-5pc': '🍳',
 };
 
 export function getCategoryVisual(slugOrId: string): CategoryVisual {

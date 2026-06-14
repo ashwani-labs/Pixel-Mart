@@ -53,6 +53,8 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 
     List<Product> findByIdInAndVisibleTrue(Collection<String> ids);
 
+    long countByCategoryId(String categoryId);
+
     long countByStockQtyLessThanEqual(int stockQty);
 
     List<Product> findByStockQtyLessThanEqualOrderByStockQtyAscNameAsc(int stockQty, Pageable pageable);
