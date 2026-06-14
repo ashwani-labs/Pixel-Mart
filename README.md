@@ -16,7 +16,7 @@ Three main folders:
 
 ## One-command local start
 
-See **[pixelmart-setup/README.md](pixelmart-setup/README.md)** for Docker and SQL setup (no Hibernate DDL auto — Flyway only).
+See **[pixelmart-setup/README.md](pixelmart-setup/README.md)** for Docker and SQL setup (no Hibernate DDL auto — schema SQL in `pixelmart-setup/sql/`).
 
 ```bash
 cd pixelmart-setup
@@ -42,7 +42,7 @@ Open `http://localhost:5173` (Vite dev server with `/api` proxy).
 | 2 | Cart, addresses, checkout, offers, order history | Complete |
 | 3 | Wishlist, reviews, admin console, audit log, CI, polish | Complete |
 
-Demo seed data (Flyway `V8__demo_seed.sql`) includes **15 visible products**, **2 active offers**, and **sample reviews** (approved on the storefront plus one pending item for admin moderation).
+Demo seed data in `pixelmart-setup/sql/03-catalog-service.sql` includes **15 visible products**, **2 active offers**, and **sample reviews** (approved on the storefront plus one pending item for admin moderation).
 
 ## 3-minute demo script
 
@@ -57,7 +57,7 @@ Demo seed data (Flyway `V8__demo_seed.sql`) includes **15 visible products**, **
 - **Authentication:** email/password registration, login, JWT access tokens, HTTP-only refresh token cookie, silent refresh, logout, `/me`, profile update, and admin/customer roles.
 - **Catalog:** categories, products, public reads, admin CRUD, visibility filtering, local product image uploads, store settings, active offers, coupon-aware effective pricing, wishlist, moderated reviews, and audit log entries for admin changes.
 - **Orders:** one cart per user, add/update/remove cart items, address CRUD, India pincode proxy/cache, mock payment methods, checkout stock validation, order/item/payment snapshots, and cart clearing on success.
-- **Platform:** Spring Cloud Gateway on `:8080`, service-owned MySQL schemas, Flyway migrations, Docker Compose for the backend stack, GitHub Actions CI, and Vite dev server for the frontend.
+- **Platform:** Spring Cloud Gateway on `:8080`, service-owned MySQL databases, consolidated setup SQL, Docker Compose for the backend stack, GitHub Actions CI, and Vite dev server for the frontend.
 
 ## Architecture
 
@@ -87,7 +87,7 @@ flowchart LR
 
 ## Tech stack
 
-- **Backend:** Java 21, Spring Boot 3.4.2, Spring Cloud 2024.0, Spring Security, Spring Data JPA, Flyway, MySQL 8.4, springdoc OpenAPI.
+- **Backend:** Java 21, Spring Boot 3.4.2, Spring Cloud 2024.0, Spring Security, Spring Data JPA, MySQL 8.4, springdoc OpenAPI.
 - **Frontend:** React 19, Vite 6, TypeScript, Redux Toolkit, RTK Query, React Router 7, MUI 9 (admin), React Hook Form, Zod.
 - **Local runtime:** Docker Compose for MySQL, gateway, and backend services; Vite dev server for the frontend.
 
@@ -202,7 +202,7 @@ docker compose up --build
 ## Documentation
 
 - [Docker setup](pixelmart-setup/DOCKER.md)
-- [SQL / Flyway setup](pixelmart-setup/SQL.md)
+- [SQL / database setup](pixelmart-setup/SQL.md)
 
 ## License
 

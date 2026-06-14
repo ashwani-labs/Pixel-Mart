@@ -1,20 +1,20 @@
 # SQL & Database Setup
 
-PixelMart uses **one MySQL 8.4 instance** with **four logical schemas**. Application tables are created by **Flyway**, not Hibernate DDL auto.
+PixelMart uses **one MySQL 8.4 instance** with **four service databases**. Schema DDL lives in **`pixelmart-setup/sql/`** — not in backend services.
 
-## Policy: no DDL auto
+## Policy: no DDL auto, no Flyway in services
 
 Every backend service sets:
 
 ```yaml
 spring.jpa.hibernate.ddl-auto: none
-spring.flyway.enabled: true
+spring.flyway.enabled: false
 ```
 
 | Layer | Responsibility |
 |-------|----------------|
-| Bootstrap SQL | Databases, schemas, user grants |
-| Flyway | Tables, indexes, seed data (versioned migrations) |
+| `sql/01-schemas.sql` | Databases, grants |
+| `sql/02–05-*-service.sql` | Tables, indexes, seed data (one file per service) |
 | JPA/Hibernate | Read/write data only — **never** auto-create or alter schema |
 
 Integration tests use H2 with `ddl-auto: create-drop` in `application-test.yml` only. That profile is **not** active in Docker or production.
@@ -22,14 +22,15 @@ Integration tests use H2 with `ddl-auto: create-drop` in `application-test.yml` 
 ## Architecture
 
 ```
-MySQL 8.4 (main database: `pixelmart-db`; service databases: `auth`, `catalog`, `orders`, `notify`)
-├── auth          ← auth-service
-├── catalog       ← catalog-service
-├── orders        ← order-service
-└── notify        ← notification-service
+MySQL 8.4
+├── pixelmart-db   (bootstrap marker DB from Compose MYSQL_DATABASE)
+├── auth           ← auth-service
+├── catalog        ← catalog-service
+├── orders         ← order-service
+└── notify         ← notification-service
 ```
 
-Each service connects to its schema via JDBC URL, for example:
+Each service connects to its database via JDBC URL, for example:
 
 ```
 jdbc:mysql://localhost:3306/auth?...
@@ -38,23 +39,32 @@ jdbc:mysql://localhost:3306/orders?...
 jdbc:mysql://localhost:3306/notify?...
 ```
 
-## Step 1 — Bootstrap (schemas & grants)
+## SQL files (`sql/`)
 
-### Docker (automatic)
+| File | Database | Contents |
+|------|----------|----------|
+| [`01-schemas.sql`](sql/01-schemas.sql) | — | Creates `pixelmart-db`, `auth`, `catalog`, `orders`, `notify`, grants |
+| [`02-auth-service.sql`](sql/02-auth-service.sql) | `auth` | Users, roles, refresh tokens, demo accounts |
+| [`03-catalog-service.sql`](sql/03-catalog-service.sql) | `catalog` | Catalog, offers, wishlist, reviews, demo seed |
+| [`04-order-service.sql`](sql/04-order-service.sql) | `orders` | Carts, addresses, orders, payments, idempotency |
+| [`05-notification-service.sql`](sql/05-notification-service.sql) | `notify` | Email outbox |
+
+Scripts run in **alphabetical order** on first MySQL init via Docker `docker-entrypoint-initdb.d`.
+
+### Demo accounts (auth seed)
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `admin@pixelmart.local` | `Admin@123` |
+| Customer | `customer@pixelmart.local` | `Customer@123` |
+
+## Docker (automatic)
 
 On **first** MySQL container start with an empty volume, Compose mounts:
 
 ```
 sql/ → /docker-entrypoint-initdb.d/
 ```
-
-Script executed: [`sql/01-schemas.sql`](sql/01-schemas.sql)
-
-It creates:
-
-- Database `pixelmart-db`
-- Schemas `auth`, `catalog`, `orders`, `notify`
-- Grants for user `root` / password `root` (from `.env`)
 
 **Important:** Init scripts run only when the MySQL data volume is new. To re-bootstrap:
 
@@ -63,16 +73,19 @@ docker compose down -v
 docker compose up --build
 ```
 
-### Manual (local MySQL or cloud RDS)
+## Manual (local MySQL or cloud RDS)
 
-1. Create a MySQL 8.x user (or use root for dev only).
-2. Run the bootstrap script as a user with `CREATE` privilege:
+Run all scripts in order:
 
 ```bash
 mysql -h localhost -P 3306 -u root -p < sql/01-schemas.sql
+mysql -h localhost -P 3306 -u root -p < sql/02-auth-service.sql
+mysql -h localhost -P 3306 -u root -p < sql/03-catalog-service.sql
+mysql -h localhost -P 3306 -u root -p < sql/04-order-service.sql
+mysql -h localhost -P 3306 -u root -p < sql/05-notification-service.sql
 ```
 
-3. Ensure `.env` / service env vars match your host, port, user, and password:
+Environment variables (`.env`):
 
 | Variable | Default | Used by |
 |----------|---------|---------|
@@ -85,124 +98,44 @@ mysql -h localhost -P 3306 -u root -p < sql/01-schemas.sql
 
 Compose exposes MySQL on host port **3307** → container `3306`.
 
-## Step 2 — Flyway migrations (tables & data)
-
-Migrations run **automatically** when each Spring Boot service starts. Flyway creates a `flyway_schema_history` table per schema.
-
-### auth-service → schema `auth`
-
-| Migration | Type | Description |
-|-----------|------|-------------|
-| V1__init.sql | SQL | Schema bootstrap marker |
-| V2__users_and_roles.sql | SQL | Users, roles |
-| V4__refresh_tokens.sql | SQL | Refresh token storage |
-| V3__Seed_test_users.java | Java | Demo admin + customer accounts |
-
-Path: `pixelmart-backend/auth-service/src/main/resources/db/migration/` (+ Java migration in `src/main/java/db/migration/`)
-
-### catalog-service → schema `catalog`
-
-| Migration | Description |
-|-----------|-------------|
-| V1__init.sql | Bootstrap marker |
-| V2__categories_and_products.sql | Categories, products |
-| V3__seed_catalog.sql | Base catalog seed |
-| V4__store_settings_images_audit.sql | Settings, images, audit |
-| V5__offers.sql | Offers / coupons |
-| V6__wishlist_items.sql | Wishlist |
-| V7__reviews.sql | Reviews |
-| V8__fix_review_id_columns.sql | Review ID fix |
-| V9__demo_seed.sql | Demo products, offers, reviews |
-
-Path: `pixelmart-backend/catalog-service/src/main/resources/db/migration/`
-
-### order-service → schema `orders`
-
-| Migration | Description |
-|-----------|-------------|
-| V1__init.sql | Bootstrap marker |
-| V2__carts_and_cart_items.sql | Cart |
-| V3__addresses_and_pincode_cache.sql | Addresses, pincode cache |
-| V4__orders_order_items_payments.sql | Orders, items, payments |
-| V5__order_discount.sql | Order-level discounts |
-| V6__checkout_idempotency.sql | Checkout idempotency keys |
-
-Path: `pixelmart-backend/order-service/src/main/resources/db/migration/`
-
-### notification-service → schema `notify`
-
-| Migration | Description |
-|-----------|-------------|
-| V1__init.sql | Bootstrap marker |
-| V2__email_outbox.sql | Email outbox |
-
-Path: `pixelmart-backend/notification-service/src/main/resources/db/migration/`
-
 ## Startup order
 
 ```mermaid
 sequenceDiagram
   participant MySQL
-  participant Auth
-  participant Catalog
-  participant Order
-  participant Notify
+  participant Services
 
-  MySQL->>MySQL: 01-schemas.sql (first boot only)
-  Auth->>MySQL: Flyway auth migrations
-  Catalog->>MySQL: Flyway catalog migrations
-  Order->>MySQL: Flyway orders migrations
-  Notify->>MySQL: Flyway notify migrations
+  MySQL->>MySQL: 01-schemas.sql
+  MySQL->>MySQL: 02-auth-service.sql
+  MySQL->>MySQL: 03-catalog-service.sql
+  MySQL->>MySQL: 04-order-service.sql
+  MySQL->>MySQL: 05-notification-service.sql
+  Services->>MySQL: JPA read/write (schema already exists)
 ```
 
-Docker Compose waits for MySQL health before starting services. Each service applies its own Flyway history independently.
+Docker Compose waits for MySQL health before starting services.
 
 ## Verify schema
-
-### Docker
 
 ```bash
 docker exec -it pixelmart-mysql mysql -u root -proot -e "SHOW DATABASES;"
 docker exec -it pixelmart-mysql mysql -u root -proot -e "USE auth; SHOW TABLES;"
-docker exec -it pixelmart-mysql mysql -u root -proot -e "SELECT * FROM auth.flyway_schema_history;"
+docker exec -it pixelmart-mysql mysql -u root -proot -e "SELECT email FROM auth.users;"
 ```
 
-### Check Flyway from logs
+## Schema changes
 
-```bash
-docker compose logs auth-service | findstr /i flyway
-```
-
-Successful startup logs include Flyway migrate success for each service.
-
-## Manual migration (without Docker)
-
-1. Run [`sql/01-schemas.sql`](sql/01-schemas.sql).
-2. Start services in any order (each runs Flyway on boot):
-
-```bash
-mvn -pl pixelmart-backend/auth-service spring-boot:run
-mvn -pl pixelmart-backend/catalog-service spring-boot:run
-# ... etc.
-```
-
-Or build and run JARs with `MYSQL_HOST`, `MYSQL_USER`, `MYSQL_PASSWORD` set.
+1. Edit the **single** SQL file for that service under `sql/` (e.g. `03-catalog-service.sql`).
+2. For existing dev DBs: `docker compose down -v` and bring the stack back up, or apply the changed DDL manually.
+3. Do **not** add `db/migration` folders back into backend services.
 
 ## Do not use
 
 | Setting | Why |
 |---------|-----|
-| `ddl-auto: update` | Unversioned schema drift; breaks multi-service ownership |
+| `ddl-auto: update` | Unversioned schema drift |
 | `ddl-auto: create` / `create-drop` | Wipes or recreates tables; not for shared MySQL |
-| Manual DDL in production | Bypasses Flyway history; causes migration conflicts |
-| Editing applied migrations | Change checksums; use new `V{n+1}__*.sql` instead |
-
-## Adding a new migration
-
-1. Add `V{n}__description.sql` under the service's `src/main/resources/db/migration/`.
-2. Never modify a migration already applied in shared environments.
-3. Test with `mvn -pl pixelmart-backend/<service> verify`.
-4. Deploy — Flyway runs the new script on next service start.
+| Flyway in services | Duplicates setup SQL; use `pixelmart-setup/sql/` only |
 
 ## Reset database (development)
 
@@ -211,4 +144,4 @@ docker compose down -v
 docker compose up --build
 ```
 
-This drops the `mysql_data` volume, re-runs bootstrap SQL, and re-applies all Flyway migrations.
+This drops the `mysql_data` volume and re-runs all SQL init scripts.

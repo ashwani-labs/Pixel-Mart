@@ -16,10 +16,7 @@ spring:
       hibernate:
         default_schema: notify
   flyway:
-    enabled: true
-    schemas: notify
-    default-schema: notify
-    locations: classpath:db/migration
+    enabled: false
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}

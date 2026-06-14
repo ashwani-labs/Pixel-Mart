@@ -1,7 +1,7 @@
 -- PixelMart MySQL bootstrap (runs once on first Docker MySQL container start)
 -- Creates the shared database, per-service schemas, and grants for the app user.
 -- Default: database pixelmart-db, username root, password root (see .env.example)
--- Table DDL is applied by Flyway when each service starts (ddl-auto: none).
+-- Per-service table DDL is in 02–05 *.sql (same folder); runs automatically on first MySQL init.
 
 CREATE DATABASE IF NOT EXISTS `pixelmart-db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `pixelmart-db`;

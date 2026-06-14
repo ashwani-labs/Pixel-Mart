@@ -16,10 +16,7 @@ spring:
       hibernate:
         default_schema: catalog
   flyway:
-    enabled: true
-    schemas: catalog
-    default-schema: catalog
-    locations: classpath:db/migration
+    enabled: false
   servlet:
     multipart:
       max-file-size: 5MB

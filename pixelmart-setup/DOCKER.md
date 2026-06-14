@@ -91,7 +91,7 @@ Stop without removing data:
 docker compose down
 ```
 
-Stop and **delete MySQL data** (re-runs bootstrap SQL + Flyway on next start):
+Stop and **delete MySQL data** (re-runs all SQL init scripts on next start):
 
 ```bash
 docker compose down -v
@@ -129,10 +129,10 @@ Open http://localhost:5173. Vite proxies `/api` to the gateway at `:8080`.
 |-------|-----|
 | Port already in use | Stop processes on `3000`, `3307`, `8080`–`8084`, or change ports in `docker-compose.yml` |
 | MySQL unhealthy | Wait for `start_period` (30s); check `docker compose logs mysql` |
-| Service restart loop / Flyway error | DB volume may be partial — `docker compose down -v` and start fresh |
+| Service restart loop / schema error | DB volume may be partial — `docker compose down -v` and start fresh |
 | Frontend 502 / API errors | Ensure `api-gateway` is healthy; check `docker compose logs api-gateway` |
 | Schema missing | Bootstrap SQL only runs on **empty** volume — see [SQL.md](SQL.md) |
-| Hibernate DDL errors | Production uses `ddl-auto: none`; schema must come from Flyway |
+| Hibernate DDL errors | Production uses `ddl-auto: none`; schema must come from `pixelmart-setup/sql/` |
 
 ## 9. Build backend without Compose
 

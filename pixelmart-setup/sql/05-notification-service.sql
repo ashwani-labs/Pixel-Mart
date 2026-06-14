@@ -1,3 +1,13 @@
+-- Notification service DDL. Runs on first MySQL init (database: notify).
+USE notify;
+SET NAMES utf8mb4;
+
+CREATE TABLE IF NOT EXISTS schema_bootstrap (
+    id TINYINT NOT NULL PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+INSERT IGNORE INTO schema_bootstrap (id) VALUES (1);
+
 CREATE TABLE email_outbox (
     id CHAR(36) NOT NULL PRIMARY KEY,
     recipient_to VARCHAR(255) NOT NULL,

@@ -15,7 +15,7 @@ This is one of **three main project folders**:
 | File | Description |
 |------|-------------|
 | [DOCKER.md](DOCKER.md) | Run the full stack with Docker Compose |
-| [SQL.md](SQL.md) | Database bootstrap, Flyway, no `ddl-auto` |
+| [SQL.md](SQL.md) | Database bootstrap SQL (one file per service) |
 
 ## Folder layout
 
@@ -27,7 +27,11 @@ pixelmart-setup/
 ├── docker-compose.yml
 ├── .env.example
 ├── sql/
-│   └── 01-schemas.sql
+│   ├── 01-schemas.sql
+│   ├── 02-auth-service.sql
+│   ├── 03-catalog-service.sql
+│   ├── 04-order-service.sql
+│   └── 05-notification-service.sql
 └── scripts/
 ```
 
@@ -51,7 +55,7 @@ Open **http://localhost:3000**. Gateway: **http://localhost:8080**.
 ## Database policy
 
 - **No DDL auto** — services use `spring.jpa.hibernate.ddl-auto: none`
-- **Flyway** applies migrations on service startup
-- **`sql/01-schemas.sql`** only creates schemas and grants (no app tables)
+- **Schema SQL** in `sql/` (applied on first MySQL init via Docker)
+- **`sql/01-schemas.sql`** creates databases and grants; `02–05` create tables and seed data
 
 See [SQL.md](SQL.md).

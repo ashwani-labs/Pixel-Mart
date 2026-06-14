@@ -16,10 +16,7 @@ spring:
       hibernate:
         default_schema: auth
   flyway:
-    enabled: true
-    schemas: auth
-    default-schema: auth
-    locations: classpath:db/migration
+    enabled: false
 
 pixelmart:
   internal:
