@@ -12,11 +12,11 @@ Three main folders:
 |--------|---------|
 | [`pixelmart-backend`](pixelmart-backend) | Spring Boot microservices + API gateway |
 | [`pixelmart-frontend`](pixelmart-frontend) | React storefront and admin console |
-| [`pixelmart-setup`](pixelmart-setup) | Docker Compose, SQL bootstrap, setup docs |
+| [`pixelmart-setup`](pixelmart-setup) | Docker Compose, SQL bootstrap, [setup guide](pixelmart-setup/SETUP.md) |
 
 ## One-command local start
 
-See **[pixelmart-setup/README.md](pixelmart-setup/README.md)** for Docker and SQL setup (no Hibernate DDL auto — schema SQL in `pixelmart-setup/sql/`).
+See **[pixelmart-setup/SETUP.md](pixelmart-setup/SETUP.md)** for the full guide (clone → database → run backend & frontend).
 
 ```bash
 cd pixelmart-setup
@@ -101,7 +101,7 @@ cd pixelmart/pixelmart-setup
 cp .env.example .env
 ```
 
-Full setup guide: [pixelmart-setup/DOCKER.md](pixelmart-setup/DOCKER.md) · Database: [pixelmart-setup/SQL.md](pixelmart-setup/SQL.md)
+Full setup guide: [pixelmart-setup/SETUP.md](pixelmart-setup/SETUP.md)
 
 ### 2. Start stack
 
@@ -201,8 +201,7 @@ docker compose up --build
 
 ## Documentation
 
-- [Docker setup](pixelmart-setup/DOCKER.md)
-- [SQL / database setup](pixelmart-setup/SQL.md)
+- [Local setup guide](pixelmart-setup/SETUP.md) — clone, database, backend & frontend
 
 ## License
 
