@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { AdminPageHeader } from '../components/admin/AdminPageHeader';
 import {
   Box,
   Button,
@@ -221,12 +222,10 @@ export function AdminCategoriesPage() {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
-        Catalog hierarchy
-      </Typography>
-      <Typography color="text.secondary" sx={{ mb: 2 }}>
-        Super categories group your storefront aisles. Categories sit under a super category and hold products.
-      </Typography>
+      <AdminPageHeader
+        title="Catalog hierarchy"
+        subtitle="Super categories group your storefront aisles. Categories sit under a super category and hold products."
+      />
 
       <Tabs value={tab} onChange={(_e, value: CategoryTab) => setTab(value)} sx={{ mb: 2 }}>
         <Tab value="super" label="Super categories" />

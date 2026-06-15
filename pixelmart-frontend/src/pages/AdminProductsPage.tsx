@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { AdminPageHeader } from '../components/admin/AdminPageHeader';
 import {
   Box,
   Button,
@@ -204,12 +205,10 @@ export function AdminProductsPage() {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
-        Products
-      </Typography>
-      <Typography color="text.secondary" sx={{ mb: 2 }}>
-        Add products under a category (which belongs to a super category). Toggle visibility inline or upload images.
-      </Typography>
+      <AdminPageHeader
+        title="Products"
+        subtitle="Add products under a category (which belongs to a super category). Toggle visibility inline or upload images."
+      />
 
       <Box
         component="form"

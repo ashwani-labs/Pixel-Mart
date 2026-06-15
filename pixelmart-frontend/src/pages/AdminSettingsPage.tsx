@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useDispatch, useSelector } from 'react-redux';
-import { Typography } from '@mui/material';
+import { AdminPageHeader } from '../components/admin/AdminPageHeader';
 import {
   useGetAdminStoreSettingsQuery,
   useUpdateStoreSettingsMutation,
@@ -118,12 +118,10 @@ export function AdminSettingsPage() {
 
   return (
     <div className={styles.page}>
-      <Typography variant="h4" gutterBottom>
-        Store settings
-      </Typography>
-      <Typography color="text.secondary" sx={{ mb: 2 }}>
-        Branding, market currency/locale, and tax defaults for checkout.
-      </Typography>
+      <AdminPageHeader
+        title="Store settings"
+        subtitle="Branding, market currency/locale, and tax defaults for checkout."
+      />
 
       <div className={styles.layout}>
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>

@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { Box } from '@mui/material';
+import { AdminPageHeader } from '../components/admin/AdminPageHeader';
 import {
   useCreateOfferMutation,
   useDeleteOfferMutation,
@@ -6,7 +8,6 @@ import {
   useGetCategoriesQuery,
 } from '../store/api/catalogApi';
 import type { OfferScope, OfferType, UpsertOfferRequest } from '../types/catalog';
-import styles from './PlaceholderPage.module.css';
 import formStyles from './AdminProductsPage.module.css';
 
 const nowLocal = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
@@ -62,9 +63,11 @@ export function AdminOffersPage() {
   };
 
   return (
-    <div className={styles.page}>
-      <h1>Admin — Offers</h1>
-      <p>Create product, category, or whole-cart discounts.</p>
+    <Box>
+      <AdminPageHeader
+        title="Offers"
+        subtitle="Create product, category, or whole-cart discounts."
+      />
 
       <form className={formStyles.uploadForm} onSubmit={handleCreate}>
         <label>
@@ -165,6 +168,6 @@ export function AdminOffersPage() {
           <p>No offers yet.</p>
         )}
       </section>
-    </div>
+    </Box>
   );
 }

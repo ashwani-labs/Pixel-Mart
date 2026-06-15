@@ -1,5 +1,6 @@
+import { Box } from '@mui/material';
+import { AdminPageHeader } from '../components/admin/AdminPageHeader';
 import { useGetAdminReviewsQuery, useModerateReviewMutation } from '../store/api/catalogApi';
-import styles from './PlaceholderPage.module.css';
 import formStyles from './AdminProductsPage.module.css';
 
 function formatDate(value: string) {
@@ -13,9 +14,11 @@ export function AdminReviewsPage() {
   const [moderateReview] = useModerateReviewMutation();
 
   return (
-    <div className={styles.page}>
-      <h1>Admin — Reviews</h1>
-      <p>Approve or reject customer reviews before they appear on the storefront.</p>
+    <Box>
+      <AdminPageHeader
+        title="Reviews"
+        subtitle="Approve or reject customer reviews before they appear on the storefront."
+      />
 
       {isLoading ? (
         <p>Loading review queue…</p>
@@ -31,7 +34,7 @@ export function AdminReviewsPage() {
                 {review.title ? ` — ${review.title}` : ''}
               </p>
               <p>{review.body}</p>
-              <p className={styles.subtitle}>
+              <p style={{ fontSize: '0.875rem', color: 'var(--muted-foreground)' }}>
                 {formatDate(review.createdAt)}
                 {review.verifiedPurchase ? ' · Verified purchase' : ''}
               </p>
@@ -55,6 +58,6 @@ export function AdminReviewsPage() {
       ) : (
         <p>No pending reviews.</p>
       )}
-    </div>
+    </Box>
   );
 }

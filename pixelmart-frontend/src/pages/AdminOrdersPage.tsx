@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Box } from '@mui/material';
+import { AdminPageHeader } from '../components/admin/AdminPageHeader';
 import type { RootState } from '../store';
 import {
   useGetAdminOrdersQuery,
   useUpdateAdminOrderStatusMutation,
 } from '../store/api/orderApi';
-import styles from './PlaceholderPage.module.css';
 import formStyles from './AdminProductsPage.module.css';
 import orderStyles from './OrderDetailPage.module.css';
 
@@ -33,9 +34,11 @@ export function AdminOrdersPage() {
   };
 
   return (
-    <div className={styles.page}>
-      <h1>Admin — Orders</h1>
-      <p>Review all customer orders and update fulfillment status.</p>
+    <Box>
+      <AdminPageHeader
+        title="Orders"
+        subtitle="Review all customer orders and update fulfillment status."
+      />
       {message && <p className={formStyles.message}>{message}</p>}
 
       {isLoading ? (
@@ -71,6 +74,6 @@ export function AdminOrdersPage() {
       ) : (
         <p>No orders yet.</p>
       )}
-    </div>
+    </Box>
   );
 }

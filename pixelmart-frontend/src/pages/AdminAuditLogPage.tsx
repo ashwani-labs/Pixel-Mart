@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { AdminPageHeader } from '../components/admin/AdminPageHeader';
 import {
   Box,
   Button,
@@ -87,12 +88,10 @@ export function AdminAuditLogPage() {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
-        Audit log
-      </Typography>
-      <Typography color="text.secondary" sx={{ mb: 2 }}>
-        Track admin changes to products, offers, categories, and store settings.
-      </Typography>
+      <AdminPageHeader
+        title="Audit log"
+        subtitle="Track admin changes to products, offers, categories, and store settings."
+      />
 
       <Box
         sx={{
