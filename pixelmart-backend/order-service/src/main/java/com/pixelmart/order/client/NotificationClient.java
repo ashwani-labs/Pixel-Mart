@@ -59,4 +59,29 @@ public class NotificationClient {
             BigDecimal lineTotal
     ) {
     }
+
+    public record AbandonedCartPayload(
+            String recipientEmail,
+            String recipientName,
+            int itemCount,
+            BigDecimal subtotal,
+            String currencyCode
+    ) {
+    }
+
+    public void sendAbandonedCart(AbandonedCartPayload payload) {
+        String url = properties.getBaseUrl() + "/api/internal/email/abandoned-cart";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-Internal-Service", properties.getInternalServiceName());
+        try {
+            restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(payload, headers),
+                    Void.class
+            );
+        } catch (Exception ex) {
+            log.warn("Failed to queue abandoned cart email for {}: {}", payload.recipientEmail(), ex.getMessage());
+        }
+    }
 }

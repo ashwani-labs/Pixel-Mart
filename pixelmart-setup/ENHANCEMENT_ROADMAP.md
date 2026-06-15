@@ -150,11 +150,11 @@ Most traffic is mobile; closing the mobile vs desktop conversion gap is a major 
 | **P0** | Real policy pages (shipping, returns, FAQ) | Low | Trust | ✅ Done |
 | **P0** | Delivery ETA by PIN on PDP / cart | Medium | Conversion | ✅ Done |
 | **P1** | Price + stock filters on product list | Medium | Discovery | ✅ Done |
-| **P1** | Guest checkout | Medium | Less cart abandonment | Pending |
-| **P1** | Admin homepage banner CMS | Medium | Merchandising | Pending |
+| **P1** | Guest checkout | Medium | Less cart abandonment | ✅ Done |
+| **P1** | Admin homepage banner CMS | Medium | Merchandising | ✅ Done |
 | **P2** | Search autocomplete | Medium | Discovery | Pending |
 | **P2** | Razorpay (or similar) integration | High | Production payments | Pending |
-| **P2** | Abandoned cart email | Medium | Revenue recovery | Pending |
+| **P2** | Abandoned cart email | Medium | Revenue recovery | ✅ Done |
 | **P3** | Product variants (size, color) | High | Fashion / electronics | Pending |
 | **P3** | Recommendations / recently viewed | Medium | Higher AOV | Partial (related products on PDP) |
 | **P3** | Loyalty points / referral program | High | Retention | Pending |
@@ -167,7 +167,7 @@ Most traffic is mobile; closing the mobile vs desktop conversion gap is a major 
 2. ~~Related products on PDP (same `categoryId`)~~ ✅ Done
 3. ~~Price min/max filter (extend existing product list API)~~ ✅ Done
 4. ~~Sticky mobile add-to-cart on PDP~~ ✅ Done
-5. Admin-managed carousel (slides in DB or settings JSON)
+5. ~~Admin-managed carousel (slides in DB or settings JSON)~~ ✅ Done
 6. ~~Fix footer links to point to policy routes~~ ✅ Done
 7. ~~Better empty states on cart and search~~ ✅ Done (search empty state; cart already had empty state)
 
@@ -175,7 +175,7 @@ Most traffic is mobile; closing the mobile vs desktop conversion gap is a major 
 
 ## Implementation status (June 2026)
 
-### Phase 1 — Trust and polish — **in progress**
+### Phase 1 — Trust and polish — **complete**
 
 | Item | Status | Notes |
 |------|--------|-------|
@@ -186,10 +186,16 @@ Most traffic is mobile; closing the mobile vs desktop conversion gap is a major 
 | Sticky mobile add-to-cart on PDP | ✅ Done | `StickyAddToCartBar` via IntersectionObserver |
 | Price range + in-stock filters | ✅ Done | `minPrice`, `maxPrice`, `inStockOnly` on catalog API |
 | Search empty state with bestsellers | ✅ Done | Featured products + aisle shortcuts when no results |
+| Admin homepage carousel CMS | ✅ Done | `/admin/homepage` + `hero_slides_json` in store settings |
 
-### Phase 2 — Conversion — **not started**
+### Phase 2 — Conversion — **in progress**
 
-Guest checkout, abandoned cart emails, order tracking UI, admin orders DataGrid + export.
+| Item | Status | Notes |
+|------|--------|-------|
+| Guest checkout | ✅ Done | Local guest cart + `POST /orders/guest-checkout` |
+| Abandoned cart emails | ✅ Done | Hourly scheduler + notification outbox |
+| Order tracking UI | ✅ Done | Timeline on order detail; tracking ID on ship |
+| Admin orders DataGrid + export | ✅ Done | Filters, status updates, CSV export |
 
 ### Phase 3 — Growth — **not started**
 

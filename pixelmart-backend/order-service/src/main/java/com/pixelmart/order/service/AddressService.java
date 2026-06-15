@@ -54,6 +54,23 @@ public class AddressService {
     }
 
     @Transactional
+    public Address createForUser(String userId, UpsertAddressRequest request) {
+        pincodeService.lookup(request.pincode());
+        Address address = map(new Address(), request);
+        address.setUserId(userId);
+        long count = addressRepository.findByUserIdOrderByDefaultAddressDescCreatedAtDesc(userId).size();
+        if (count == 0) {
+            address.setDefaultAddress(true);
+        } else if (request.isDefault()) {
+            addressRepository.clearAllDefaults(userId);
+            address.setDefaultAddress(true);
+        } else {
+            address.setDefaultAddress(false);
+        }
+        return addressRepository.save(address);
+    }
+
+    @Transactional
     public AddressResponse update(String id, UpsertAddressRequest request) {
         String userId = CurrentUser.requireUserId();
         pincodeService.lookup(request.pincode());

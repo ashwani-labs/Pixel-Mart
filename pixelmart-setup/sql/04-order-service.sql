@@ -13,6 +13,7 @@ CREATE TABLE carts (
     user_id CHAR(36) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    abandoned_cart_email_sent_at TIMESTAMP NULL,
     CONSTRAINT uq_carts_user_id UNIQUE (user_id)
 );
 
@@ -84,6 +85,7 @@ CREATE TABLE orders (
     ship_pincode CHAR(6) NOT NULL,
     ship_country VARCHAR(64) NOT NULL,
     ship_post_office_name VARCHAR(255) NULL,
+    tracking_number VARCHAR(64) NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_orders_address FOREIGN KEY (address_id) REFERENCES addresses (id)

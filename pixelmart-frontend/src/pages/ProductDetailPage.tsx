@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { getCategoryVisual, getProductEmoji } from '@/lib/categoryStyle';
+import { addGuestCartItem } from '@/lib/guestCart';
 import { DeliveryEstimate } from '../components/product/DeliveryEstimate';
 import { ProductImageGallery } from '../components/product/ProductImageGallery';
 import { ProductReviews } from '../components/product/ProductReviews';
@@ -72,7 +73,13 @@ export function ProductDetailPage() {
   const handleAddToCart = async () => {
     setCartMessage(null);
     if (!isAuthenticated) {
-      navigate('/login', { state: { from: `/products/${slug}` } });
+      addGuestCartItem({
+        productId: product.id,
+        productName: product.name,
+        productSlug: product.slug,
+        unitPrice: product.effectivePrice,
+      });
+      setCartMessage('Added to cart.');
       return;
     }
     try {

@@ -21,6 +21,9 @@ public class Cart {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    @Column(name = "abandoned_cart_email_sent_at")
+    private Instant abandonedCartEmailSentAt;
+
     @PrePersist
     void onCreate() {
         if (id == null) {
@@ -48,5 +51,17 @@ public class Cart {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public Instant getAbandonedCartEmailSentAt() {
+        return abandonedCartEmailSentAt;
+    }
+
+    public void setAbandonedCartEmailSentAt(Instant abandonedCartEmailSentAt) {
+        this.abandonedCartEmailSentAt = abandonedCartEmailSentAt;
     }
 }

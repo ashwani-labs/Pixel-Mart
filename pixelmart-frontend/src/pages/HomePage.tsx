@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { HeroCarousel } from '@/components/storefront/HeroCarousel';
+import { useGetHeroSlidesQuery } from '../store/api/settingsApi';
 import { ProductCard } from '@/components/storefront/ProductCard';
 import { FALLBACK_SUPER_CATEGORIES } from '@/lib/catalogFallbacks';
 import { getCategoryVisual } from '@/lib/categoryStyle';
@@ -19,6 +20,7 @@ function formatPrice(value: number) {
 const SPOTLIGHT_AISLES = ['super-grocery', 'super-electronics', 'super-fashion'] as const;
 
 export function HomePage() {
+  const { data: heroSlides } = useGetHeroSlidesQuery();
   const { data: superCategories } = useGetSuperCategoriesQuery();
   const { data: featured, isLoading } = useGetProductsQuery({ page: 0, size: 12, featured: true });
   const { data: groceryDeals } = useGetProductsQuery({
@@ -35,7 +37,7 @@ export function HomePage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <HeroCarousel />
+      <HeroCarousel slides={heroSlides?.slides} />
 
       {spotlightAisles.length > 0 && (
         <section className="grid grid-cols-1 gap-3 sm:grid-cols-3">

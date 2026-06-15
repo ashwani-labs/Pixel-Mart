@@ -5,6 +5,11 @@ import com.pixelmart.order.domain.OrderItem;
 import com.pixelmart.order.domain.Payment;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.Valid;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -26,6 +31,39 @@ public final class CheckoutDtos {
             @NotBlank String addressId,
             @NotNull PaymentMethod paymentMethod,
             String couponCode
+    ) {
+    }
+
+    public record GuestCartLineRequest(
+            @NotBlank String productId,
+            @NotNull @Min(1) Integer quantity
+    ) {
+    }
+
+    public record GuestCheckoutRequest(
+            @NotBlank @Email String email,
+            @NotBlank String fullName,
+            @NotBlank String phone,
+            @NotBlank String addressLine1,
+            String addressLine2,
+            @NotBlank String city,
+            @NotBlank String state,
+            @NotBlank @Pattern(regexp = "^[0-9]{6}$") String pincode,
+            String country,
+            String postOfficeName,
+            @NotNull PaymentMethod paymentMethod,
+            String couponCode,
+            @NotEmpty List<@Valid GuestCartLineRequest> items
+    ) {
+    }
+
+    public record GuestCheckoutResponse(
+            OrderResponse order,
+            String accessToken,
+            long expiresIn,
+            String userId,
+            String email,
+            String userName
     ) {
     }
 
@@ -91,6 +129,7 @@ public final class CheckoutDtos {
             String shipPincode,
             String shipCountry,
             String shipPostOfficeName,
+            String trackingNumber,
             List<OrderItemResponse> items,
             PaymentResponse payment
     ) {
@@ -116,6 +155,7 @@ public final class CheckoutDtos {
                     order.getShipPincode(),
                     order.getShipCountry(),
                     order.getShipPostOfficeName(),
+                    order.getTrackingNumber(),
                     items.stream().map(OrderItemResponse::from).toList(),
                     PaymentResponse.from(payment)
             );

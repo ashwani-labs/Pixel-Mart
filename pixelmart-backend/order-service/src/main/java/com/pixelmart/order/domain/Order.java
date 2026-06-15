@@ -79,6 +79,9 @@ public class Order {
     @Column(name = "ship_post_office_name")
     private String shipPostOfficeName;
 
+    @Column(name = "tracking_number", length = 64)
+    private String trackingNumber;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -280,6 +283,14 @@ public class Order {
 
     public void setShipPostOfficeName(String shipPostOfficeName) {
         this.shipPostOfficeName = shipPostOfficeName;
+    }
+
+    public String getTrackingNumber() {
+        return trackingNumber;
+    }
+
+    public void setTrackingNumber(String trackingNumber) {
+        this.trackingNumber = trackingNumber;
     }
 
     public Instant getCreatedAt() {

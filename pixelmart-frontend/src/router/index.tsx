@@ -7,6 +7,7 @@ import { AppLayout } from '../components/layout/AppLayout';
 import { AdminAuditLogPage } from '../pages/AdminAuditLogPage';
 import { AdminCategoriesPage } from '../pages/AdminCategoriesPage';
 import { AdminDashboardPage } from '../pages/AdminDashboardPage';
+import { AdminHomepagePage } from '../pages/AdminHomepagePage';
 import { AdminReviewsPage } from '../pages/AdminReviewsPage';
 import { AdminOffersPage } from '../pages/AdminOffersPage';
 import { AdminProductsPage } from '../pages/AdminProductsPage';
@@ -50,6 +51,7 @@ export const router = createBrowserRouter([
       { path: 'categories', element: <AdminCategoriesPage /> },
       { path: 'offers', element: <AdminOffersPage /> },
       { path: 'orders', element: <AdminOrdersPage /> },
+      { path: 'homepage', element: <AdminHomepagePage /> },
       { path: 'reviews', element: <AdminReviewsPage /> },
       { path: 'audit-log', element: <AdminAuditLogPage /> },
       { path: 'settings', element: <AdminSettingsPage /> },
@@ -75,30 +77,9 @@ export const router = createBrowserRouter([
       { path: 'register', element: <RegisterPage /> },
       { path: 'profile', element: <ProfilePage /> },
       { path: 'profile/addresses', element: <ProfileAddressesPage /> },
-      {
-        path: 'wishlist',
-        element: (
-          <RequireAuth>
-            <WishlistPage />
-          </RequireAuth>
-        ),
-      },
-      {
-        path: 'cart',
-        element: (
-          <RequireAuth>
-            <CartPage />
-          </RequireAuth>
-        ),
-      },
-      {
-        path: 'checkout',
-        element: (
-          <RequireAuth>
-            <CheckoutPage />
-          </RequireAuth>
-        ),
-      },
+      { path: 'wishlist', element: <RequireAuth><WishlistPage /></RequireAuth> },
+      { path: 'cart', element: <CartPage /> },
+      { path: 'checkout', element: <CheckoutPage /> },
       {
         path: 'orders',
         element: (

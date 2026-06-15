@@ -16,6 +16,7 @@ import com.pixelmart.order.domain.CartItem;
 import com.pixelmart.order.domain.Order;
 import com.pixelmart.order.domain.OrderItem;
 import com.pixelmart.order.domain.Payment;
+import com.pixelmart.order.dto.CheckoutDtos;
 import com.pixelmart.order.dto.CheckoutDtos.CheckoutRequest;
 import com.pixelmart.order.dto.CheckoutDtos.OrderResponse;
 import com.pixelmart.order.dto.CheckoutDtos.PaymentMethod;
@@ -127,6 +128,62 @@ public class CheckoutService {
         queueOrderConfirmation(order, orderItems, settings);
 
         return OrderResponse.from(order, orderItems, payment);
+    }
+
+    @Transactional
+    public OrderResponse checkoutForUser(
+            String userId,
+            Address address,
+            List<CheckoutDtos.GuestCartLineRequest> lines,
+            PaymentMethod paymentMethod,
+            String couponCode
+    ) {
+        if (lines.isEmpty()) {
+            throw new BadRequestException("Cart is empty");
+        }
+        String coupon = normalizeCoupon(couponCode);
+        List<CartItem> cartItems = lines.stream().map(this::toVirtualCartItem).toList();
+        Map<String, CatalogProductSnapshot> products = loadProducts(cartItems, coupon);
+        CatalogStoreSettings settings = catalogClient.getStoreSettings();
+        BigDecimal subtotal = subtotal(cartItems, products);
+        CatalogCartDiscountSnapshot cartDiscount = catalogClient.getCartDiscount(subtotal, coupon);
+        validateCoupon(coupon, products, cartDiscount);
+        List<ReserveStockLine> stockLines = cartItems.stream()
+                .map(item -> new ReserveStockLine(item.getProductId(), item.getQuantity()))
+                .toList();
+        catalogClient.reserveStock(stockLines);
+
+        BigDecimal discountTotal = cartDiscount.discountTotal();
+        BigDecimal taxableSubtotal = subtotal.subtract(discountTotal);
+        BigDecimal taxRate = settings.effectiveTaxRate();
+        BigDecimal taxTotal = taxableSubtotal.multiply(taxRate)
+                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+        BigDecimal grandTotal = taxableSubtotal.add(taxTotal);
+
+        Order order = orderRepository.save(buildOrder(
+                userId,
+                address,
+                paymentMethod,
+                subtotal,
+                discountTotal,
+                cartDiscount.offerName(),
+                taxTotal,
+                grandTotal,
+                settings
+        ));
+        List<OrderItem> orderItems = orderItemRepository.saveAll(buildOrderItems(order, cartItems, products));
+        Payment payment = paymentRepository.save(buildPayment(order, paymentMethod, grandTotal));
+
+        queueOrderConfirmation(order, orderItems, settings);
+
+        return OrderResponse.from(order, orderItems, payment);
+    }
+
+    private CartItem toVirtualCartItem(CheckoutDtos.GuestCartLineRequest line) {
+        CartItem item = new CartItem();
+        item.setProductId(line.productId());
+        item.setQuantity(line.quantity());
+        return item;
     }
 
     private void queueOrderConfirmation(Order order, List<OrderItem> orderItems, CatalogStoreSettings settings) {

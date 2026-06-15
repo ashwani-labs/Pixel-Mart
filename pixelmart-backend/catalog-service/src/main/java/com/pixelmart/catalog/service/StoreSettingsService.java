@@ -84,6 +84,11 @@ public class StoreSettingsService {
                 .orElseThrow(() -> new ResourceNotFoundException("StoreSettings", SETTINGS_ID));
     }
 
+    @Transactional
+    public StoreSettings save(StoreSettings settings) {
+        return storeSettingsRepository.save(settings);
+    }
+
     String resolveLogoUrl(StoreSettings settings) {
         return settings.getLogoStorageKey() != null ? mediaUrlService.brandLogoUrl() : null;
     }

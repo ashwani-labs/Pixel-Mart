@@ -34,6 +34,36 @@ export interface CheckoutRequest {
   couponCode?: string;
 }
 
+export interface GuestCartLine {
+  productId: string;
+  quantity: number;
+}
+
+export interface GuestCheckoutRequest {
+  email: string;
+  fullName: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  pincode: string;
+  country?: string;
+  postOfficeName?: string;
+  paymentMethod: PaymentMethod;
+  couponCode?: string;
+  items: GuestCartLine[];
+}
+
+export interface GuestCheckoutResponse {
+  order: Order;
+  accessToken: string;
+  expiresIn: number;
+  userId: string;
+  email: string;
+  userName: string;
+}
+
 export interface OrderItem {
   productId: string;
   productName: string;
@@ -71,6 +101,7 @@ export interface Order {
   shipPincode: string;
   shipCountry: string;
   shipPostOfficeName: string | null;
+  trackingNumber: string | null;
   items: OrderItem[];
   payment: Payment;
 }

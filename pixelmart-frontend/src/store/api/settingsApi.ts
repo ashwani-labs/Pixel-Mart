@@ -1,4 +1,5 @@
 import type { AdminStoreSettings, PublicStoreSettings, UpdateStoreSettingsRequest } from '../../types/settings';
+import type { HeroSlidesResponse, HeroSlide } from '../../types/homepage';
 import type { ProductImage } from '../../types/catalog';
 import { baseApi } from './baseApi';
 
@@ -47,6 +48,22 @@ export const settingsApi = baseApi.injectEndpoints({
       },
       invalidatesTags: (_r, _e, { productId }) => [{ type: 'Product', id: productId }],
     }),
+    getHeroSlides: build.query<HeroSlidesResponse, void>({
+      query: () => '/catalog/hero-slides',
+      providesTags: ['Settings'],
+    }),
+    getAdminHeroSlides: build.query<HeroSlidesResponse, void>({
+      query: () => '/admin/settings/hero-slides',
+      providesTags: ['Settings'],
+    }),
+    updateHeroSlides: build.mutation<HeroSlidesResponse, { slides: HeroSlide[] }>({
+      query: (body) => ({
+        url: '/admin/settings/hero-slides',
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: ['Settings'],
+    }),
   }),
 });
 
@@ -56,4 +73,7 @@ export const {
   useUpdateStoreSettingsMutation,
   useUploadStoreLogoMutation,
   useUploadProductImageMutation,
+  useGetHeroSlidesQuery,
+  useGetAdminHeroSlidesQuery,
+  useUpdateHeroSlidesMutation,
 } = settingsApi;

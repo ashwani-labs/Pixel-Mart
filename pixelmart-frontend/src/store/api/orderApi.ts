@@ -3,6 +3,8 @@ import type {
   AddCartItemRequest,
   Cart,
   CheckoutRequest,
+  GuestCheckoutRequest,
+  GuestCheckoutResponse,
   Order,
   OrderDashboardStats,
   UpdateCartItemRequest,
@@ -99,6 +101,14 @@ export const orderApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['Cart', 'Order'],
     }),
+    guestCheckout: build.mutation<GuestCheckoutResponse, GuestCheckoutRequest>({
+      query: (body) => ({
+        url: '/orders/guest-checkout',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Order'],
+    }),
     getOrders: build.query<Order[], void>({
       query: () => '/orders',
       providesTags: ['Order'],
@@ -139,6 +149,7 @@ export const {
   useSetDefaultAddressMutation,
   useDeleteAddressMutation,
   useCheckoutMutation,
+  useGuestCheckoutMutation,
   useGetOrdersQuery,
   useGetOrderQuery,
   useGetAdminOrdersQuery,

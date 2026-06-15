@@ -48,6 +48,9 @@ public class StoreSettings {
     @Column(name = "tax_label", nullable = false, length = 64)
     private String taxLabel;
 
+    @Column(name = "hero_slides_json", columnDefinition = "JSON")
+    private String heroSlidesJson;
+
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
@@ -155,5 +158,13 @@ public class StoreSettings {
 
     public void setTaxLabel(String taxLabel) {
         this.taxLabel = taxLabel;
+    }
+
+    public String getHeroSlidesJson() {
+        return heroSlidesJson;
+    }
+
+    public void setHeroSlidesJson(String heroSlidesJson) {
+        this.heroSlidesJson = heroSlidesJson;
     }
 }

@@ -1,6 +1,7 @@
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store';
+import { OrderTrackingTimeline } from '../components/order/OrderTrackingTimeline';
 import { useGetOrderQuery } from '../store/api/orderApi';
 import styles from './OrderDetailPage.module.css';
 
@@ -37,8 +38,13 @@ export function OrderDetailPage() {
       </Link>
       <section className={styles.card}>
         <h1>Order {order.orderNumber}</h1>
+        <OrderTrackingTimeline
+          status={order.status}
+          trackingNumber={order.trackingNumber}
+          orderNumber={order.orderNumber}
+        />
         <p className={styles.muted}>
-          Status: <strong>{order.status}</strong> · Payment: <strong>{order.payment.status}</strong>
+          Payment: <strong>{order.payment.status}</strong>
         </p>
         <p className={styles.muted}>
           Method: {order.payment.method.replace('MOCK_', 'Mock ')} · Ref:{' '}

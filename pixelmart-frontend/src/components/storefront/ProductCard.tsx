@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { addGuestCartItem } from '@/lib/guestCart';
 import {
   discountPercent,
   getCategoryVisual,
@@ -47,7 +48,13 @@ export function ProductCard({
     e.preventDefault();
     e.stopPropagation();
     if (!isAuthenticated) {
-      navigate('/login');
+      addGuestCartItem({
+        productId: product.id,
+        productName: product.name,
+        productSlug: product.slug,
+        unitPrice: product.effectivePrice,
+      });
+      navigate('/cart');
       return;
     }
     try {

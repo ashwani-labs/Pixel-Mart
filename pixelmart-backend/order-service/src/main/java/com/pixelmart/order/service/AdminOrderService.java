@@ -56,6 +56,9 @@ public class AdminOrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", id));
         order.setStatus(status);
+        if ("SHIPPED".equals(status) && (order.getTrackingNumber() == null || order.getTrackingNumber().isBlank())) {
+            order.setTrackingNumber("PMX" + order.getOrderNumber().substring(2));
+        }
         return toResponse(orderRepository.save(order));
     }
 

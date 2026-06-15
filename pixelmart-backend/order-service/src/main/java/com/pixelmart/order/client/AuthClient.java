@@ -23,8 +23,7 @@ public class AuthClient {
 
     public AuthUserSnapshot getUser(String userId) {
         String url = properties.getBaseUrl() + "/api/auth/internal/users/" + userId;
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-Internal-Service", properties.getInternalServiceName());
+        HttpHeaders headers = internalHeaders();
         try {
             ResponseEntity<AuthUserSnapshot> response = restTemplate.exchange(
                     url,
@@ -40,5 +39,31 @@ public class AuthClient {
         } catch (HttpStatusCodeException ex) {
             throw new BadRequestException("Unable to load user profile");
         }
+    }
+
+    public GuestSessionResponse createGuestSession(String email, String name) {
+        String url = properties.getBaseUrl() + "/api/auth/internal/users/guest-session";
+        HttpHeaders headers = internalHeaders();
+        try {
+            ResponseEntity<GuestSessionResponse> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    new HttpEntity<>(new GuestSessionRequest(email, name), headers),
+                    GuestSessionResponse.class
+            );
+            GuestSessionResponse body = response.getBody();
+            if (body == null) {
+                throw new BadRequestException("Guest session not available");
+            }
+            return body;
+        } catch (HttpStatusCodeException ex) {
+            throw new BadRequestException("Unable to create guest session");
+        }
+    }
+
+    private HttpHeaders internalHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-Internal-Service", properties.getInternalServiceName());
+        return headers;
     }
 }

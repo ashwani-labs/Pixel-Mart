@@ -218,6 +218,7 @@ CREATE TABLE store_settings (
     tax_enabled BOOLEAN NOT NULL DEFAULT FALSE,
     tax_rate_percent DECIMAL(5, 2) NOT NULL DEFAULT 0,
     tax_label VARCHAR(64) NOT NULL DEFAULT 'GST',
+    hero_slides_json JSON NULL,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 

@@ -1,9 +1,12 @@
 package com.pixelmart.order.controller;
 
 import com.pixelmart.order.dto.CheckoutDtos.CheckoutRequest;
+import com.pixelmart.order.dto.CheckoutDtos.GuestCheckoutRequest;
+import com.pixelmart.order.dto.CheckoutDtos.GuestCheckoutResponse;
 import com.pixelmart.order.dto.CheckoutDtos.OrderResponse;
 import com.pixelmart.order.service.CheckoutIdempotencyService;
 import com.pixelmart.order.service.CheckoutService;
+import com.pixelmart.order.service.GuestCheckoutService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,13 +19,22 @@ public class CheckoutController {
 
     private final CheckoutIdempotencyService checkoutIdempotencyService;
     private final CheckoutService checkoutService;
+    private final GuestCheckoutService guestCheckoutService;
 
     public CheckoutController(
             CheckoutIdempotencyService checkoutIdempotencyService,
-            CheckoutService checkoutService
+            CheckoutService checkoutService,
+            GuestCheckoutService guestCheckoutService
     ) {
         this.checkoutIdempotencyService = checkoutIdempotencyService;
         this.checkoutService = checkoutService;
+        this.guestCheckoutService = guestCheckoutService;
+    }
+
+    @PostMapping("/guest-checkout")
+    @ResponseStatus(HttpStatus.CREATED)
+    public GuestCheckoutResponse guestCheckout(@Valid @RequestBody GuestCheckoutRequest request) {
+        return guestCheckoutService.checkout(request);
     }
 
     @PostMapping("/checkout")
