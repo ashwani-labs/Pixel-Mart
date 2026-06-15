@@ -98,6 +98,9 @@ public class JwtGatewayFilter implements GlobalFilter, Ordered {
         if (method == HttpMethod.GET && path.startsWith("/api/catalog/")) {
             return !path.startsWith("/api/catalog/wishlist");
         }
+        if (method == HttpMethod.GET && path.matches("/api/orders/addresses/pincode/\\d{6}")) {
+            return true;
+        }
         return false;
     }
 

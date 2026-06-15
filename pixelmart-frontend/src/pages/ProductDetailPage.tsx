@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { getCategoryVisual, getProductEmoji } from '@/lib/categoryStyle';
+import { DeliveryEstimate } from '../components/product/DeliveryEstimate';
 import { ProductImageGallery } from '../components/product/ProductImageGallery';
 import { ProductReviews } from '../components/product/ProductReviews';
+import { RelatedProducts } from '../components/product/RelatedProducts';
+import { StickyAddToCartBar } from '../components/product/StickyAddToCartBar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -32,6 +35,20 @@ export function ProductDetailPage() {
   const [addWishlistItem] = useAddWishlistItemMutation();
   const [removeWishlistItem] = useRemoveWishlistItemMutation();
   const [cartMessage, setCartMessage] = useState<string | null>(null);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  const addToCartRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const target = addToCartRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowStickyBar(!entry.isIntersecting),
+      { threshold: 0, rootMargin: '0px' },
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [product?.id]);
 
   if (isLoading) {
     return (
@@ -49,6 +66,22 @@ export function ProductDetailPage() {
   }
 
   const isWishlisted = wishlist.some((item) => item.id === product.id);
+  const outOfStock = product.stockQty < 1;
+  const lowStock = product.stockQty > 0 && product.stockQty <= 5;
+
+  const handleAddToCart = async () => {
+    setCartMessage(null);
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: `/products/${slug}` } });
+      return;
+    }
+    try {
+      await addToCart({ productId: product.id, quantity: 1 }).unwrap();
+      setCartMessage('Added to cart.');
+    } catch {
+      setCartMessage('Could not add to cart.');
+    }
+  };
 
   const handleWishlistToggle = async () => {
     if (!isAuthenticated) {
@@ -63,7 +96,7 @@ export function ProductDetailPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 pb-20 md:pb-0">
       <nav className="text-sm text-muted-foreground" aria-label="Breadcrumb">
         <Link to="/" className="no-underline hover:text-primary hover:no-underline">
           Home
@@ -90,6 +123,8 @@ export function ProductDetailPage() {
           <div className="mb-3 flex flex-wrap gap-2">
             {product.featured && <Badge>Featured</Badge>}
             {product.offerName && <Badge variant="success">{product.offerName}</Badge>}
+            {lowStock && <Badge variant="deal">Only {product.stockQty} left</Badge>}
+            {!outOfStock && product.stockQty > 5 && <Badge variant="success">In stock</Badge>}
           </div>
           <h1 className="m-0 mb-2 text-3xl font-bold text-foreground">{product.name}</h1>
           <div className="mb-4 flex items-baseline gap-2">
@@ -101,40 +136,49 @@ export function ProductDetailPage() {
             )}
           </div>
           <p className="text-muted-foreground">{product.description ?? 'No description available.'}</p>
-          <p className="text-sm text-muted-foreground">In stock: {product.stockQty}</p>
-          <Button
-            variant="accent"
-            size="lg"
-            className="mt-5 min-w-[10rem]"
-            disabled={adding || product.stockQty < 1}
-            onClick={async () => {
-              setCartMessage(null);
-              if (!isAuthenticated) {
-                navigate('/login', { state: { from: `/products/${slug}` } });
-                return;
-              }
-              try {
-                await addToCart({ productId: product.id, quantity: 1 }).unwrap();
-                setCartMessage('Added to cart.');
-              } catch {
-                setCartMessage('Could not add to cart.');
-              }
-            }}
-          >
-            {adding ? 'Adding…' : 'ADD TO CART'}
-          </Button>
-          <Button type="button" variant="outline" className="mt-3" onClick={handleWishlistToggle}>
-            {isWishlisted ? '♥ Remove from wishlist' : '♡ Add to wishlist'}
-          </Button>
-          {cartMessage && <p className="mt-2 text-sm text-primary">{cartMessage}</p>}
-          {isAuthenticated && (
-            <Link to="/cart" className="mt-2 inline-block text-sm">
-              View cart
-            </Link>
-          )}
+
+          <div className="mt-4">
+            <DeliveryEstimate />
+          </div>
+
+          <div ref={addToCartRef} className="mt-5">
+            <Button
+              variant="accent"
+              size="lg"
+              className="min-w-[10rem]"
+              disabled={adding || outOfStock}
+              onClick={() => void handleAddToCart()}
+            >
+              {adding ? 'Adding…' : outOfStock ? 'OUT OF STOCK' : 'ADD TO CART'}
+            </Button>
+            <Button type="button" variant="outline" className="mt-3" onClick={() => void handleWishlistToggle()}>
+              {isWishlisted ? '♥ Remove from wishlist' : '♡ Add to wishlist'}
+            </Button>
+            {cartMessage && <p className="mt-2 text-sm text-primary">{cartMessage}</p>}
+            {isAuthenticated && (
+              <Link to="/cart" className="mt-2 inline-block text-sm">
+                View cart
+              </Link>
+            )}
+          </div>
         </div>
       </div>
+
+      <RelatedProducts
+        productId={product.id}
+        categoryId={product.categoryId}
+        formatPrice={formatPrice}
+      />
       <ProductReviews productId={product.id} />
+
+      <StickyAddToCartBar
+        productName={product.name}
+        priceLabel={formatPrice(product.effectivePrice)}
+        visible={showStickyBar}
+        disabled={outOfStock}
+        loading={adding}
+        onAddToCart={() => void handleAddToCart()}
+      />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { DeliveryEstimate } from '@/components/product/DeliveryEstimate';
 import type { RootState } from '../store';
 import {
   useGetCartQuery,
@@ -122,6 +123,7 @@ export function CartPage() {
           <Card className="h-fit border-primary/20 bg-card shadow-md lg:sticky lg:top-24">
             <CardContent className="flex flex-col gap-4 p-5">
               <h2 className="m-0 text-lg font-bold">Order summary</h2>
+              <DeliveryEstimate compact />
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Items ({cart!.totalQuantity})</span>
                 <span className="font-semibold">

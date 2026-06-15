@@ -6,9 +6,14 @@ import { useGetSuperCategoriesQuery } from '../../store/api/catalogApi';
 import { selectIsAuthenticated } from '../../store/slices/authSlice';
 
 const HELP_LINKS = [
-  { label: 'Shipping & delivery', to: '/products' },
-  { label: 'Returns & refunds', to: '/products' },
-  { label: 'FAQs', to: '/products' },
+  { label: 'Shipping & delivery', to: '/shipping' },
+  { label: 'Returns & refunds', to: '/returns' },
+  { label: 'FAQs', to: '/faq' },
+] as const;
+
+const LEGAL_LINKS = [
+  { label: 'Privacy policy', to: '/privacy' },
+  { label: 'Terms of use', to: '/terms' },
 ] as const;
 
 const PAYMENT_BADGES = ['UPI', 'Cards', 'Net Banking', 'COD'] as const;
@@ -112,6 +117,13 @@ export function StoreFooter() {
             </h3>
             <ul className="m-0 flex list-none flex-col gap-2 p-0">
               {HELP_LINKS.map((item) => (
+                <li key={item.label}>
+                  <Link to={item.to} className={footerLink}>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+              {LEGAL_LINKS.map((item) => (
                 <li key={item.label}>
                   <Link to={item.to} className={footerLink}>
                     {item.label}

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -41,12 +42,17 @@ public class PublicCatalogController {
             @RequestParam(required = false) String superCategoryId,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) Boolean featured,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) Boolean inStockOnly,
             @PageableDefault(size = 12, sort = "name", direction = Sort.Direction.ASC) Pageable pageable
     ) {
         if (Boolean.TRUE.equals(featured)) {
             return PageResponse.from(productService.listFeatured(pageable));
         }
-        return PageResponse.from(productService.listPublic(categoryId, superCategoryId, search, pageable));
+        return PageResponse.from(
+                productService.listPublic(categoryId, superCategoryId, search, minPrice, maxPrice, inStockOnly, pageable)
+        );
     }
 
     @GetMapping("/products/{slug}")

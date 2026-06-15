@@ -25,6 +25,13 @@ import { RegisterPage } from '../pages/RegisterPage';
 import { WishlistPage } from '../pages/WishlistPage';
 import { CartPage } from '../pages/CartPage';
 import { CheckoutPage } from '../pages/CheckoutPage';
+import {
+  FaqPage,
+  PrivacyPolicyPage,
+  ReturnsPolicyPage,
+  ShippingPolicyPage,
+  TermsPage,
+} from '../pages/policy/PolicyPages';
 
 export const router = createBrowserRouter([
   { path: '/admin-login', element: <AdminLoginPage /> },
@@ -59,6 +66,11 @@ export const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: 'products', element: <ProductListPage /> },
       { path: 'products/:slug', element: <ProductDetailPage /> },
+      { path: 'shipping', element: <ShippingPolicyPage /> },
+      { path: 'returns', element: <ReturnsPolicyPage /> },
+      { path: 'faq', element: <FaqPage /> },
+      { path: 'privacy', element: <PrivacyPolicyPage /> },
+      { path: 'terms', element: <TermsPage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
       { path: 'profile', element: <ProfilePage /> },

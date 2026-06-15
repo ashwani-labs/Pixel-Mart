@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,11 +51,22 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ProductResponse> listPublic(String categoryId, String superCategoryId, String search, Pageable pageable) {
+    public Page<ProductResponse> listPublic(
+            String categoryId,
+            String superCategoryId,
+            String search,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            Boolean inStockOnly,
+            Pageable pageable
+    ) {
         return productRepository.findPublicProducts(
                         normalize(categoryId),
                         normalize(superCategoryId),
                         normalize(search),
+                        minPrice,
+                        maxPrice,
+                        inStockOnly,
                         pageable
                 )
                 .map(product -> ProductResponse.fromPublic(product, offerService.price(product)));

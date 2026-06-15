@@ -23,6 +23,9 @@ export interface ProductListParams {
   search?: string;
   featured?: boolean;
   sort?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  inStockOnly?: boolean;
 }
 
 export const catalogApi = baseApi.injectEndpoints({
@@ -138,7 +141,18 @@ export const catalogApi = baseApi.injectEndpoints({
       providesTags: ['Dashboard'],
     }),
     getProducts: build.query<PageResponse<Product>, ProductListParams>({
-      query: ({ page = 0, size = 12, categoryId, superCategoryId, search, featured, sort }) => ({
+      query: ({
+        page = 0,
+        size = 12,
+        categoryId,
+        superCategoryId,
+        search,
+        featured,
+        sort,
+        minPrice,
+        maxPrice,
+        inStockOnly,
+      }) => ({
         url: '/catalog/products',
         params: {
           page,
@@ -148,6 +162,9 @@ export const catalogApi = baseApi.injectEndpoints({
           search: search || undefined,
           featured: featured ?? undefined,
           sort: sort || undefined,
+          minPrice: minPrice ?? undefined,
+          maxPrice: maxPrice ?? undefined,
+          inStockOnly: inStockOnly ?? undefined,
         },
       }),
       providesTags: (result) =>

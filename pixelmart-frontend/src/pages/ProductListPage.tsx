@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,8 +35,13 @@ export function ProductListPage() {
   const search = searchParams.get('search') ?? '';
   const sort = searchParams.get('sort') ?? 'name,asc';
   const featured = searchParams.get('featured') === 'true';
+  const minPrice = searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : undefined;
+  const maxPrice = searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined;
+  const inStockOnly = searchParams.get('inStockOnly') === 'true';
   const page = Number(searchParams.get('page') ?? '0');
   const [searchInput, setSearchInput] = useState(search);
+  const [minPriceInput, setMinPriceInput] = useState(minPrice?.toString() ?? '');
+  const [maxPriceInput, setMaxPriceInput] = useState(maxPrice?.toString() ?? '');
 
   const { data: superCategories = [] } = useGetSuperCategoriesQuery();
   const { data: subCategories = [] } = useGetCategoriesQuery();
@@ -51,7 +56,14 @@ export function ProductListPage() {
     search: search || undefined,
     featured: featured || undefined,
     sort,
+    minPrice,
+    maxPrice,
+    inStockOnly: inStockOnly || undefined,
   });
+  const { data: featuredFallback } = useGetProductsQuery(
+    { page: 0, size: 4, featured: true },
+    { skip: !data || data.content.length > 0 || isLoading },
+  );
   const wishlistIds = new Set(wishlist.map((item) => item.id));
 
   const subCategoriesBySuper = useMemo(() => {
@@ -109,6 +121,42 @@ export function ProductListPage() {
     next.set('sort', value);
     next.set('page', '0');
     setSearchParams(next);
+  };
+
+  const applyPriceFilters = () => {
+    const next = new URLSearchParams(searchParams);
+    const min = minPriceInput.trim() ? Number(minPriceInput) : undefined;
+    const max = maxPriceInput.trim() ? Number(maxPriceInput) : undefined;
+    if (min != null && !Number.isNaN(min) && min >= 0) {
+      next.set('minPrice', String(min));
+    } else {
+      next.delete('minPrice');
+    }
+    if (max != null && !Number.isNaN(max) && max >= 0) {
+      next.set('maxPrice', String(max));
+    } else {
+      next.delete('maxPrice');
+    }
+    next.set('page', '0');
+    setSearchParams(next);
+  };
+
+  const setInStockOnly = (checked: boolean) => {
+    const next = new URLSearchParams(searchParams);
+    if (checked) {
+      next.set('inStockOnly', 'true');
+    } else {
+      next.delete('inStockOnly');
+    }
+    next.set('page', '0');
+    setSearchParams(next);
+  };
+
+  const clearAllFilters = () => {
+    setSearchInput('');
+    setMinPriceInput('');
+    setMaxPriceInput('');
+    setSearchParams({});
   };
 
   const pageTitle = featured
@@ -173,6 +221,44 @@ export function ProductListPage() {
               );
             })}
           </ul>
+
+          <div className="mt-6 border-t border-border pt-4">
+            <h2 className="m-0 mb-3 text-sm font-bold uppercase tracking-wide text-muted-foreground">
+              Price range (₹)
+            </h2>
+            <div className="flex flex-col gap-2">
+              <Input
+                type="number"
+                min={0}
+                placeholder="Min"
+                value={minPriceInput}
+                onChange={(e) => setMinPriceInput(e.target.value)}
+                className="h-9"
+                aria-label="Minimum price"
+              />
+              <Input
+                type="number"
+                min={0}
+                placeholder="Max"
+                value={maxPriceInput}
+                onChange={(e) => setMaxPriceInput(e.target.value)}
+                className="h-9"
+                aria-label="Maximum price"
+              />
+              <Button type="button" size="sm" variant="outline" onClick={applyPriceFilters}>
+                Apply
+              </Button>
+            </div>
+            <label className="mt-4 flex cursor-pointer items-center gap-2 text-sm text-foreground">
+              <input
+                type="checkbox"
+                checked={inStockOnly}
+                onChange={(e) => setInStockOnly(e.target.checked)}
+                className="h-4 w-4 accent-primary"
+              />
+              In stock only
+            </label>
+          </div>
         </div>
       </aside>
 
@@ -288,9 +374,54 @@ export function ProductListPage() {
             </div>
           </>
         ) : (
-          <div className="rounded-xl border border-dashed border-border bg-card py-16 text-center">
+          <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center">
             <p className="m-0 text-lg font-semibold text-foreground">No products found</p>
-            <p className="mt-1 text-sm text-muted-foreground">Try another aisle or search term.</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {search
+                ? `We couldn't find anything matching “${search}”.`
+                : 'Try adjusting filters or browse another aisle.'}
+            </p>
+            <Button type="button" variant="outline" className="mt-4" onClick={clearAllFilters}>
+              Clear filters
+            </Button>
+
+            {(featuredFallback?.content.length ?? 0) > 0 && (
+              <div className="mt-10 text-left">
+                <h2 className="m-0 mb-4 text-lg font-bold text-foreground">Popular picks</h2>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {featuredFallback!.content.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      formatPrice={formatPrice}
+                      showWishlist={isAuthenticated}
+                      showAddToCart
+                      isWishlisted={wishlistIds.has(product.id)}
+                      onWishlistToggle={() =>
+                        wishlistIds.has(product.id)
+                          ? removeWishlistItem(product.id)
+                          : addWishlistItem(product.id)
+                      }
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {superCategories.length > 0 && (
+              <div className="mt-8">
+                <p className="m-0 mb-3 text-sm font-semibold text-muted-foreground">Browse aisles</p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {superCategories.slice(0, 4).map((aisle) => (
+                    <Button key={aisle.id} variant="outline" size="sm" asChild>
+                      <Link to={`/products?superCategoryId=${aisle.id}`}>
+                        {getCategoryVisual(aisle.id).emoji} {aisle.name}
+                      </Link>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
