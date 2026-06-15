@@ -5,10 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { RootState } from '../../store';
 import { FALLBACK_SUPER_CATEGORIES } from '../../lib/catalogFallbacks';
+import {
+  clearAdminStorefrontPreview,
+  isAdminStorefrontPreviewEnabled,
+} from '../../lib/adminStorefrontPreview';
 import { useGetSuperCategoriesQuery } from '../../store/api/catalogApi';
 import { useLogoutMutation } from '../../store/api/authApi';
 import { useGetCartQuery } from '../../store/api/orderApi';
-import { clearCredentials, selectAuthUser, selectIsAuthenticated } from '../../store/slices/authSlice';
+import { clearCredentials, selectAuthUser, selectHasRole, selectIsAuthenticated } from '../../store/slices/authSlice';
 import { TrustBar } from '../storefront/TrustBar';
 import { ThemeSwitcher } from '../theme/ThemeSwitcher';
 import { StoreFooter } from './StoreFooter';
@@ -20,6 +24,8 @@ export function AppLayout() {
   const navigate = useNavigate();
   const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
   const user = useSelector((s: RootState) => selectAuthUser(s));
+  const isAdmin = useSelector((s: RootState) => selectHasRole('ADMIN')(s));
+  const showAdminPreview = isAuthenticated && isAdmin && isAdminStorefrontPreviewEnabled();
   const storeName = useSelector((s: RootState) => s.settings.storeName);
   const logoUrl = useSelector((s: RootState) => s.settings.logoUrl);
   const [logoutApi] = useLogoutMutation();
@@ -36,6 +42,7 @@ export function AppLayout() {
       // Clear local session even if API fails
     }
     dispatch(clearCredentials());
+    clearAdminStorefrontPreview();
     navigate('/');
   };
 
@@ -52,6 +59,21 @@ export function AppLayout() {
 
   return (
     <div className="flex min-h-full flex-col bg-background">
+      {showAdminPreview && (
+        <div className="flex flex-wrap items-center justify-center gap-3 border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-950">
+          <span className="font-medium">Admin storefront preview</span>
+          <button
+            type="button"
+            className="font-semibold text-primary underline-offset-2 hover:underline"
+            onClick={() => {
+              clearAdminStorefrontPreview();
+              navigate('/admin');
+            }}
+          >
+            Back to admin console
+          </button>
+        </div>
+      )}
       <header className="sticky top-0 z-50 bg-brand shadow-md">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-3">
           <Link
