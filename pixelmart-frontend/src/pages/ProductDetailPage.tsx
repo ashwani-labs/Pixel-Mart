@@ -7,6 +7,8 @@ import { DeliveryEstimate } from '../components/product/DeliveryEstimate';
 import { ProductImageGallery } from '../components/product/ProductImageGallery';
 import { ProductReviews } from '../components/product/ProductReviews';
 import { RelatedProducts } from '../components/product/RelatedProducts';
+import { RecentlyViewed } from '../components/product/RecentlyViewed';
+import { recordRecentlyViewed } from '@/lib/recentlyViewed';
 import { StickyAddToCartBar } from '../components/product/StickyAddToCartBar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -50,6 +52,11 @@ export function ProductDetailPage() {
     observer.observe(target);
     return () => observer.disconnect();
   }, [product?.id]);
+
+  useEffect(() => {
+    if (!product) return;
+    recordRecentlyViewed({ id: product.id, slug: product.slug, name: product.name });
+  }, [product]);
 
   if (isLoading) {
     return (
@@ -171,6 +178,7 @@ export function ProductDetailPage() {
         </div>
       </div>
 
+      <RecentlyViewed formatPrice={formatPrice} excludeProductId={product.id} />
       <RelatedProducts
         productId={product.id}
         categoryId={product.categoryId}

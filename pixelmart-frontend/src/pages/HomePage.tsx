@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { HeroCarousel } from '@/components/storefront/HeroCarousel';
 import { useGetHeroSlidesQuery } from '../store/api/settingsApi';
 import { ProductCard } from '@/components/storefront/ProductCard';
+import { RecentlyViewed } from '@/components/product/RecentlyViewed';
 import { FALLBACK_SUPER_CATEGORIES } from '@/lib/catalogFallbacks';
 import { getCategoryVisual } from '@/lib/categoryStyle';
 import {
@@ -38,6 +39,8 @@ export function HomePage() {
   return (
     <div className="flex flex-col gap-8">
       <HeroCarousel slides={heroSlides?.slides} />
+
+      <RecentlyViewed formatPrice={formatPrice} />
 
       {spotlightAisles.length > 0 && (
         <section className="grid grid-cols-1 gap-3 sm:grid-cols-3">
