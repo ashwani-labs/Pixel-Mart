@@ -105,10 +105,12 @@ public class CheckoutService {
 
         BigDecimal discountTotal = cartDiscount.discountTotal();
         BigDecimal taxableSubtotal = subtotal.subtract(discountTotal);
+        BigDecimal shippingTotal = OrderShippingCalculator.shippingFee(taxableSubtotal);
         BigDecimal taxRate = settings.effectiveTaxRate();
         BigDecimal taxTotal = taxableSubtotal.multiply(taxRate)
                 .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-        BigDecimal grandTotal = taxableSubtotal.add(taxTotal);
+        BigDecimal grandTotal = taxableSubtotal.add(taxTotal).add(shippingTotal);
+        OrderShippingCalculator.validateCodPayment(grandTotal, request.paymentMethod());
 
         Order order = orderRepository.save(buildOrder(
                 userId,
@@ -118,6 +120,7 @@ public class CheckoutService {
                 discountTotal,
                 cartDiscount.offerName(),
                 taxTotal,
+                shippingTotal,
                 grandTotal,
                 settings
         ));
@@ -155,10 +158,12 @@ public class CheckoutService {
 
         BigDecimal discountTotal = cartDiscount.discountTotal();
         BigDecimal taxableSubtotal = subtotal.subtract(discountTotal);
+        BigDecimal shippingTotal = OrderShippingCalculator.shippingFee(taxableSubtotal);
         BigDecimal taxRate = settings.effectiveTaxRate();
         BigDecimal taxTotal = taxableSubtotal.multiply(taxRate)
                 .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-        BigDecimal grandTotal = taxableSubtotal.add(taxTotal);
+        BigDecimal grandTotal = taxableSubtotal.add(taxTotal).add(shippingTotal);
+        OrderShippingCalculator.validateCodPayment(grandTotal, paymentMethod);
 
         Order order = orderRepository.save(buildOrder(
                 userId,
@@ -168,6 +173,7 @@ public class CheckoutService {
                 discountTotal,
                 cartDiscount.offerName(),
                 taxTotal,
+                shippingTotal,
                 grandTotal,
                 settings
         ));
@@ -251,6 +257,7 @@ public class CheckoutService {
             BigDecimal discountTotal,
             String discountLabel,
             BigDecimal taxTotal,
+            BigDecimal shippingTotal,
             BigDecimal grandTotal,
             CatalogStoreSettings settings
     ) {
@@ -263,6 +270,7 @@ public class CheckoutService {
         order.setDiscountTotal(discountTotal);
         order.setDiscountLabel(discountLabel);
         order.setTaxTotal(taxTotal);
+        order.setShippingTotal(shippingTotal);
         order.setGrandTotal(grandTotal);
         order.setTaxLabel(settings.effectiveTaxLabel());
         order.setTaxRatePercent(settings.effectiveTaxRate());

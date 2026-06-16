@@ -71,6 +71,7 @@ CREATE TABLE orders (
     discount_total DECIMAL(12, 2) NOT NULL DEFAULT 0,
     discount_label VARCHAR(255) NULL,
     tax_total DECIMAL(12, 2) NOT NULL,
+    shipping_total DECIMAL(12, 2) NOT NULL DEFAULT 0,
     grand_total DECIMAL(12, 2) NOT NULL,
     tax_label VARCHAR(64) NOT NULL,
     tax_rate_percent DECIMAL(5, 2) NOT NULL,

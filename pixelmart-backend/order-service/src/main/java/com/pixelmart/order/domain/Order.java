@@ -37,6 +37,9 @@ public class Order {
     @Column(name = "tax_total", nullable = false, precision = 12, scale = 2)
     private BigDecimal taxTotal;
 
+    @Column(name = "shipping_total", nullable = false, precision = 12, scale = 2)
+    private BigDecimal shippingTotal = BigDecimal.ZERO;
+
     @Column(name = "grand_total", nullable = false, precision = 12, scale = 2)
     private BigDecimal grandTotal;
 
@@ -171,6 +174,14 @@ public class Order {
 
     public void setTaxTotal(BigDecimal taxTotal) {
         this.taxTotal = taxTotal;
+    }
+
+    public BigDecimal getShippingTotal() {
+        return shippingTotal;
+    }
+
+    public void setShippingTotal(BigDecimal shippingTotal) {
+        this.shippingTotal = shippingTotal;
     }
 
     public BigDecimal getGrandTotal() {
