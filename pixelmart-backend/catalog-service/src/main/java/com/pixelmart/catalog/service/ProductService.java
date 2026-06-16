@@ -58,6 +58,7 @@ public class ProductService {
             BigDecimal minPrice,
             BigDecimal maxPrice,
             Boolean inStockOnly,
+            Boolean onSaleOnly,
             Pageable pageable
     ) {
         return productRepository.findPublicProducts(
@@ -67,6 +68,7 @@ public class ProductService {
                         minPrice,
                         maxPrice,
                         inStockOnly,
+                        onSaleOnly,
                         pageable
                 )
                 .map(product -> ProductResponse.fromPublic(product, offerService.price(product)));

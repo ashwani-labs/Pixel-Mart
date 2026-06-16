@@ -38,6 +38,7 @@ export function ProductListPage() {
   const minPrice = searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : undefined;
   const maxPrice = searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined;
   const inStockOnly = searchParams.get('inStockOnly') === 'true';
+  const onSaleOnly = searchParams.get('onSaleOnly') === 'true';
   const page = Number(searchParams.get('page') ?? '0');
   const [searchInput, setSearchInput] = useState(search);
   const [minPriceInput, setMinPriceInput] = useState(minPrice?.toString() ?? '');
@@ -59,6 +60,7 @@ export function ProductListPage() {
     minPrice,
     maxPrice,
     inStockOnly: inStockOnly || undefined,
+    onSaleOnly: onSaleOnly || undefined,
   });
   const { data: featuredFallback } = useGetProductsQuery(
     { page: 0, size: 4, featured: true },
@@ -147,6 +149,17 @@ export function ProductListPage() {
       next.set('inStockOnly', 'true');
     } else {
       next.delete('inStockOnly');
+    }
+    next.set('page', '0');
+    setSearchParams(next);
+  };
+
+  const setOnSaleOnly = (checked: boolean) => {
+    const next = new URLSearchParams(searchParams);
+    if (checked) {
+      next.set('onSaleOnly', 'true');
+    } else {
+      next.delete('onSaleOnly');
     }
     next.set('page', '0');
     setSearchParams(next);
@@ -257,6 +270,15 @@ export function ProductListPage() {
                 className="h-4 w-4 accent-primary"
               />
               In stock only
+            </label>
+            <label className="mt-2 flex cursor-pointer items-center gap-2 text-sm text-foreground">
+              <input
+                type="checkbox"
+                checked={onSaleOnly}
+                onChange={(e) => setOnSaleOnly(e.target.checked)}
+                className="h-4 w-4 accent-primary"
+              />
+              On sale only
             </label>
           </div>
         </div>

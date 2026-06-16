@@ -8,6 +8,7 @@ import type {
   Product,
   ProductDetail,
   Review,
+  SearchSuggestResponse,
   SubmitReviewRequest,
   UpsertCategoryRequest,
   UpsertOfferRequest,
@@ -26,6 +27,7 @@ export interface ProductListParams {
   minPrice?: number;
   maxPrice?: number;
   inStockOnly?: boolean;
+  onSaleOnly?: boolean;
 }
 
 export const catalogApi = baseApi.injectEndpoints({
@@ -152,6 +154,7 @@ export const catalogApi = baseApi.injectEndpoints({
         minPrice,
         maxPrice,
         inStockOnly,
+        onSaleOnly,
       }) => ({
         url: '/catalog/products',
         params: {
@@ -165,6 +168,7 @@ export const catalogApi = baseApi.injectEndpoints({
           minPrice: minPrice ?? undefined,
           maxPrice: maxPrice ?? undefined,
           inStockOnly: inStockOnly ?? undefined,
+          onSaleOnly: onSaleOnly ?? undefined,
         },
       }),
       providesTags: (result) =>
@@ -174,6 +178,22 @@ export const catalogApi = baseApi.injectEndpoints({
               { type: 'ProductList', id: 'LIST' },
             ]
           : [{ type: 'ProductList', id: 'LIST' }],
+    }),
+    getSearchSuggest: build.query<SearchSuggestResponse, string>({
+      query: (q) => ({
+        url: '/catalog/search/suggest',
+        params: { q },
+      }),
+    }),
+    getProductsByIds: build.query<Product[], string[]>({
+      query: (ids) => ({
+        url: '/catalog/products/by-ids',
+        params: { ids: ids.join(',') },
+      }),
+      providesTags: (result) =>
+        result
+          ? result.map((p) => ({ type: 'Product' as const, id: p.id }))
+          : [],
     }),
     getProductBySlug: build.query<ProductDetail, string>({
       query: (slug) => `/catalog/products/${slug}`,
@@ -322,6 +342,8 @@ export const {
   useDeleteProductMutation,
   useGetCatalogDashboardStatsQuery,
   useGetProductsQuery,
+  useLazyGetSearchSuggestQuery,
+  useGetProductsByIdsQuery,
   useGetProductBySlugQuery,
   useGetActiveOffersQuery,
   useGetWishlistQuery,

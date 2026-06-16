@@ -157,3 +157,15 @@ export interface AuditLogParams {
   from?: string;
   to?: string;
 }
+
+export interface SearchSuggestItem {
+  id: string;
+  label: string;
+  slug: string;
+  type: 'product' | 'category';
+}
+
+export interface SearchSuggestResponse {
+  products: SearchSuggestItem[];
+  categories: SearchSuggestItem[];
+}

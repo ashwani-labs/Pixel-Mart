@@ -34,6 +34,8 @@ public interface ProductRepository extends JpaRepository<Product, String> {
               AND (:minPrice IS NULL OR p.basePrice >= :minPrice)
               AND (:maxPrice IS NULL OR p.basePrice <= :maxPrice)
               AND (:inStockOnly IS NULL OR :inStockOnly = false OR p.stockQty > 0)
+              AND (:onSaleOnly IS NULL OR :onSaleOnly = false
+                   OR (p.compareAtPrice IS NOT NULL AND p.compareAtPrice > p.basePrice))
             """)
     Page<Product> findPublicProducts(
             @Param("categoryId") String categoryId,
@@ -42,8 +44,17 @@ public interface ProductRepository extends JpaRepository<Product, String> {
             @Param("minPrice") BigDecimal minPrice,
             @Param("maxPrice") BigDecimal maxPrice,
             @Param("inStockOnly") Boolean inStockOnly,
+            @Param("onSaleOnly") Boolean onSaleOnly,
             Pageable pageable
     );
+
+    @Query("""
+            SELECT p FROM Product p
+            WHERE p.visible = true
+              AND LOWER(p.name) LIKE LOWER(CONCAT('%', :q, '%'))
+            ORDER BY p.name ASC
+            """)
+    List<Product> suggestVisibleByName(@Param("q") String q, Pageable pageable);
 
     @Query("""
             SELECT p FROM Product p
