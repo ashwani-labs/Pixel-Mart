@@ -2,7 +2,7 @@ import { FormEvent, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { guestCartSummary, getGuestCart } from '@/lib/guestCart';
 import type { RootState } from '../../store';
 import { FALLBACK_SUPER_CATEGORIES } from '../../lib/catalogFallbacks';
 import {
@@ -15,6 +15,8 @@ import { useGetCartQuery } from '../../store/api/orderApi';
 import { clearCredentials, selectAuthUser, selectHasRole, selectIsAuthenticated } from '../../store/slices/authSlice';
 import { TrustBar } from '../storefront/TrustBar';
 import { ThemeSwitcher } from '../theme/ThemeSwitcher';
+import { MobileBottomNav } from './MobileBottomNav';
+import { SearchAutocomplete } from './SearchAutocomplete';
 import { StoreFooter } from './StoreFooter';
 
 const FALLBACK_AISLES = FALLBACK_SUPER_CATEGORIES;
@@ -32,7 +34,9 @@ export function AppLayout() {
   const { data: cart } = useGetCartQuery(undefined, { skip: !isAuthenticated });
   const { data: superCategories } = useGetSuperCategoriesQuery();
   const navAisles = superCategories?.length ? superCategories : FALLBACK_AISLES;
-  const cartQty = cart?.totalQuantity ?? 0;
+  const cartQty = isAuthenticated
+    ? (cart?.totalQuantity ?? 0)
+    : guestCartSummary(getGuestCart()).totalQuantity;
   const [search, setSearch] = useState('');
 
   const handleLogout = async () => {
@@ -91,12 +95,14 @@ export function AppLayout() {
           </Link>
 
           <form onSubmit={handleSearch} className="flex min-w-[12rem] flex-1 items-center gap-2">
-            <Input
+            <SearchAutocomplete
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search products…"
+              onChange={setSearch}
+              onSubmit={() => {
+                const q = search.trim();
+                navigate(q ? `/products?search=${encodeURIComponent(q)}` : '/products');
+              }}
               className="search-field-light h-10 flex-1 border-0 shadow-sm"
-              aria-label="Search products"
             />
             <Button type="submit" variant="accent" size="sm" className="shrink-0">
               Search
@@ -123,7 +129,7 @@ export function AppLayout() {
             )}
 
             <Button variant="accent" size="sm" className="relative font-bold" asChild>
-              <Link to={isAuthenticated ? '/cart' : '/login'} className="no-underline hover:no-underline">
+              <Link to="/cart" className="no-underline hover:no-underline">
                 🛒 Cart
                 {cartQty > 0 && (
                   <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-dark px-1 text-[10px] font-bold text-on-brand ring-2 ring-accent">
@@ -168,11 +174,12 @@ export function AppLayout() {
 
       <TrustBar />
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 pb-24 md:pb-6">
         <Outlet />
       </main>
 
       <StoreFooter />
+      <MobileBottomNav />
     </div>
   );
 }
