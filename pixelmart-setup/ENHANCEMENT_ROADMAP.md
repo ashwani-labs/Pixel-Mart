@@ -188,7 +188,7 @@ Most traffic is mobile; closing the mobile vs desktop conversion gap is a major 
 | Search empty state with bestsellers | ✅ Done | Featured products + aisle shortcuts when no results |
 | Admin homepage carousel CMS | ✅ Done | `/admin/homepage` + `hero_slides_json` in store settings |
 
-### Phase 2 — Conversion — **in progress**
+### Phase 2 — Conversion — **complete**
 
 | Item | Status | Notes |
 |------|--------|-------|
@@ -197,9 +197,19 @@ Most traffic is mobile; closing the mobile vs desktop conversion gap is a major 
 | Order tracking UI | ✅ Done | Timeline on order detail; tracking ID on ship |
 | Admin orders DataGrid + export | ✅ Done | Filters, status updates, CSV export |
 
-### Phase 3 — Growth — **not started**
+### Phase 3 — Growth — **in progress**
 
-Razorpay, search autocomplete, homepage banner CMS, recently viewed + recommendations.
+| Item | Status | Notes |
+|------|--------|-------|
+| Search autocomplete | ✅ Done | `GET /catalog/search/suggest` + header typeahead |
+| Recently viewed products | ✅ Done | localStorage + homepage / PDP sections |
+| On-sale filter | ✅ Done | `onSaleOnly` on catalog product list API |
+| ₹499 free delivery | ✅ Done | ₹49 shipping below threshold; cart + checkout + order totals |
+| Mobile bottom nav | ✅ Done | Home, Shop, Cart, Account on small screens |
+| UPI-first checkout | ✅ Done | UPI default payment method in checkout |
+| COD order limit | ✅ Done | COD disabled above ₹2000 (frontend + backend) |
+| Razorpay integration | ⏳ Pending | Requires gateway credentials |
+| Homepage banner CMS | ✅ Done | Completed in Phase 1 (`/admin/homepage`) |
 
 ### Phase 4 — Scale — **not started**
 
@@ -225,10 +235,12 @@ Product variants, loyalty / referrals, advanced analytics, PWA.
 
 ### Phase 3 — Growth (4–8 weeks)
 
-- Razorpay integration
-- Search autocomplete
-- Homepage banner CMS
-- Recently viewed + basic recommendations
+- Razorpay integration *(pending credentials)*
+- ~~Search autocomplete~~ ✅
+- ~~Homepage banner CMS~~ ✅
+- ~~Recently viewed + basic recommendations~~ ✅
+- ~~₹499 free delivery enforcement~~ ✅
+- ~~Mobile bottom navigation~~ ✅
 
 ### Phase 4 — Scale (8+ weeks)
 
