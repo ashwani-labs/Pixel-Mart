@@ -68,6 +68,11 @@
   box-shadow: 0 0 0 1px var(--primary);
 }
 
+.disabledCard {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .card input,
 .selectedCard input {
   align-self: flex-start;

@@ -16,6 +16,10 @@ import {
   useUpdateCartItemMutation,
 } from '../store/api/orderApi';
 import { selectIsAuthenticated } from '../store/slices/authSlice';
+import {
+  computeShippingFee,
+  freeDeliveryMessage,
+} from '@/lib/shipping';
 
 function formatPrice(value: number, locale: string, currency: string) {
   return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(value);
@@ -80,6 +84,8 @@ export function CartPage() {
         subtotal: cart?.subtotal ?? 0,
       }
     : guestCartSummary(guestItems);
+  const shippingFee = computeShippingFee(summary.subtotal);
+  const orderTotal = summary.subtotal + shippingFee;
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -169,10 +175,19 @@ export function CartPage() {
                   {formatPrice(summary.subtotal, marketLocale, marketCurrencyCode)}
                 </span>
               </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Delivery</span>
+                <span className="font-semibold">
+                  {shippingFee === 0
+                    ? 'FREE'
+                    : formatPrice(shippingFee, marketLocale, marketCurrencyCode)}
+                </span>
+              </div>
+              <p className="m-0 text-xs text-primary">{freeDeliveryMessage(summary.subtotal)}</p>
               <div className="border-t border-border pt-4">
                 <div className="flex justify-between text-base font-extrabold">
-                  <span>Subtotal</span>
-                  <span>{formatPrice(summary.subtotal, marketLocale, marketCurrencyCode)}</span>
+                  <span>Estimated total</span>
+                  <span>{formatPrice(orderTotal, marketLocale, marketCurrencyCode)}</span>
                 </div>
               </div>
               <Button variant="accent" size="lg" className="w-full" asChild>
