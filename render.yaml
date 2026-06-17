@@ -1,0 +1,184 @@
+# PixelMart — Render Blueprint (Spring Boot microservices + API gateway)
+# Docs: https://render.com/docs/blueprint-spec
+# Frontend deploys separately on Vercel (see pixelmart-setup/DEPLOYMENT-CHECKLIST.md).
+
+services:
+  - type: web
+    name: pixelmart-auth
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: pixelmart-backend/auth-service/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/auth/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "4000"
+      - key: DB_NAME
+        value: pixelmart-db
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_ACCESS_EXPIRATION_MS
+        value: "900000"
+      - key: JWT_REFRESH_EXPIRATION_MS
+        value: "604800000"
+      - key: PIXELMART_INTERNAL_ALLOWED_SERVICES
+        value: order-service,catalog-service
+
+  - type: web
+    name: pixelmart-catalog
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: pixelmart-backend/catalog-service/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/catalog/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "4000"
+      - key: DB_NAME
+        value: pixelmart-db
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: AUTH_SERVICE_URL
+        fromService:
+          name: pixelmart-auth
+          type: web
+          property: url
+      - key: ORDER_SERVICE_URL
+        fromService:
+          name: pixelmart-order
+          type: web
+          property: url
+      - key: STORAGE_TYPE
+        value: s3
+      - key: AWS_REGION
+        sync: false
+      - key: AWS_S3_BUCKET
+        sync: false
+      - key: AWS_S3_PREFIX
+        value: pixelmart
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+
+  - type: web
+    name: pixelmart-order
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: pixelmart-backend/order-service/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/orders/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "4000"
+      - key: DB_NAME
+        value: pixelmart-db
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: AUTH_SERVICE_URL
+        fromService:
+          name: pixelmart-auth
+          type: web
+          property: url
+      - key: CATALOG_SERVICE_URL
+        fromService:
+          name: pixelmart-catalog
+          type: web
+          property: url
+      - key: NOTIFICATION_SERVICE_URL
+        fromService:
+          name: pixelmart-notification
+          type: web
+          property: url
+
+  - type: web
+    name: pixelmart-notification
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: pixelmart-backend/notification-service/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/internal/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "4000"
+      - key: DB_NAME
+        value: pixelmart-db
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: MAIL_HOST
+        sync: false
+      - key: MAIL_PORT
+        value: "587"
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+
+  - type: web
+    name: pixelmart-gateway
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: pixelmart-backend/gateway/Dockerfile
+    dockerContext: .
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: JWT_SECRET
+        fromService:
+          name: pixelmart-auth
+          type: web
+          envVarKey: JWT_SECRET
+      - key: AUTH_SERVICE_URL
+        fromService:
+          name: pixelmart-auth
+          type: web
+          property: url
+      - key: CATALOG_SERVICE_URL
+        fromService:
+          name: pixelmart-catalog
+          type: web
+          property: url
+      - key: ORDER_SERVICE_URL
+        fromService:
+          name: pixelmart-order
+          type: web
+          property: url
+      - key: NOTIFICATION_SERVICE_URL
+        fromService:
+          name: pixelmart-notification
+          type: web
+          property: url
