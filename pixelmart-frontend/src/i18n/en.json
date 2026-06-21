@@ -1,0 +1,65 @@
+{
+  "nav": {
+    "home": "Home",
+    "allProducts": "All Products",
+    "wishlist": "Wishlist",
+    "orders": "Orders",
+    "cart": "Cart",
+    "account": "Account",
+    "signIn": "Sign in",
+    "logout": "Logout",
+    "search": "Search"
+  },
+  "cart": {
+    "title": "Your cart",
+    "empty": "Your cart is empty.",
+    "browseProducts": "Browse products",
+    "subtotal": "Subtotal",
+    "checkout": "Proceed to checkout",
+    "remove": "Remove",
+    "quantity": "Quantity",
+    "addedToCart": "Added to cart.",
+    "addToCart": "Add to cart",
+    "outOfStock": "Out of stock",
+    "viewCart": "View cart"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "stepAddress": "Delivery",
+    "stepPayment": "Payment",
+    "stepReview": "Review",
+    "placeOrder": "Place order",
+    "coupon": "Coupon code",
+    "applyCoupon": "Apply",
+    "shipping": "Shipping",
+    "freeDelivery": "Free delivery on orders over ₹499",
+    "guestCheckout": "Guest checkout"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "loading": "Loading…",
+    "back": "Back",
+    "continue": "Continue",
+    "submit": "Submit",
+    "close": "Close",
+    "language": "Language"
+  },
+  "product": {
+    "specs": "Specifications",
+    "selectVariant": "Select option",
+    "onlyLeft": "Only {{count}} left",
+    "inStock": "In stock",
+    "reviews": "Customer reviews"
+  },
+  "profile": {
+    "loyaltyPoints": "Loyalty points",
+    "referralCode": "Your referral code",
+    "shareReferral": "Share this code with friends to earn rewards."
+  },
+  "register": {
+    "referralCode": "Referral code (optional)"
+  }
+}

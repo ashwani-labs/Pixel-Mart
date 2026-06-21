@@ -29,6 +29,21 @@ export interface ProductImage {
   sortOrder: number;
 }
 
+export interface ProductHighlight {
+  label: string;
+  value: string;
+}
+
+export interface ProductVariant {
+  id: string;
+  sku: string | null;
+  label: string;
+  size: string | null;
+  color: string | null;
+  price: number;
+  stockQty: number;
+}
+
 export interface ProductDetail {
   id: string;
   categoryId: string;
@@ -42,6 +57,8 @@ export interface ProductDetail {
   stockQty: number;
   featured: boolean;
   images: ProductImage[];
+  highlights: ProductHighlight[];
+  variants: ProductVariant[];
 }
 
 export type OfferType = 'PERCENT' | 'FIXED';
@@ -85,6 +102,11 @@ export interface PageResponse<T> {
 
 export type ReviewStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
+export interface ReviewImage {
+  id: string;
+  url: string;
+}
+
 export interface Review {
   id: string;
   productId: string;
@@ -96,6 +118,7 @@ export interface Review {
   status: ReviewStatus;
   verifiedPurchase: boolean;
   createdAt: string;
+  images: ReviewImage[];
 }
 
 export interface SubmitReviewRequest {
@@ -103,6 +126,41 @@ export interface SubmitReviewRequest {
   rating: number;
   title?: string;
   body: string;
+  images?: File[];
+}
+
+export interface BulkStockItem {
+  productId: string;
+  stockQty: number;
+}
+
+export interface BulkStockUpdateRequest {
+  items: BulkStockItem[];
+}
+
+export interface BulkStockUpdateResult {
+  updated: number;
+  failed: string[];
+}
+
+export interface SearchTermStat {
+  term: string;
+  count: number;
+}
+
+export interface ConversionFunnel {
+  productViews: number;
+  cartAdds: number;
+  checkoutStarts: number;
+  orders: number;
+}
+
+export type AnalyticsEventType = 'PRODUCT_VIEW' | 'ADD_TO_CART' | 'CHECKOUT_START';
+
+export interface AnalyticsEventRequest {
+  eventType: AnalyticsEventType;
+  productId?: string;
+  metadata?: Record<string, string>;
 }
 
 export interface UpsertCategoryRequest {
@@ -138,6 +196,8 @@ export interface CatalogDashboardStats {
   lowStockCount: number;
   lowStockProducts: Product[];
   pendingReviewCount: number;
+  topSearchTerms: SearchTermStat[];
+  funnelStats: ConversionFunnel;
 }
 
 export interface AuditLogEntry {

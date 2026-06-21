@@ -20,6 +20,7 @@ export interface Cart {
 export interface AddCartItemRequest {
   productId: string;
   quantity?: number;
+  variantId?: string;
 }
 
 export interface UpdateCartItemRequest {
@@ -134,6 +135,26 @@ export interface OrderDashboardStats {
   paymentMethodBreakdown: PaymentMethodStat[];
   topCoupons: CouponRedemptionStat[];
   couponOrdersLast7Days: number;
+}
+
+export interface AdminCustomer {
+  id: string;
+  email: string;
+  name: string;
+  enabled: boolean;
+  loyaltyPoints: number;
+  referralCode: string | null;
+  orderCount: number;
+  createdAt: string;
+}
+
+export interface AdminCustomerPage {
+  content: AdminCustomer[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
 }
 
 export interface PaymentConfig {

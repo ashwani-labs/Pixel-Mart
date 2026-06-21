@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { guestCartSummary, getGuestCart } from '@/lib/guestCart';
 import type { RootState } from '../../store';
@@ -15,6 +16,7 @@ import { useGetCartQuery } from '../../store/api/orderApi';
 import { clearCredentials, selectAuthUser, selectHasRole, selectIsAuthenticated } from '../../store/slices/authSlice';
 import { TrustBar } from '../storefront/TrustBar';
 import { ThemeSwitcher } from '../theme/ThemeSwitcher';
+import { LanguageSwitcher } from './LanguageSwitcher';
 import { MobileBottomNav } from './MobileBottomNav';
 import { SearchAutocomplete } from './SearchAutocomplete';
 import { StoreFooter } from './StoreFooter';
@@ -22,6 +24,7 @@ import { StoreFooter } from './StoreFooter';
 const FALLBACK_AISLES = FALLBACK_SUPER_CATEGORIES;
 
 export function AppLayout() {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
@@ -105,11 +108,12 @@ export function AppLayout() {
               className="search-field-light h-10 flex-1 border-0 shadow-sm"
             />
             <Button type="submit" variant="accent" size="sm" className="shrink-0">
-              Search
+              {t('nav.search')}
             </Button>
           </form>
 
           <div className="flex shrink-0 items-center gap-2">
+            <LanguageSwitcher compact />
             <ThemeSwitcher compact />
             {isAuthenticated ? (
               <>
@@ -117,20 +121,20 @@ export function AppLayout() {
                   Hi, <strong>{user?.name?.split(' ')[0]}</strong>
                 </span>
                 <Button type="button" variant="brandOutline" size="sm" onClick={handleLogout}>
-                  Logout
+                  {t('nav.logout')}
                 </Button>
               </>
             ) : (
               <Button variant="brandOutline" size="sm" asChild>
                 <Link to="/login" className="text-on-brand no-underline hover:no-underline hover:text-on-brand">
-                  Sign in
+                  {t('nav.signIn')}
                 </Link>
               </Button>
             )}
 
             <Button variant="accent" size="sm" className="relative font-bold" asChild>
               <Link to="/cart" className="no-underline hover:no-underline">
-                🛒 Cart
+                🛒 {t('nav.cart')}
                 {cartQty > 0 && (
                   <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-dark px-1 text-[10px] font-bold text-on-brand ring-2 ring-accent">
                     {cartQty}
@@ -144,10 +148,10 @@ export function AppLayout() {
         <nav className="border-t border-white/20 bg-brand-dark" aria-label="Shop aisles">
           <div className="nav-scroll mx-auto flex max-w-6xl flex-nowrap items-center gap-1 overflow-x-auto px-4 py-2">
             <NavLink to="/" end className={navLinkClass}>
-              Home
+              {t('nav.home')}
             </NavLink>
             <NavLink to="/products" className={navLinkClass}>
-              All Products
+              {t('nav.allProducts')}
             </NavLink>
             {navAisles.map((aisle) => (
               <NavLink
@@ -161,10 +165,10 @@ export function AppLayout() {
             {isAuthenticated && (
               <>
                 <NavLink to="/wishlist" className={navLinkClass}>
-                  Wishlist
+                  {t('nav.wishlist')}
                 </NavLink>
                 <NavLink to="/orders" className={navLinkClass}>
-                  Orders
+                  {t('nav.orders')}
                 </NavLink>
               </>
             )}

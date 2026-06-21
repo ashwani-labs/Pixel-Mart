@@ -75,6 +75,21 @@ export function AdminDashboardPage() {
       revenue: Number(row.revenue),
     })) ?? [];
 
+  const topSearchTerms = catalogStats?.topSearchTerms ?? [];
+  const funnel = catalogStats?.funnelStats ?? {
+    productViews: 0,
+    cartAdds: 0,
+    checkoutStarts: 0,
+    orders: 0,
+  };
+
+  const funnelChartData = [
+    { step: 'Product views', count: funnel.productViews },
+    { step: 'Cart adds', count: funnel.cartAdds },
+    { step: 'Checkout', count: funnel.checkoutStarts },
+    { step: 'Orders', count: funnel.orders },
+  ];
+
   return (
     <Box>
       <AdminPageHeader
@@ -326,6 +341,77 @@ export function AdminDashboardPage() {
               </Box>
             ) : (
               <Typography color="text.secondary">No coupon redemptions in the last 7 days.</Typography>
+            )}
+          </CardContent>
+        </Card>
+      </Box>
+
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' },
+          gap: 2,
+          mb: 3,
+        }}
+      >
+        <Card>
+          <CardContent sx={{ p: 2.5 }}>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Top search terms (7 days)
+            </Typography>
+            {catalogLoading ? (
+              <Typography color="text.secondary">Loading…</Typography>
+            ) : topSearchTerms.length > 0 ? (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {topSearchTerms.map((row) => (
+                  <Box
+                    key={row.term}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 2,
+                      p: 1.5,
+                      borderRadius: 2,
+                      bgcolor: 'background.default',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                    }}
+                  >
+                    <Typography sx={{ fontWeight: 600 }}>{row.term}</Typography>
+                    <Chip label={`${row.count} searches`} size="small" variant="outlined" />
+                  </Box>
+                ))}
+              </Box>
+            ) : (
+              <Typography color="text.secondary">No search data yet.</Typography>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent sx={{ p: 2.5 }}>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Conversion funnel (7 days)
+            </Typography>
+            {catalogLoading ? (
+              <Typography color="text.secondary">Loading…</Typography>
+            ) : (
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart data={funnelChartData} layout="vertical" margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
+                  <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="4 4" horizontal={false} />
+                  <XAxis type="number" allowDecimals={false} tick={{ fill: CHART_COLORS.axis, fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <YAxis type="category" dataKey="step" width={100} tick={{ fill: CHART_COLORS.axis, fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: 10,
+                      border: '1px solid #e2e8f0',
+                      boxShadow: '0 8px 24px rgba(15, 23, 42, 0.08)',
+                    }}
+                  />
+                  <Bar dataKey="count" fill={CHART_COLORS.orders} name="Count" radius={[0, 8, 8, 0]} maxBarSize={32} />
+                </BarChart>
+              </ResponsiveContainer>
             )}
           </CardContent>
         </Card>

@@ -14,6 +14,8 @@ interface ProductReviewsProps {
   productId: string;
 }
 
+const MAX_REVIEW_IMAGES = 3;
+
 function formatDate(value: string) {
   return new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium' }).format(new Date(value));
 }
@@ -27,6 +29,7 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
   const [rating, setRating] = useState(5);
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
+  const [images, setImages] = useState<File[]>([]);
   const [message, setMessage] = useState<string | null>(null);
 
   const hasDeliveredPurchase = orders.some(
@@ -35,6 +38,11 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
       order.items.some((item) => item.productId === productId),
   );
   const canSubmit = isAuthenticated && hasDeliveredPurchase && !myReview;
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? []).slice(0, MAX_REVIEW_IMAGES);
+    setImages(files);
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -45,9 +53,11 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
         rating,
         title: title.trim() || undefined,
         body: body.trim(),
+        images: images.length > 0 ? images : undefined,
       }).unwrap();
       setTitle('');
       setBody('');
+      setImages([]);
       setMessage('Review submitted and pending moderation.');
     } catch {
       setMessage('Could not submit review. You may need a delivered order for this product.');
@@ -70,6 +80,21 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
               </div>
               {review.title && <h3 className={styles.reviewTitle}>{review.title}</h3>}
               <p className={styles.reviewBody}>{review.body}</p>
+              {(review.images ?? []).length > 0 && (
+                <div className={styles.reviewImages}>
+                  {review.images.map((image) => (
+                    <a
+                      key={image.id}
+                      href={image.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.reviewImageLink}
+                    >
+                      <img src={image.url} alt="Review photo" className={styles.reviewImage} />
+                    </a>
+                  ))}
+                </div>
+              )}
               <p className={styles.reviewMeta}>
                 {formatDate(review.createdAt)}
                 {review.verifiedPurchase && ' · Verified purchase'}
@@ -116,6 +141,18 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
               maxLength={2000}
               rows={4}
             />
+          </label>
+          <label>
+            Photos (optional, up to {MAX_REVIEW_IMAGES})
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              multiple
+              onChange={handleImageChange}
+            />
+            {images.length > 0 && (
+              <span className={styles.hint}>{images.length} photo(s) selected</span>
+            )}
           </label>
           <button type="submit" className={styles.submitBtn} disabled={submitting || !body.trim()}>
             {submitting ? 'Submitting…' : 'Submit review'}

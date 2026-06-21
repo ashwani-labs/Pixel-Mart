@@ -1,6 +1,7 @@
 import type {
   AuditLogEntry,
   AuditLogParams,
+  BulkStockUpdateRequest,
   Category,
   CatalogDashboardStats,
   Offer,
@@ -13,6 +14,7 @@ import type {
   UpsertCategoryRequest,
   UpsertOfferRequest,
   UpsertProductRequest,
+  AnalyticsEventRequest,
 } from '../../types/catalog';
 import { baseApi } from './baseApi';
 
@@ -235,16 +237,51 @@ export const catalogApi = baseApi.injectEndpoints({
       providesTags: (_r, _e, productId) => [{ type: 'Review', id: `mine-${productId}` }],
     }),
     submitReview: build.mutation<Review, SubmitReviewRequest>({
-      query: (body) => ({
-        url: '/catalog/reviews',
-        method: 'POST',
-        body,
-      }),
+      query: (body) => {
+        const { images, ...rest } = body;
+        if (images && images.length > 0) {
+          const form = new FormData();
+          form.append('productId', rest.productId);
+          form.append('rating', String(rest.rating));
+          if (rest.title) form.append('title', rest.title);
+          form.append('body', rest.body);
+          images.forEach((file) => form.append('images', file));
+          return {
+            url: '/catalog/reviews',
+            method: 'POST',
+            body: form,
+          };
+        }
+        return {
+          url: '/catalog/reviews',
+          method: 'POST',
+          body: rest,
+        };
+      },
       invalidatesTags: (_r, _e, { productId }) => [
         { type: 'Review', id: productId },
         { type: 'Review', id: `mine-${productId}` },
         { type: 'Review', id: 'LIST' },
       ],
+    }),
+    bulkStockUpdate: build.mutation<void, BulkStockUpdateRequest>({
+      query: (body) => ({
+        url: '/admin/products/stock/bulk',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: [
+        { type: 'ProductList', id: 'ADMIN' },
+        { type: 'ProductList', id: 'LIST' },
+        'Dashboard',
+      ],
+    }),
+    trackAnalyticsEvent: build.mutation<void, AnalyticsEventRequest>({
+      query: (body) => ({
+        url: '/catalog/analytics/events',
+        method: 'POST',
+        body,
+      }),
     }),
     getAdminReviews: build.query<PageResponse<Review>, { status?: string } | void>({
       query: (params) => ({
@@ -355,6 +392,8 @@ export const {
   useGetProductReviewsQuery,
   useGetMyReviewQuery,
   useSubmitReviewMutation,
+  useBulkStockUpdateMutation,
+  useTrackAnalyticsEventMutation,
   useGetAdminReviewsQuery,
   useModerateReviewMutation,
   useGetAdminOffersQuery,

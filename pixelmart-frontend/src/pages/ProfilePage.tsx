@@ -67,6 +67,21 @@ function ProfileForm() {
         <p className={styles.subtitle}>{user?.email}</p>
         <p className={styles.subtitle}>Roles: {user?.roles.join(', ')}</p>
 
+        {(user?.loyaltyPoints != null || user?.referralCode) && (
+          <div>
+            {user?.loyaltyPoints != null && (
+              <p className={styles.subtitle}>
+                Loyalty points: <strong>{user.loyaltyPoints}</strong>
+              </p>
+            )}
+            {user?.referralCode && (
+              <p className={styles.subtitle}>
+                Your referral code: <strong>{user.referralCode}</strong>
+              </p>
+            )}
+          </div>
+        )}
+
         {saved && <div className={styles.bannerSuccess}>Profile updated.</div>}
         {serverError && <div className={styles.bannerError}>{serverError}</div>}
 

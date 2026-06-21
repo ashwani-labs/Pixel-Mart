@@ -1,0 +1,65 @@
+{
+  "nav": {
+    "home": "होम",
+    "allProducts": "सभी उत्पाद",
+    "wishlist": "विशलिस्ट",
+    "orders": "ऑर्डर",
+    "cart": "कार्ट",
+    "account": "खाता",
+    "signIn": "साइन इन",
+    "logout": "लॉग आउट",
+    "search": "खोजें"
+  },
+  "cart": {
+    "title": "आपकी कार्ट",
+    "empty": "आपकी कार्ट खाली है।",
+    "browseProducts": "उत्पाद देखें",
+    "subtotal": "उप-योग",
+    "checkout": "चेकआउट पर जाएं",
+    "remove": "हटाएं",
+    "quantity": "मात्रा",
+    "addedToCart": "कार्ट में जोड़ा गया।",
+    "addToCart": "कार्ट में जोड़ें",
+    "outOfStock": "स्टॉक में नहीं",
+    "viewCart": "कार्ट देखें"
+  },
+  "checkout": {
+    "title": "चेकआउट",
+    "stepAddress": "डिलीवरी",
+    "stepPayment": "भुगतान",
+    "stepReview": "समीक्षा",
+    "placeOrder": "ऑर्डर करें",
+    "coupon": "कूपन कोड",
+    "applyCoupon": "लागू करें",
+    "shipping": "शिपिंग",
+    "freeDelivery": "₹499 से ऊपर के ऑर्डर पर मुफ्त डिलीवरी",
+    "guestCheckout": "गेस्ट चेकआउट"
+  },
+  "common": {
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "edit": "संपादित करें",
+    "delete": "हटाएं",
+    "loading": "लोड हो रहा है…",
+    "back": "वापस",
+    "continue": "जारी रखें",
+    "submit": "जमा करें",
+    "close": "बंद करें",
+    "language": "भाषा"
+  },
+  "product": {
+    "specs": "विशेषताएं",
+    "selectVariant": "विकल्प चुनें",
+    "onlyLeft": "केवल {{count}} बचे",
+    "inStock": "स्टॉक में",
+    "reviews": "ग्राहक समीक्षा"
+  },
+  "profile": {
+    "loyaltyPoints": "लॉयल्टी पॉइंट्स",
+    "referralCode": "आपका रेफरल कोड",
+    "shareReferral": "दोस्तों के साथ साझा करें और रिवॉर्ड पाएं।"
+  },
+  "register": {
+    "referralCode": "रेफरल कोड (वैकल्पिक)"
+  }
+}

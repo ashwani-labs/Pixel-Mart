@@ -5,6 +5,7 @@ import { RequireRole } from '../components/auth/RequireRole';
 import { AdminLayout } from '../components/admin/AdminLayout';
 import { AppLayout } from '../components/layout/AppLayout';
 import { AdminAuditLogPage } from '../pages/AdminAuditLogPage';
+import { AdminCustomersPage } from '../pages/AdminCustomersPage';
 import { AdminCategoriesPage } from '../pages/AdminCategoriesPage';
 import { AdminDashboardPage } from '../pages/AdminDashboardPage';
 import { AdminHomepagePage } from '../pages/AdminHomepagePage';
@@ -51,6 +52,7 @@ export const router = createBrowserRouter([
       { path: 'categories', element: <AdminCategoriesPage /> },
       { path: 'offers', element: <AdminOffersPage /> },
       { path: 'orders', element: <AdminOrdersPage /> },
+      { path: 'customers', element: <AdminCustomersPage /> },
       { path: 'homepage', element: <AdminHomepagePage /> },
       { path: 'reviews', element: <AdminReviewsPage /> },
       { path: 'audit-log', element: <AdminAuditLogPage /> },

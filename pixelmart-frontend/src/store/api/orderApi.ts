@@ -9,6 +9,7 @@ import type {
   Order,
   OrderDashboardStats,
   PaymentConfig,
+  AdminCustomerPage,
   RazorpayVerifyRequest,
   UpdateCartItemRequest,
 } from '../../types/order';
@@ -142,6 +143,13 @@ export const orderApi = baseApi.injectEndpoints({
     getFrequentlyBoughtTogether: build.query<FrequentlyBoughtTogetherResponse, string>({
       query: (productId) => `/orders/products/${productId}/frequently-bought-together`,
     }),
+    getAdminCustomers: build.query<AdminCustomerPage, { page?: number; size?: number } | void>({
+      query: ({ page = 0, size = 100 } = {}) => ({
+        url: '/admin/customers',
+        params: { page, size },
+      }),
+      providesTags: ['User'],
+    }),
     verifyRazorpayPayment: build.mutation<Order, RazorpayVerifyRequest>({
       query: (body) => ({
         url: '/orders/payments/razorpay/verify',
@@ -174,5 +182,6 @@ export const {
   useGetOrderDashboardStatsQuery,
   useGetPaymentConfigQuery,
   useGetFrequentlyBoughtTogetherQuery,
+  useGetAdminCustomersQuery,
   useVerifyRazorpayPaymentMutation,
 } = orderApi;

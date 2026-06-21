@@ -4,6 +4,10 @@ import {
   Box,
   Button,
   Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   FormControlLabel,
   InputLabel,
@@ -15,6 +19,7 @@ import {
 } from '@mui/material';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import {
+  useBulkStockUpdateMutation,
   useCreateProductMutation,
   useDeleteProductMutation,
   useGetAdminCategoriesQuery,
@@ -23,7 +28,7 @@ import {
   useUpdateProductVisibilityMutation,
 } from '../store/api/catalogApi';
 import { useUploadProductImageMutation } from '../store/api/settingsApi';
-import type { Product, UpsertProductRequest } from '../types/catalog';
+import type { BulkStockItem, Product, UpsertProductRequest } from '../types/catalog';
 import { isSubCategory } from '../types/catalog';
 import uploadStyles from './AdminProductsPage.module.css';
 
@@ -51,11 +56,14 @@ export function AdminProductsPage() {
   const [deleteProduct] = useDeleteProductMutation();
   const [updateVisibility] = useUpdateProductVisibilityMutation();
   const [uploadImage, { isLoading: uploading }] = useUploadProductImageMutation();
+  const [bulkStockUpdate, { isLoading: bulkUpdating }] = useBulkStockUpdateMutation();
   const [form, setForm] = useState<UpsertProductRequest>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [productId, setProductId] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
+  const [bulkCsv, setBulkCsv] = useState('');
 
   const assignableCategories = useMemo(
     () => categories.filter(isSubCategory).sort((a, b) => a.name.localeCompare(b.name)),
@@ -203,11 +211,49 @@ export function AdminProductsPage() {
     }
   };
 
+  function parseBulkCsv(text: string): BulkStockItem[] {
+    const lines = text
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+    const items: BulkStockItem[] = [];
+    for (const line of lines) {
+      const [productIdValue, stockValue] = line.split(/[,\t]/).map((part) => part.trim());
+      if (!productIdValue || !stockValue) continue;
+      const stockQty = Number(stockValue);
+      if (!Number.isFinite(stockQty) || stockQty < 0) continue;
+      items.push({ productId: productIdValue, stockQty });
+    }
+    return items;
+  }
+
+  const handleBulkStock = async () => {
+    setMessage(null);
+    const items = parseBulkCsv(bulkCsv);
+    if (items.length === 0) {
+      setMessage('Paste CSV rows as productId,stockQty');
+      return;
+    }
+    try {
+      await bulkStockUpdate({ items }).unwrap();
+      setMessage(`Updated ${items.length} product(s).`);
+      setBulkCsv('');
+      setBulkDialogOpen(false);
+    } catch {
+      setMessage('Bulk stock update failed.');
+    }
+  };
+
   return (
     <Box>
       <AdminPageHeader
         title="Products"
         subtitle="Add products under a category (which belongs to a super category). Toggle visibility inline or upload images."
+        actions={
+          <Button variant="outlined" size="small" onClick={() => setBulkDialogOpen(true)}>
+            Bulk stock update
+          </Button>
+        }
       />
 
       <Box
@@ -373,6 +419,29 @@ export function AdminProductsPage() {
           {uploading ? 'Uploading…' : 'Upload product image'}
         </button>
       </form>
+
+      <Dialog open={bulkDialogOpen} onClose={() => setBulkDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Bulk stock update</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Paste one row per line: <code>productId,stockQty</code>
+          </Typography>
+          <TextField
+            multiline
+            minRows={8}
+            fullWidth
+            placeholder="abc-product-id,25&#10;def-product-id,10"
+            value={bulkCsv}
+            onChange={(e) => setBulkCsv(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setBulkDialogOpen(false)}>Cancel</Button>
+          <Button variant="contained" disabled={bulkUpdating} onClick={() => void handleBulkStock()}>
+            {bulkUpdating ? 'Updating…' : 'Apply update'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

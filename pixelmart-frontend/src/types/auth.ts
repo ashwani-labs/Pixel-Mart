@@ -3,6 +3,19 @@ export interface AuthUser {
   email: string;
   name: string;
   roles: string[];
+  loyaltyPoints: number;
+  referralCode: string | null;
+}
+
+export interface AdminCustomer {
+  id: string;
+  email: string;
+  name: string;
+  roles: string[];
+  loyaltyPoints: number;
+  referralCode: string | null;
+  orderCount: number;
+  createdAt: string;
 }
 
 export interface AuthResponse {
@@ -15,6 +28,7 @@ export interface RegisterRequest {
   email: string;
   password: string;
   name: string;
+  referralCode?: string;
 }
 
 export interface LoginRequest {

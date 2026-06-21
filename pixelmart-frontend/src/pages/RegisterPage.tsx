@@ -13,6 +13,7 @@ const registerSchema = z
     email: z.string().email('Enter a valid email'),
     password: z.string().min(8, 'Password must be at least 8 characters'),
     confirmPassword: z.string(),
+    referralCode: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
@@ -32,7 +33,7 @@ export function RegisterPage() {
     formState: { errors },
   } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
+    defaultValues: { name: '', email: '', password: '', confirmPassword: '', referralCode: '' },
   });
 
   const onSubmit = async (data: RegisterForm) => {
@@ -42,6 +43,7 @@ export function RegisterPage() {
         name: data.name,
         email: data.email,
         password: data.password,
+        referralCode: data.referralCode?.trim() || undefined,
       }).unwrap();
       navigate('/login', { state: { registered: true } });
     } catch (err) {
@@ -85,6 +87,10 @@ export function RegisterPage() {
             {errors.confirmPassword && (
               <span className={styles.error}>{errors.confirmPassword.message}</span>
             )}
+          </div>
+          <div className={styles.field}>
+            <label htmlFor="referralCode">Referral code (optional)</label>
+            <input id="referralCode" type="text" autoComplete="off" {...register('referralCode')} />
           </div>
           <button type="submit" className={styles.submit} disabled={isLoading}>
             {isLoading ? 'Creating account…' : 'Create account'}

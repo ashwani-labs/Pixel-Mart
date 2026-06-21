@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { DeliveryEstimate } from '@/components/product/DeliveryEstimate';
 import { clearGuestCart, getGuestCart, guestCartSummary } from '@/lib/guestCart';
+import { trackEvent } from '@/lib/analytics';
 import type { RootState } from '../store';
 import {
   useCheckoutMutation,
@@ -83,6 +84,10 @@ export function CheckoutPage() {
       setGuestItems(getGuestCart());
     }
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    trackEvent('CHECKOUT_START');
+  }, []);
 
   const items = isAuthenticated
     ? (cart?.items ?? [])
@@ -193,6 +198,8 @@ export function CheckoutPage() {
               email: response.email,
               name: response.userName,
               roles: ['CUSTOMER'],
+              loyaltyPoints: 0,
+              referralCode: null,
             },
           }),
         );
