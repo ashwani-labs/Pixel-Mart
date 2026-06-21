@@ -178,7 +178,11 @@ class OrderIntegrationTest {
             new BigDecimal("850.00"),
             10,
             true,
-            false);
+            false,
+            null,
+            null,
+            null,
+            null);
     when(catalogClient.getProductForCart(eq(PRODUCT_ID), any())).thenReturn(product);
     when(catalogClient.getStoreSettings())
         .thenReturn(new CatalogStoreSettings(true, new BigDecimal("18.00"), "GST", "INR"));
