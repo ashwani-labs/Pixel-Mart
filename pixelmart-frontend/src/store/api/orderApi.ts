@@ -3,10 +3,13 @@ import type {
   AddCartItemRequest,
   Cart,
   CheckoutRequest,
+  FrequentlyBoughtTogetherResponse,
   GuestCheckoutRequest,
   GuestCheckoutResponse,
   Order,
   OrderDashboardStats,
+  PaymentConfig,
+  RazorpayVerifyRequest,
   UpdateCartItemRequest,
 } from '../../types/order';
 import { baseApi } from './baseApi';
@@ -133,6 +136,20 @@ export const orderApi = baseApi.injectEndpoints({
       query: () => '/admin/dashboard/orders',
       providesTags: ['Dashboard'],
     }),
+    getPaymentConfig: build.query<PaymentConfig, void>({
+      query: () => '/orders/payments/config',
+    }),
+    getFrequentlyBoughtTogether: build.query<FrequentlyBoughtTogetherResponse, string>({
+      query: (productId) => `/orders/products/${productId}/frequently-bought-together`,
+    }),
+    verifyRazorpayPayment: build.mutation<Order, RazorpayVerifyRequest>({
+      query: (body) => ({
+        url: '/orders/payments/razorpay/verify',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Order', 'Cart', 'Dashboard'],
+    }),
   }),
 });
 
@@ -155,4 +172,7 @@ export const {
   useGetAdminOrdersQuery,
   useUpdateAdminOrderStatusMutation,
   useGetOrderDashboardStatsQuery,
+  useGetPaymentConfigQuery,
+  useGetFrequentlyBoughtTogetherQuery,
+  useVerifyRazorpayPaymentMutation,
 } = orderApi;

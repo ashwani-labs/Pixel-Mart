@@ -26,7 +26,7 @@ export interface UpdateCartItemRequest {
   quantity: number;
 }
 
-export type PaymentMethod = 'MOCK_CARD' | 'MOCK_UPI' | 'MOCK_WALLET' | 'MOCK_COD';
+export type PaymentMethod = 'MOCK_CARD' | 'MOCK_UPI' | 'MOCK_WALLET' | 'MOCK_COD' | 'RAZORPAY';
 
 export interface CheckoutRequest {
   addressId: string;
@@ -104,6 +104,9 @@ export interface Order {
   trackingNumber: string | null;
   items: OrderItem[];
   payment: Payment;
+  razorpayKeyId?: string | null;
+  razorpayOrderId?: string | null;
+  razorpayAmountPaise?: number | null;
 }
 
 export interface OrderTrendPoint {
@@ -112,8 +115,39 @@ export interface OrderTrendPoint {
   revenue: number;
 }
 
+export interface PaymentMethodStat {
+  method: string;
+  orderCount: number;
+  revenue: number;
+}
+
+export interface CouponRedemptionStat {
+  couponCode: string;
+  redemptions: number;
+  discountTotal: number;
+}
+
 export interface OrderDashboardStats {
   ordersToday: number;
   revenueToday: number;
   trends: OrderTrendPoint[];
+  paymentMethodBreakdown: PaymentMethodStat[];
+  topCoupons: CouponRedemptionStat[];
+  couponOrdersLast7Days: number;
+}
+
+export interface PaymentConfig {
+  razorpayEnabled: boolean;
+  razorpayKeyId: string | null;
+}
+
+export interface RazorpayVerifyRequest {
+  orderId: string;
+  razorpayPaymentId: string;
+  razorpayOrderId: string;
+  razorpaySignature: string;
+}
+
+export interface FrequentlyBoughtTogetherResponse {
+  productIds: string[];
 }

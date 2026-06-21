@@ -137,6 +137,7 @@ export interface CatalogDashboardStats {
   lowStockThreshold: number;
   lowStockCount: number;
   lowStockProducts: Product[];
+  pendingReviewCount: number;
 }
 
 export interface AuditLogEntry {

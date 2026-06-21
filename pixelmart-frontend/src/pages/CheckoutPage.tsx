@@ -8,9 +8,13 @@ import {
   useCheckoutMutation,
   useGetAddressesQuery,
   useGetCartQuery,
+  useGetPaymentConfigQuery,
   useGuestCheckoutMutation,
   useLazyLookupPincodeQuery,
+  useVerifyRazorpayPaymentMutation,
 } from '../store/api/orderApi';
+import { openRazorpayCheckout } from '@/lib/razorpay';
+import type { Order } from '../types/order';
 import { setCredentials } from '../store/slices/authSlice';
 import { selectIsAuthenticated } from '../store/slices/authSlice';
 import type { PaymentMethod } from '../types/order';
@@ -63,7 +67,16 @@ export function CheckoutPage() {
   });
   const [checkout, { isLoading: placingOrder }] = useCheckoutMutation();
   const [guestCheckout, { isLoading: placingGuestOrder }] = useGuestCheckoutMutation();
+  const [verifyRazorpayPayment] = useVerifyRazorpayPaymentMutation();
+  const { data: paymentConfig } = useGetPaymentConfigQuery();
   const [error, setError] = useState<string | null>(null);
+
+  const paymentMethods = [
+    ...(paymentConfig?.razorpayEnabled
+      ? [{ id: 'RAZORPAY' as PaymentMethod, title: 'Razorpay', description: 'UPI, cards, and wallets (live payment).' }]
+      : []),
+    ...PAYMENT_METHODS,
+  ];
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -118,6 +131,38 @@ export function CheckoutPage() {
     }
   };
 
+  useEffect(() => {
+    if (paymentConfig?.razorpayEnabled) {
+      setPaymentMethod('RAZORPAY');
+    }
+  }, [paymentConfig?.razorpayEnabled]);
+
+  const completeRazorpayPayment = async (order: Order, customer?: { name?: string; email?: string; phone?: string }) => {
+    if (!order.razorpayKeyId || !order.razorpayOrderId || !order.razorpayAmountPaise) {
+      throw new Error('Razorpay checkout details are missing');
+    }
+    await openRazorpayCheckout({
+      keyId: order.razorpayKeyId,
+      amountPaise: order.razorpayAmountPaise,
+      currency: 'INR',
+      orderId: order.orderNumber,
+      razorpayOrderId: order.razorpayOrderId,
+      customerName: customer?.name,
+      customerEmail: customer?.email,
+      customerPhone: customer?.phone,
+      onSuccess: async (response) => {
+        await verifyRazorpayPayment({
+          orderId: order.id,
+          razorpayPaymentId: response.razorpay_payment_id,
+          razorpayOrderId: response.razorpay_order_id,
+          razorpaySignature: response.razorpay_signature,
+        }).unwrap();
+        navigate(`/orders/${order.id}`, { state: { checkedOut: true } });
+      },
+      onDismiss: () => setError('Payment was cancelled. Your order is saved as pending.'),
+    });
+  };
+
   const placeOrder = async () => {
     setError(null);
     if (!isAuthenticated) {
@@ -151,6 +196,14 @@ export function CheckoutPage() {
             },
           }),
         );
+        if (paymentMethod === 'RAZORPAY') {
+          await completeRazorpayPayment(response.order, {
+            name: guestFullName.trim(),
+            email: guestEmail.trim(),
+            phone: guestPhone.trim(),
+          });
+          return;
+        }
         navigate(`/orders/${response.order.id}`, { state: { checkedOut: true } });
       } catch {
         setError('Could not place order. Check stock and delivery details.');
@@ -169,6 +222,15 @@ export function CheckoutPage() {
         paymentMethod,
         couponCode: trimmedCoupon || undefined,
       }).unwrap();
+      if (paymentMethod === 'RAZORPAY') {
+        const selectedAddress = addresses?.find((address) => address.id === selectedAddressId);
+        await completeRazorpayPayment(order, {
+          name: selectedAddress?.fullName,
+          email: undefined,
+          phone: selectedAddress?.phone,
+        });
+        return;
+      }
       navigate(`/orders/${order.id}`, { state: { checkedOut: true } });
     } catch {
       setError('Could not place order. Check stock, coupon, and try again.');
@@ -284,7 +346,7 @@ export function CheckoutPage() {
       <section className={styles.section} aria-labelledby="checkout-payment-heading">
         <h2 id="checkout-payment-heading">Payment method</h2>
         <div className={styles.paymentGrid} role="radiogroup" aria-label="Payment method">
-          {PAYMENT_METHODS.map((method) => {
+          {paymentMethods.map((method) => {
             const disabled = method.id === 'MOCK_COD' && !codAvailable;
             return (
             <label
@@ -374,7 +436,11 @@ export function CheckoutPage() {
           disabled={placingOrder || placingGuestOrder || (isAuthenticated && !selectedAddressId)}
           onClick={() => void placeOrder()}
         >
-          {placingOrder || placingGuestOrder ? 'Placing order…' : 'Place mock order'}
+          {placingOrder || placingGuestOrder
+            ? 'Placing order…'
+            : paymentMethod === 'RAZORPAY'
+              ? 'Pay with Razorpay'
+              : 'Place mock order'}
         </button>
       </div>
     </div>

@@ -39,6 +39,7 @@ export function ProductListPage() {
   const maxPrice = searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined;
   const inStockOnly = searchParams.get('inStockOnly') === 'true';
   const onSaleOnly = searchParams.get('onSaleOnly') === 'true';
+  const minRating = searchParams.get('minRating') ? Number(searchParams.get('minRating')) : undefined;
   const page = Number(searchParams.get('page') ?? '0');
   const [searchInput, setSearchInput] = useState(search);
   const [minPriceInput, setMinPriceInput] = useState(minPrice?.toString() ?? '');
@@ -61,6 +62,7 @@ export function ProductListPage() {
     maxPrice,
     inStockOnly: inStockOnly || undefined,
     onSaleOnly: onSaleOnly || undefined,
+    minRating,
   });
   const { data: featuredFallback } = useGetProductsQuery(
     { page: 0, size: 4, featured: true },
@@ -160,6 +162,17 @@ export function ProductListPage() {
       next.set('onSaleOnly', 'true');
     } else {
       next.delete('onSaleOnly');
+    }
+    next.set('page', '0');
+    setSearchParams(next);
+  };
+
+  const setMinRating = (value?: number) => {
+    const next = new URLSearchParams(searchParams);
+    if (value != null && value > 0) {
+      next.set('minRating', String(value));
+    } else {
+      next.delete('minRating');
     }
     next.set('page', '0');
     setSearchParams(next);
@@ -280,6 +293,24 @@ export function ProductListPage() {
               />
               On sale only
             </label>
+            <div className="mt-4">
+              <h3 className="m-0 mb-2 text-sm font-bold uppercase tracking-wide text-muted-foreground">
+                Minimum rating
+              </h3>
+              <Select
+                className="h-9 w-full"
+                value={minRating != null ? String(minRating) : ''}
+                onChange={(e) =>
+                  setMinRating(e.target.value ? Number(e.target.value) : undefined)
+                }
+                aria-label="Minimum rating filter"
+              >
+                <option value="">Any rating</option>
+                <option value="3">3★ & up</option>
+                <option value="4">4★ & up</option>
+                <option value="5">5★ only</option>
+              </Select>
+            </div>
           </div>
         </div>
       </aside>

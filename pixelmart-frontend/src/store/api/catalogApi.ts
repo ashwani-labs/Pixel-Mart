@@ -28,6 +28,7 @@ export interface ProductListParams {
   maxPrice?: number;
   inStockOnly?: boolean;
   onSaleOnly?: boolean;
+  minRating?: number;
 }
 
 export const catalogApi = baseApi.injectEndpoints({
@@ -155,6 +156,7 @@ export const catalogApi = baseApi.injectEndpoints({
         maxPrice,
         inStockOnly,
         onSaleOnly,
+        minRating,
       }) => ({
         url: '/catalog/products',
         params: {
@@ -169,6 +171,7 @@ export const catalogApi = baseApi.injectEndpoints({
           maxPrice: maxPrice ?? undefined,
           inStockOnly: inStockOnly ?? undefined,
           onSaleOnly: onSaleOnly ?? undefined,
+          minRating: minRating ?? undefined,
         },
       }),
       providesTags: (result) =>

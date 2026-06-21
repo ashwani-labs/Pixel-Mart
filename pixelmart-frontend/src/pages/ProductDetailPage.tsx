@@ -7,6 +7,7 @@ import { DeliveryEstimate } from '../components/product/DeliveryEstimate';
 import { ProductImageGallery } from '../components/product/ProductImageGallery';
 import { ProductReviews } from '../components/product/ProductReviews';
 import { RelatedProducts } from '../components/product/RelatedProducts';
+import { FrequentlyBoughtTogether } from '../components/product/FrequentlyBoughtTogether';
 import { RecentlyViewed } from '../components/product/RecentlyViewed';
 import { recordRecentlyViewed } from '@/lib/recentlyViewed';
 import { StickyAddToCartBar } from '../components/product/StickyAddToCartBar';
@@ -179,6 +180,7 @@ export function ProductDetailPage() {
       </div>
 
       <RecentlyViewed formatPrice={formatPrice} excludeProductId={product.id} />
+      <FrequentlyBoughtTogether productId={product.id} formatPrice={formatPrice} />
       <RelatedProducts
         productId={product.id}
         categoryId={product.categoryId}

@@ -11,6 +11,8 @@ import {
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
+import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
+import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
 import TrendingUpOutlinedIcon from '@mui/icons-material/TrendingUpOutlined';
 import {
   Bar,
@@ -32,6 +34,10 @@ import type { RootState } from '../store';
 
 function formatPrice(value: number, locale: string, currency: string) {
   return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(value);
+}
+
+function formatPaymentMethod(method: string) {
+  return method.replace(/^MOCK_/, '').replace(/_/g, ' ');
 }
 
 function formatTrendDate(isoDate: string) {
@@ -62,6 +68,13 @@ export function AdminDashboardPage() {
   const weekOrders = chartData.reduce((sum, point) => sum + point.orders, 0);
   const weekRevenue = chartData.reduce((sum, point) => sum + point.revenue, 0);
 
+  const paymentChartData =
+    orderStats?.paymentMethodBreakdown.map((row) => ({
+      method: formatPaymentMethod(row.method),
+      orders: row.orderCount,
+      revenue: Number(row.revenue),
+    })) ?? [];
+
   return (
     <Box>
       <AdminPageHeader
@@ -82,7 +95,7 @@ export function AdminDashboardPage() {
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', lg: 'repeat(4, 1fr)' },
+          gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', lg: 'repeat(3, 1fr)' },
           gap: 2,
           mb: 3,
         }}
@@ -112,20 +125,36 @@ export function AdminDashboardPage() {
           loading={ordersLoading}
         />
         <AdminStatCard
-          label="7-day orders"
-          value={ordersLoading ? '…' : weekOrders}
-          hint="Total orders in the last week"
-          icon={<TrendingUpOutlinedIcon />}
-          accent="#0e7490"
-          loading={ordersLoading}
-        />
-        <AdminStatCard
           label="Low stock"
           value={catalogLoading ? '…' : (catalogStats?.lowStockCount ?? 0)}
           hint={`Threshold: ${catalogStats?.lowStockThreshold ?? 5} units or less`}
           icon={<Inventory2OutlinedIcon />}
           accent="#d97706"
           loading={catalogLoading}
+        />
+        <AdminStatCard
+          label="Pending reviews"
+          value={catalogLoading ? '…' : (catalogStats?.pendingReviewCount ?? 0)}
+          hint="Awaiting moderation"
+          icon={<RateReviewOutlinedIcon />}
+          accent="#7c3aed"
+          loading={catalogLoading}
+        />
+        <AdminStatCard
+          label="Coupon orders (7d)"
+          value={ordersLoading ? '…' : (orderStats?.couponOrdersLast7Days ?? 0)}
+          hint="Orders with a coupon code"
+          icon={<LocalOfferOutlinedIcon />}
+          accent="#db2777"
+          loading={ordersLoading}
+        />
+        <AdminStatCard
+          label="7-day orders"
+          value={ordersLoading ? '…' : weekOrders}
+          hint="Total orders in the last week"
+          icon={<TrendingUpOutlinedIcon />}
+          accent="#0e7490"
+          loading={ordersLoading}
         />
       </Box>
 
@@ -211,6 +240,92 @@ export function AdminDashboardPage() {
                   />
                 </LineChart>
               </ResponsiveContainer>
+            )}
+          </CardContent>
+        </Card>
+      </Box>
+
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' },
+          gap: 2,
+          mb: 3,
+        }}
+      >
+        <Card>
+          <CardContent sx={{ p: 2.5 }}>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Payment methods (7 days)
+            </Typography>
+            {ordersLoading ? (
+              <Typography color="text.secondary">Loading…</Typography>
+            ) : paymentChartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart data={paymentChartData} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
+                  <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="4 4" vertical={false} />
+                  <XAxis dataKey="method" tick={{ fill: CHART_COLORS.axis, fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <YAxis allowDecimals={false} tick={{ fill: CHART_COLORS.axis, fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <Tooltip
+                    formatter={(value, name) =>
+                      name === 'revenue'
+                        ? formatPrice(Number(value ?? 0), marketLocale, marketCurrencyCode)
+                        : value
+                    }
+                    contentStyle={{
+                      borderRadius: 10,
+                      border: '1px solid #e2e8f0',
+                      boxShadow: '0 8px 24px rgba(15, 23, 42, 0.08)',
+                    }}
+                  />
+                  <Bar dataKey="orders" fill={CHART_COLORS.orders} name="Orders" radius={[8, 8, 0, 0]} maxBarSize={48} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <Typography color="text.secondary">No orders in the last 7 days.</Typography>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent sx={{ p: 2.5 }}>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Top coupons (7 days)
+            </Typography>
+            {ordersLoading ? (
+              <Typography color="text.secondary">Loading…</Typography>
+            ) : (orderStats?.topCoupons.length ?? 0) > 0 ? (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {orderStats!.topCoupons.map((coupon) => (
+                  <Box
+                    key={coupon.couponCode}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 2,
+                      p: 1.5,
+                      borderRadius: 2,
+                      bgcolor: 'background.default',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                    }}
+                  >
+                    <Typography sx={{ fontWeight: 700 }}>{coupon.couponCode}</Typography>
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                      <Chip label={`${coupon.redemptions} uses`} size="small" variant="outlined" />
+                      <Chip
+                        label={formatPrice(Number(coupon.discountTotal), marketLocale, marketCurrencyCode)}
+                        size="small"
+                        color="success"
+                        variant="outlined"
+                      />
+                    </Box>
+                  </Box>
+                ))}
+              </Box>
+            ) : (
+              <Typography color="text.secondary">No coupon redemptions in the last 7 days.</Typography>
             )}
           </CardContent>
         </Card>
