@@ -9,13 +9,14 @@ Suggestions for growing PixelMart toward patterns used by leading e-commerce sit
 | Area | Built today |
 |------|-------------|
 | **Catalog** | Super category → category → product hierarchy, offers, featured products, rich seed data |
-| **Storefront** | Hero carousel, shop aisles, search, sort, deals, trust bar, theme presets, dark mode |
-| **Commerce** | Cart, coupons, tax, mock payments (card / UPI / wallet / COD), addresses + PIN lookup |
-| **Customer** | Wishlist, reviews (with admin moderation), orders, profile |
-| **Admin** | Separate console, dashboard KPIs, products / categories / offers / orders / reviews / audit / settings |
-| **Backend** | Microservices (auth, catalog, order, notification), email outbox, low-stock alerts |
+| **Storefront** | Hero carousel, shop aisles, search autocomplete, sort, deals, trust bar, theme presets, dark mode |
+| **Commerce** | Cart, coupons, tax, mock payments + optional Razorpay, addresses + PIN lookup, guest checkout |
+| **Customer** | Wishlist, reviews (with admin moderation), orders, profile, recently viewed, FBT recommendations |
+| **Admin** | Separate console, dashboard KPIs + analytics, products / categories / offers / orders / reviews / audit / settings |
+| **Backend** | Microservices (auth, catalog, order, notification), email outbox, low-stock alerts, TiDB/MySQL profiles |
+| **Mobile** | Bottom nav, sticky PDP add-to-cart, PWA (installable shell + offline assets) |
 
-The largest gaps vs production retail are **product discovery**, **checkout friction**, **trust content**, and **growth / retention** features.
+The largest remaining gaps vs production retail are **product variants**, **loyalty / retention**, and **photo reviews**.
 
 ---
 
@@ -23,86 +24,69 @@ The largest gaps vs production retail are **product discovery**, **checkout fric
 
 ### 1. Smarter product discovery (highest ROI)
 
-Leading sites treat search as a primary entry point — buyers who search often convert at 2–3× the rate of casual browsers.
-
-**Suggested additions:**
+**Built:**
 
 - Search autocomplete (typeahead for products and categories)
-- Faceted filters: price range, in-stock only, discount %, rating
-- “No results” page with bestsellers and related aisles instead of an empty state
+- Faceted filters: price range, in-stock only, on-sale, **minimum rating**
+- “No results” page with bestsellers and related aisles
 - Recently viewed products
 - “Frequently bought together” on the product detail page
-
-**PixelMart today:** Basic search, category / super-category filters, and sort exist. This layer builds on that.
 
 ---
 
 ### 2. Richer product pages (PDP)
 
-**Suggested additions:**
+**Built:**
 
-- Specs / highlights table (electronics, groceries)
-- Delivery ETA by PIN on PDP and cart (e.g. “Delivery by Friday to 560001”)
-- Stock urgency (“Only 3 left”, “Fast delivery” badge)
-- Photo reviews (not only text)
-- Related products in the same category or aisle
+- Delivery ETA by PIN on PDP and cart
+- Stock urgency badges
+- Related products in the same category
+- Image gallery, reviews, wishlist, sticky add-to-cart
 
-**PixelMart today:** Image gallery, reviews, wishlist, and PIN lookup API exist — surfacing delivery promise on PDP is a natural next step.
+**Still pending:**
+
+- Specs / highlights table
+- Photo reviews (text-only today)
 
 ---
 
 ### 3. Frictionless checkout
 
-**Suggested additions:**
+**Built:**
 
-- Guest checkout (cart and checkout currently require sign-in)
-- One-page or three-step checkout with sticky order summary on mobile
-- Real payment gateway (e.g. Razorpay for India: UPI, cards, wallets)
-- Abandoned cart emails via the existing notification-service outbox
-- Order tracking page with status timeline and tracking ID
-
-**PixelMart today:** Mock payments are appropriate for demos; a real gateway is the main production milestone.
-
----
-
-### 4. Trust and policy pages
-
-Footer links such as Shipping, Returns, and FAQs should lead to real content pages, not generic product listings.
-
-**Suggested pages:**
-
-- Shipping & delivery policy
-- Returns & refunds (align with TrustBar: “7-day hassle-free”)
-- FAQ
-- Privacy policy and terms of use
-
-Low effort, high trust impact.
+- Guest checkout
+- Three-step checkout with order summary
+- Mock payments (card / UPI / wallet / COD)
+- **Optional Razorpay** when `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` are set
+- Abandoned cart emails
+- Order tracking UI with status timeline
 
 ---
 
-### 5. Mobile-first conversion
+### 4. Trust and policy pages — **complete**
 
-Most traffic is mobile; closing the mobile vs desktop conversion gap is a major opportunity.
+Routes: `/shipping`, `/returns`, `/faq`, `/privacy`, `/terms`
 
-**Suggested additions:**
+---
 
-- Sticky “Add to cart” bar on PDP when scrolling
-- Bottom navigation on mobile (Home, Categories, Cart, Account)
-- Image optimization (WebP / AVIF, lazy loading)
-- PWA (installable app, offline shell)
+### 5. Mobile-first conversion — **complete**
+
+- Sticky “Add to cart” bar on PDP
+- Bottom navigation (Home, Shop, Cart, Account)
+- PWA via `vite-plugin-pwa` (manifest + service worker)
 
 ---
 
 ## India-specific features
 
-| Feature | Why it matters |
-|---------|----------------|
-| UPI-first checkout | Default payment method for many Indian shoppers |
-| COD with order limits | Common for groceries; cap by order value |
-| PIN-based delivery promise | “Deliver to 560001 by Tuesday” |
-| ₹499 free delivery rule | Already shown in TrustBar — enforce in cart logic |
-| Regional language (later) | Hindi (or other) labels for broader reach |
-| WhatsApp order updates | Common for SMB retail in India |
+| Feature | Status |
+|---------|--------|
+| UPI-first checkout | ✅ Mock UPI default; Razorpay when configured |
+| COD with order limits | ✅ Up to ₹2000 |
+| PIN-based delivery promise | ✅ |
+| ₹499 free delivery rule | ✅ |
+| Regional language | ⏳ Later |
+| WhatsApp order updates | ⏳ Later |
 
 ---
 
@@ -110,36 +94,24 @@ Most traffic is mobile; closing the mobile vs desktop conversion gap is a major 
 
 ### Operations
 
-- **Orders:** MUI DataGrid (like Products) — filters, CSV export, bulk status updates
-- **Customers:** List users, view order history, disable accounts
-- **Inventory:** Bulk stock update, reorder alerts, stock history
-- **Homepage CMS:** Manage carousel slides from admin instead of hardcoded slides
-- **Coupon analytics:** Redemptions and revenue impact
+| Feature | Status |
+|---------|--------|
+| Orders DataGrid + export | ✅ |
+| Homepage carousel CMS | ✅ |
+| Coupon analytics | ✅ Redemptions + discount totals (7-day dashboard) |
+| Customers list | ⏳ |
+| Bulk stock update | ⏳ |
 
 ### Analytics
 
-- Conversion funnel: browse → cart → checkout → paid
-- Top products, categories, and search terms
-- Revenue by payment method and aisle
-- Review queue metrics (pending vs approved)
-
-### Merchandising
-
-- Drag-and-drop category ordering
-- Featured product scheduler (time-bound deals)
-- “Deal of the day” slot on homepage
-
----
-
-## Inspiration by site type
-
-| Site | Ideas worth borrowing |
-|------|------------------------|
-| **Amazon** | “Customers also bought”, Q&A on PDP, compare, reviews with photos |
-| **Flipkart** | PIN delivery date, exchange offers, loyalty coins (later) |
-| **DMart / BigBasket** | Grocery aisle UX, value packs, “₹X saved” on cart, repeat order |
-| **Shopify** | Clean 3-step checkout, trust badges, email capture |
-| **Myntra** | Size guide, brand/size/discount filters, wishlist-driven promos |
+| Feature | Status |
+|---------|--------|
+| Revenue / orders trends (7-day) | ✅ |
+| Payment method breakdown | ✅ |
+| Pending review queue count | ✅ |
+| Top coupon redemptions | ✅ |
+| Conversion funnel | ⏳ |
+| Search term analytics | ⏳ |
 
 ---
 
@@ -147,29 +119,20 @@ Most traffic is mobile; closing the mobile vs desktop conversion gap is a major 
 
 | Priority | Feature | Effort | Impact | Status |
 |----------|---------|--------|--------|--------|
-| **P0** | Real policy pages (shipping, returns, FAQ) | Low | Trust | ✅ Done |
-| **P0** | Delivery ETA by PIN on PDP / cart | Medium | Conversion | ✅ Done |
-| **P1** | Price + stock filters on product list | Medium | Discovery | ✅ Done |
-| **P1** | Guest checkout | Medium | Less cart abandonment | ✅ Done |
+| **P0** | Real policy pages | Low | Trust | ✅ Done |
+| **P0** | Delivery ETA by PIN | Medium | Conversion | ✅ Done |
+| **P1** | Price + stock + rating filters | Medium | Discovery | ✅ Done |
+| **P1** | Guest checkout | Medium | Less abandonment | ✅ Done |
 | **P1** | Admin homepage banner CMS | Medium | Merchandising | ✅ Done |
-| **P2** | Search autocomplete | Medium | Discovery | Pending |
-| **P2** | Razorpay (or similar) integration | High | Production payments | Pending |
+| **P2** | Search autocomplete | Medium | Discovery | ✅ Done |
+| **P2** | Razorpay integration | High | Production payments | ✅ Optional (env-based) |
 | **P2** | Abandoned cart email | Medium | Revenue recovery | ✅ Done |
-| **P3** | Product variants (size, color) | High | Fashion / electronics | Pending |
-| **P3** | Recommendations / recently viewed | Medium | Higher AOV | Partial (related products on PDP) |
-| **P3** | Loyalty points / referral program | High | Retention | Pending |
-
----
-
-## Quick wins (minimal backend change)
-
-1. ~~Policy / FAQ static pages with real routes~~ ✅ Done
-2. ~~Related products on PDP (same `categoryId`)~~ ✅ Done
-3. ~~Price min/max filter (extend existing product list API)~~ ✅ Done
-4. ~~Sticky mobile add-to-cart on PDP~~ ✅ Done
-5. ~~Admin-managed carousel (slides in DB or settings JSON)~~ ✅ Done
-6. ~~Fix footer links to point to policy routes~~ ✅ Done
-7. ~~Better empty states on cart and search~~ ✅ Done (search empty state; cart already had empty state)
+| **P2** | Frequently bought together | Medium | Higher AOV | ✅ Done |
+| **P2** | Advanced admin analytics | Medium | Operations | ✅ Done |
+| **P2** | PWA | Medium | Mobile retention | ✅ Done |
+| **P3** | Product variants (size, color) | High | Fashion / electronics | ⏳ Pending |
+| **P3** | Loyalty points / referral program | High | Retention | ⏳ Pending |
+| **P3** | Photo reviews | Medium | Trust | ⏳ Pending |
 
 ---
 
@@ -177,89 +140,59 @@ Most traffic is mobile; closing the mobile vs desktop conversion gap is a major 
 
 ### Phase 1 — Trust and polish — **complete**
 
-| Item | Status | Notes |
-|------|--------|-------|
-| Policy pages (shipping, returns, FAQ, privacy, terms) | ✅ Done | Routes: `/shipping`, `/returns`, `/faq`, `/privacy`, `/terms` |
-| Footer links to policy routes | ✅ Done | Customer care + legal links in `StoreFooter` |
-| Delivery ETA by PIN on PDP / cart | ✅ Done | `DeliveryEstimate` component; public PIN lookup; metro vs standard windows |
-| PDP related products | ✅ Done | Same-category suggestions, excludes current product |
-| Sticky mobile add-to-cart on PDP | ✅ Done | `StickyAddToCartBar` via IntersectionObserver |
-| Price range + in-stock filters | ✅ Done | `minPrice`, `maxPrice`, `inStockOnly` on catalog API |
-| Search empty state with bestsellers | ✅ Done | Featured products + aisle shortcuts when no results |
-| Admin homepage carousel CMS | ✅ Done | `/admin/homepage` + `hero_slides_json` in store settings |
+All items from the original Phase 1 plan are shipped.
 
 ### Phase 2 — Conversion — **complete**
 
-| Item | Status | Notes |
-|------|--------|-------|
-| Guest checkout | ✅ Done | Local guest cart + `POST /orders/guest-checkout` |
-| Abandoned cart emails | ✅ Done | Hourly scheduler + notification outbox |
-| Order tracking UI | ✅ Done | Timeline on order detail; tracking ID on ship |
-| Admin orders DataGrid + export | ✅ Done | Filters, status updates, CSV export |
+All items from the original Phase 2 plan are shipped.
 
-### Phase 3 — Growth — **in progress**
+### Phase 3 — Growth — **complete**
 
 | Item | Status | Notes |
 |------|--------|-------|
-| Search autocomplete | ✅ Done | `GET /catalog/search/suggest` + header typeahead |
-| Recently viewed products | ✅ Done | localStorage + homepage / PDP sections |
-| On-sale filter | ✅ Done | `onSaleOnly` on catalog product list API |
-| ₹499 free delivery | ✅ Done | ₹49 shipping below threshold; cart + checkout + order totals |
-| Mobile bottom nav | ✅ Done | Home, Shop, Cart, Account on small screens |
-| UPI-first checkout | ✅ Done | UPI default payment method in checkout |
-| COD order limit | ✅ Done | COD disabled above ₹2000 (frontend + backend) |
-| Razorpay integration | ⏳ Pending | Requires gateway credentials |
-| Homepage banner CMS | ✅ Done | Completed in Phase 1 (`/admin/homepage`) |
+| Search autocomplete | ✅ | `GET /catalog/search/suggest` |
+| Recently viewed | ✅ | localStorage |
+| On-sale filter | ✅ | `onSaleOnly` query param |
+| ₹499 free delivery | ✅ | Cart + checkout |
+| Mobile bottom nav | ✅ | |
+| UPI-first checkout | ✅ | |
+| COD order limit | ✅ | |
+| Rating filter | ✅ | `minRating` on catalog API + product list UI |
+| Frequently bought together | ✅ | Order-service co-purchase query + PDP section |
+| Razorpay | ✅ | Optional; mock fallback when unset |
+| Coupon analytics | ✅ | `coupon_code` on orders + admin dashboard |
+| Advanced analytics | ✅ | Payment breakdown, top coupons, pending reviews |
+| PWA | ✅ | `vite-plugin-pwa` |
 
-### Phase 4 — Scale — **not started**
+### Phase 4 — Scale — **partial / backlog**
 
-Product variants, loyalty / referrals, advanced analytics, PWA.
-
----
-
-## Suggested implementation phases
-
-### Phase 1 — Trust and polish (1–2 weeks)
-
-- Policy pages and footer links
-- Delivery ETA display using existing PIN APIs
-- PDP related products and sticky add-to-cart
-- Price range filter on product list
-
-### Phase 2 — Conversion (2–4 weeks)
-
-- Guest checkout
-- Abandoned cart emails
-- Order tracking UI
-- Admin orders DataGrid + export
-
-### Phase 3 — Growth (4–8 weeks)
-
-- Razorpay integration *(pending credentials)*
-- ~~Search autocomplete~~ ✅
-- ~~Homepage banner CMS~~ ✅
-- ~~Recently viewed + basic recommendations~~ ✅
-- ~~₹499 free delivery enforcement~~ ✅
-- ~~Mobile bottom navigation~~ ✅
-
-### Phase 4 — Scale (8+ weeks)
-
-- Product variants
-- Loyalty / referrals
-- Advanced analytics dashboard
-- PWA and performance hardening
+| Item | Status |
+|------|--------|
+| Product variants | ⏳ Not started |
+| Loyalty / referrals | ⏳ Not started |
+| Photo reviews | ⏳ Not started |
+| Conversion funnel analytics | ⏳ Not started |
+| Customer admin module | ⏳ Not started |
 
 ---
 
-## References
+## Razorpay setup (optional)
 
-Industry patterns drawn from common 2025–2026 e-commerce UX guidance:
+1. Create a Razorpay account and generate test/live API keys.
+2. Set on **order-service**:
+   - `RAZORPAY_KEY_ID=rzp_test_...`
+   - `RAZORPAY_KEY_SECRET=...`
+3. Restart order-service. Checkout shows **Pay with Razorpay** as the default method.
+4. Without keys, checkout continues to use mock payment methods only.
 
-- Mobile-first design and sub-3s load targets
-- Three-step (or fewer) checkout with guest option
-- Faceted search and typo-tolerant discovery
-- Trust signals: reviews, delivery ETA, clear returns
-- Abandoned cart recovery (e.g. 1h / 24h / 72h emails)
+---
+
+## Suggested next steps (Phase 4)
+
+1. Product variants schema + PDP selector (size / color / SKU)
+2. Loyalty points on order completion + referral codes
+3. Review photo uploads (catalog storage + moderation)
+4. Admin customer list with order history
 
 ---
 
