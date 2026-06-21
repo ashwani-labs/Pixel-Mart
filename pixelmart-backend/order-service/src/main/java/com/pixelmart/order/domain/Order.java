@@ -34,6 +34,9 @@ public class Order {
   @Column(name = "discount_label")
   private String discountLabel;
 
+  @Column(name = "coupon_code", length = 64)
+  private String couponCode;
+
   @Column(name = "tax_total", nullable = false, precision = 12, scale = 2)
   private BigDecimal taxTotal;
 
@@ -166,6 +169,14 @@ public class Order {
 
   public void setDiscountLabel(String discountLabel) {
     this.discountLabel = discountLabel;
+  }
+
+  public String getCouponCode() {
+    return couponCode;
+  }
+
+  public void setCouponCode(String couponCode) {
+    this.couponCode = couponCode;
   }
 
   public BigDecimal getTaxTotal() {

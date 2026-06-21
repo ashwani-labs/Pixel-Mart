@@ -1,8 +1,10 @@
 package com.pixelmart.order.service;
 
-import com.pixelmart.order.domain.Order;
 import com.pixelmart.order.dto.AdminOrderDashboardResponse;
+import com.pixelmart.order.dto.CouponRedemptionStat;
 import com.pixelmart.order.dto.OrderTrendPoint;
+import com.pixelmart.order.dto.PaymentMethodStat;
+import com.pixelmart.order.domain.Order;
 import com.pixelmart.order.repository.OrderRepository;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -29,9 +31,17 @@ public class AdminDashboardService {
   @Transactional(readOnly = true)
   public AdminOrderDashboardResponse orderStats() {
     Instant startOfDay = LocalDate.now(ZoneOffset.UTC).atStartOfDay().toInstant(ZoneOffset.UTC);
+    Instant trendSince =
+        LocalDate.now(ZoneOffset.UTC).minusDays(TREND_DAYS - 1L).atStartOfDay().toInstant(ZoneOffset.UTC);
     long ordersToday = orderRepository.countByCreatedAtGreaterThanEqual(startOfDay);
     BigDecimal revenueToday = orderRepository.sumGrandTotalSince(startOfDay);
-    return new AdminOrderDashboardResponse(ordersToday, revenueToday, orderTrends(TREND_DAYS));
+    return new AdminOrderDashboardResponse(
+        ordersToday,
+        revenueToday,
+        orderTrends(TREND_DAYS),
+        paymentMethodBreakdown(trendSince),
+        topCoupons(trendSince),
+        orderRepository.countByCreatedAtGreaterThanEqualAndCouponCodeIsNotNull(trendSince));
   }
 
   private List<OrderTrendPoint> orderTrends(int days) {
@@ -53,5 +63,31 @@ public class AdminDashboardService {
       trends.add(new OrderTrendPoint(day.toString(), dayOrders.size(), revenue));
     }
     return trends;
+  }
+
+  private List<PaymentMethodStat> paymentMethodBreakdown(Instant since) {
+    return orderRepository.paymentMethodBreakdownSince(since).stream()
+        .map(
+            row ->
+                new PaymentMethodStat(
+                    String.valueOf(row[0]),
+                    ((Number) row[1]).longValue(),
+                    row[2] instanceof BigDecimal amount
+                        ? amount
+                        : new BigDecimal(String.valueOf(row[2]))))
+        .toList();
+  }
+
+  private List<CouponRedemptionStat> topCoupons(Instant since) {
+    return orderRepository.topCouponsSince(since, 5).stream()
+        .map(
+            row ->
+                new CouponRedemptionStat(
+                    String.valueOf(row[0]),
+                    ((Number) row[1]).longValue(),
+                    row[2] instanceof BigDecimal amount
+                        ? amount
+                        : new BigDecimal(String.valueOf(row[2]))))
+        .toList();
   }
 }

@@ -21,4 +21,20 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, String> {
             """)
   boolean existsDeliveredPurchase(
       @Param("userId") String userId, @Param("productId") String productId);
+
+  @Query(
+      value =
+          """
+          SELECT oi2.product_id
+          FROM order_items oi1
+          INNER JOIN order_items oi2
+            ON oi1.order_id = oi2.order_id AND oi2.product_id <> oi1.product_id
+          WHERE oi1.product_id = :productId
+          GROUP BY oi2.product_id
+          ORDER BY COUNT(*) DESC
+          LIMIT :limit
+          """,
+      nativeQuery = true)
+  List<String> findFrequentlyBoughtTogetherProductIds(
+      @Param("productId") String productId, @Param("limit") int limit);
 }

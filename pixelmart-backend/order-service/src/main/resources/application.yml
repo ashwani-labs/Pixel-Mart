@@ -31,6 +31,9 @@ pixelmart:
   pincode:
     api-base-url: ${PINCODE_API_BASE_URL:https://api.postalpincode.in}
     cache-ttl-hours: ${PINCODE_CACHE_TTL_HOURS:24}
+  razorpay:
+    key-id: ${RAZORPAY_KEY_ID:}
+    key-secret: ${RAZORPAY_KEY_SECRET:}
 
 management:
   endpoints:

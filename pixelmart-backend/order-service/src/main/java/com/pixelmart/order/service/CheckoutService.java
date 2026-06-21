@@ -17,6 +17,7 @@ import com.pixelmart.order.domain.Order;
 import com.pixelmart.order.domain.OrderItem;
 import com.pixelmart.order.domain.Payment;
 import com.pixelmart.order.dto.CheckoutDtos;
+import com.pixelmart.order.dto.CheckoutDtos.RazorpayCheckoutDetails;
 import com.pixelmart.order.dto.CheckoutDtos.CheckoutRequest;
 import com.pixelmart.order.dto.CheckoutDtos.OrderResponse;
 import com.pixelmart.order.dto.CheckoutDtos.PaymentMethod;
@@ -56,6 +57,7 @@ public class CheckoutService {
   private final CatalogClient catalogClient;
   private final AuthClient authClient;
   private final NotificationClient notificationClient;
+  private final RazorpayPaymentService razorpayPaymentService;
 
   public CheckoutService(
       CartRepository cartRepository,
@@ -66,7 +68,8 @@ public class CheckoutService {
       PaymentRepository paymentRepository,
       CatalogClient catalogClient,
       AuthClient authClient,
-      NotificationClient notificationClient) {
+      NotificationClient notificationClient,
+      RazorpayPaymentService razorpayPaymentService) {
     this.cartRepository = cartRepository;
     this.cartItemRepository = cartItemRepository;
     this.addressRepository = addressRepository;
@@ -76,6 +79,7 @@ public class CheckoutService {
     this.catalogClient = catalogClient;
     this.authClient = authClient;
     this.notificationClient = notificationClient;
+    this.razorpayPaymentService = razorpayPaymentService;
   }
 
   @Transactional
@@ -124,6 +128,7 @@ public class CheckoutService {
                 subtotal,
                 discountTotal,
                 cartDiscount.offerName(),
+                couponCode,
                 taxTotal,
                 shippingTotal,
                 grandTotal,
@@ -134,9 +139,7 @@ public class CheckoutService {
         paymentRepository.save(buildPayment(order, request.paymentMethod(), grandTotal));
     cartItemRepository.deleteByCartId(cart.getId());
 
-    queueOrderConfirmation(order, orderItems, settings);
-
-    return OrderResponse.from(order, orderItems, payment);
+    return finalizeCheckout(order, orderItems, payment, request.paymentMethod(), settings);
   }
 
   @Transactional
@@ -180,6 +183,7 @@ public class CheckoutService {
                 subtotal,
                 discountTotal,
                 cartDiscount.offerName(),
+                coupon,
                 taxTotal,
                 shippingTotal,
                 grandTotal,
@@ -188,9 +192,65 @@ public class CheckoutService {
         orderItemRepository.saveAll(buildOrderItems(order, cartItems, products));
     Payment payment = paymentRepository.save(buildPayment(order, paymentMethod, grandTotal));
 
-    queueOrderConfirmation(order, orderItems, settings);
+    return finalizeCheckout(order, orderItems, payment, paymentMethod, settings);
+  }
 
+  @Transactional
+  public OrderResponse confirmRazorpayPayment(
+      String orderId,
+      String razorpayOrderId,
+      String razorpayPaymentId,
+      String razorpaySignature) {
+    String userId = CurrentUser.requireUserId();
+    Order order =
+        orderRepository
+            .findByIdAndUserId(orderId, userId)
+            .orElseThrow(() -> new ResourceNotFoundException("Order", orderId));
+    if (!PaymentMethod.RAZORPAY.name().equals(order.getPaymentMethod())) {
+      throw new BadRequestException("Order was not paid with Razorpay");
+    }
+    if (!"PENDING".equals(order.getPaymentStatus())) {
+      throw new BadRequestException("Payment has already been processed");
+    }
+    Payment payment =
+        paymentRepository
+            .findByOrderId(order.getId())
+            .orElseThrow(() -> new ResourceNotFoundException("Payment", order.getId()));
+    razorpayPaymentService.verifySignature(razorpayOrderId, razorpayPaymentId, razorpaySignature);
+    order.setStatus("CONFIRMED");
+    order.setPaymentStatus("PAID");
+    orderRepository.save(order);
+    payment.setStatus("PAID");
+    payment.setProviderReference(razorpayPaymentId);
+    paymentRepository.save(payment);
+    List<OrderItem> orderItems =
+        orderItemRepository.findByOrderIdOrderByCreatedAtAsc(order.getId());
+    queueOrderConfirmation(order, orderItems, catalogClient.getStoreSettings());
     return OrderResponse.from(order, orderItems, payment);
+  }
+
+  private OrderResponse finalizeCheckout(
+      Order order,
+      List<OrderItem> orderItems,
+      Payment payment,
+      PaymentMethod paymentMethod,
+      CatalogStoreSettings settings) {
+    RazorpayCheckoutDetails checkout = null;
+    if (paymentMethod == PaymentMethod.RAZORPAY) {
+      if (!razorpayPaymentService.isEnabled()) {
+        throw new BadRequestException("Razorpay is not configured on the server");
+      }
+      RazorpayPaymentService.RazorpayCheckout razorpayOrder =
+          razorpayPaymentService.createCheckoutOrder(order.getOrderNumber(), order.getGrandTotal());
+      payment.setProviderReference(razorpayOrder.razorpayOrderId());
+      paymentRepository.save(payment);
+      checkout =
+          new RazorpayCheckoutDetails(
+              razorpayOrder.keyId(), razorpayOrder.razorpayOrderId(), razorpayOrder.amountPaise());
+    } else if (!isAwaitingPayment(paymentMethod)) {
+      queueOrderConfirmation(order, orderItems, settings);
+    }
+    return OrderResponse.from(order, orderItems, payment, checkout);
   }
 
   private CartItem toVirtualCartItem(CheckoutDtos.GuestCartLineRequest line) {
@@ -279,6 +339,7 @@ public class CheckoutService {
       BigDecimal subtotal,
       BigDecimal discountTotal,
       String discountLabel,
+      String couponCode,
       BigDecimal taxTotal,
       BigDecimal shippingTotal,
       BigDecimal grandTotal,
@@ -287,17 +348,18 @@ public class CheckoutService {
     order.setOrderNumber(generateOrderNumber());
     order.setUserId(userId);
     order.setAddressId(address.getId());
-    order.setStatus(method == PaymentMethod.MOCK_COD ? "PENDING" : "CONFIRMED");
+    order.setStatus(isAwaitingPayment(method) ? "PENDING" : "CONFIRMED");
     order.setSubtotal(subtotal);
     order.setDiscountTotal(discountTotal);
     order.setDiscountLabel(discountLabel);
+    order.setCouponCode(couponCode);
     order.setTaxTotal(taxTotal);
     order.setShippingTotal(shippingTotal);
     order.setGrandTotal(grandTotal);
     order.setTaxLabel(settings.effectiveTaxLabel());
     order.setTaxRatePercent(settings.effectiveTaxRate());
     order.setPaymentMethod(method.name());
-    order.setPaymentStatus(method == PaymentMethod.MOCK_COD ? "PENDING" : "PAID");
+    order.setPaymentStatus(isAwaitingPayment(method) ? "PENDING" : "PAID");
     order.setShipToName(address.getFullName());
     order.setShipToPhone(address.getPhone());
     order.setShipAddressLine1(address.getAddressLine1());
@@ -355,11 +417,19 @@ public class CheckoutService {
     Payment payment = new Payment();
     payment.setOrderId(order.getId());
     payment.setMethod(method.name());
-    payment.setStatus(method == PaymentMethod.MOCK_COD ? "PENDING" : "PAID");
+    payment.setStatus(isAwaitingPayment(method) ? "PENDING" : "PAID");
     payment.setAmount(amount);
-    payment.setProviderReference(
-        "MOCK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+    if (method == PaymentMethod.RAZORPAY) {
+      payment.setProviderReference(null);
+    } else {
+      payment.setProviderReference(
+          "MOCK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+    }
     return payment;
+  }
+
+  private static boolean isAwaitingPayment(PaymentMethod method) {
+    return method == PaymentMethod.MOCK_COD || method == PaymentMethod.RAZORPAY;
   }
 
   private OrderResponse toResponse(Order order) {

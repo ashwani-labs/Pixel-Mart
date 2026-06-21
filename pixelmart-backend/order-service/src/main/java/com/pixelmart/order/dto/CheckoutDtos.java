@@ -22,7 +22,8 @@ public final class CheckoutDtos {
     MOCK_CARD,
     MOCK_UPI,
     MOCK_WALLET,
-    MOCK_COD
+    MOCK_COD,
+    RAZORPAY
   }
 
   public record CheckoutRequest(
@@ -108,8 +109,19 @@ public final class CheckoutDtos {
       String shipPostOfficeName,
       String trackingNumber,
       List<OrderItemResponse> items,
-      PaymentResponse payment) {
+      PaymentResponse payment,
+      String razorpayKeyId,
+      String razorpayOrderId,
+      Long razorpayAmountPaise) {
     public static OrderResponse from(Order order, List<OrderItem> items, Payment payment) {
+      return from(order, items, payment, null);
+    }
+
+    public static OrderResponse from(
+        Order order,
+        List<OrderItem> items,
+        Payment payment,
+        RazorpayCheckoutDetails checkout) {
       return new OrderResponse(
           order.getId(),
           order.getOrderNumber(),
@@ -133,7 +145,12 @@ public final class CheckoutDtos {
           order.getShipPostOfficeName(),
           order.getTrackingNumber(),
           items.stream().map(OrderItemResponse::from).toList(),
-          PaymentResponse.from(payment));
+          PaymentResponse.from(payment),
+          checkout != null ? checkout.keyId() : null,
+          checkout != null ? checkout.razorpayOrderId() : null,
+          checkout != null ? checkout.amountPaise() : null);
     }
   }
+
+  public record RazorpayCheckoutDetails(String keyId, String razorpayOrderId, long amountPaise) {}
 }

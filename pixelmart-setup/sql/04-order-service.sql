@@ -70,6 +70,7 @@ CREATE TABLE orders (
     subtotal DECIMAL(12, 2) NOT NULL,
     discount_total DECIMAL(12, 2) NOT NULL DEFAULT 0,
     discount_label VARCHAR(255) NULL,
+    coupon_code VARCHAR(64) NULL,
     tax_total DECIMAL(12, 2) NOT NULL,
     shipping_total DECIMAL(12, 2) NOT NULL DEFAULT 0,
     grand_total DECIMAL(12, 2) NOT NULL,
@@ -117,6 +118,7 @@ CREATE TABLE payments (
 );
 
 CREATE INDEX idx_orders_user_id_created_at ON orders (user_id, created_at DESC);
+CREATE INDEX idx_orders_coupon_code ON orders (coupon_code);
 CREATE INDEX idx_order_items_order_id ON order_items (order_id);
 CREATE INDEX idx_payments_order_id ON payments (order_id);
 
