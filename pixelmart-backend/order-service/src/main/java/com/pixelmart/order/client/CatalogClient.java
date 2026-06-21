@@ -25,13 +25,19 @@ public class CatalogClient {
   }
 
   public CatalogProductSnapshot getProductForCart(String productId) {
-    return getProductForCart(productId, null);
+    return getProductForCart(productId, null, null);
   }
 
-  public CatalogProductSnapshot getProductForCart(String productId, String couponCode) {
+  public CatalogProductSnapshot getProductForCart(String productId, String variantId) {
+    return getProductForCart(productId, variantId, null);
+  }
+
+  public CatalogProductSnapshot getProductForCart(
+      String productId, String variantId, String couponCode) {
     String url =
         UriComponentsBuilder.fromUriString(
                 properties.getBaseUrl() + "/api/catalog/internal/products/" + productId)
+            .queryParamIfPresent("variantId", java.util.Optional.ofNullable(blankToNull(variantId)))
             .queryParamIfPresent("couponCode", java.util.Optional.ofNullable(couponCode))
             .toUriString();
     HttpHeaders headers = new HttpHeaders();
@@ -104,9 +110,16 @@ public class CatalogClient {
     }
   }
 
+  private String blankToNull(String value) {
+    if (value == null || value.isBlank()) {
+      return null;
+    }
+    return value.trim();
+  }
+
   public record CartDiscountRequest(BigDecimal subtotal, String couponCode) {}
 
   public record ReserveStockRequest(List<ReserveStockLine> items) {}
 
-  public record ReserveStockLine(String productId, int quantity) {}
+  public record ReserveStockLine(String productId, String variantId, int quantity) {}
 }

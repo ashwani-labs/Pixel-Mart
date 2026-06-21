@@ -11,7 +11,8 @@ public final class CartDtos {
 
   private CartDtos() {}
 
-  public record AddCartItemRequest(@NotBlank String productId, Integer quantity) {
+  public record AddCartItemRequest(
+      @NotBlank String productId, String variantId, Integer quantity) {
     public int resolvedQuantity() {
       return quantity == null || quantity < 1 ? 1 : quantity;
     }
@@ -22,6 +23,7 @@ public final class CartDtos {
   public record CartItemResponse(
       String id,
       String productId,
+      String variantId,
       String productName,
       String productSlug,
       BigDecimal unitPrice,
@@ -32,6 +34,7 @@ public final class CartDtos {
       return new CartItemResponse(
           item.getId(),
           item.getProductId(),
+          item.getVariantId(),
           item.getProductName(),
           item.getProductSlug(),
           item.getUnitPrice(),

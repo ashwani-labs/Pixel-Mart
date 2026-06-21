@@ -50,4 +50,7 @@ public interface OrderRepository extends JpaRepository<Order, String> {
           """,
       nativeQuery = true)
   List<Object[]> topCouponsSince(@Param("since") Instant since, @Param("limit") int limit);
+
+  @Query("SELECT o.userId, COUNT(o) FROM Order o GROUP BY o.userId")
+  List<Object[]> countOrdersByUser();
 }

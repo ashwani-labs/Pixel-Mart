@@ -106,7 +106,10 @@ public class CheckoutService {
     validateCoupon(couponCode, products, cartDiscount);
     List<ReserveStockLine> stockLines =
         cartItems.stream()
-            .map(item -> new ReserveStockLine(item.getProductId(), item.getQuantity()))
+            .map(
+                item ->
+                    new ReserveStockLine(
+                        item.getProductId(), item.getVariantId(), item.getQuantity()))
             .toList();
     catalogClient.reserveStock(stockLines);
 
@@ -161,7 +164,10 @@ public class CheckoutService {
     validateCoupon(coupon, products, cartDiscount);
     List<ReserveStockLine> stockLines =
         cartItems.stream()
-            .map(item -> new ReserveStockLine(item.getProductId(), item.getQuantity()))
+            .map(
+                item ->
+                    new ReserveStockLine(
+                        item.getProductId(), item.getVariantId(), item.getQuantity()))
             .toList();
     catalogClient.reserveStock(stockLines);
 
@@ -226,6 +232,7 @@ public class CheckoutService {
     List<OrderItem> orderItems =
         orderItemRepository.findByOrderIdOrderByCreatedAtAsc(order.getId());
     queueOrderConfirmation(order, orderItems, catalogClient.getStoreSettings());
+    awardLoyaltyPoints(order);
     return OrderResponse.from(order, orderItems, payment);
   }
 
@@ -249,6 +256,7 @@ public class CheckoutService {
               razorpayOrder.keyId(), razorpayOrder.razorpayOrderId(), razorpayOrder.amountPaise());
     } else if (!isAwaitingPayment(paymentMethod)) {
       queueOrderConfirmation(order, orderItems, settings);
+      awardLoyaltyPoints(order);
     }
     return OrderResponse.from(order, orderItems, payment, checkout);
   }
@@ -256,8 +264,20 @@ public class CheckoutService {
   private CartItem toVirtualCartItem(CheckoutDtos.GuestCartLineRequest line) {
     CartItem item = new CartItem();
     item.setProductId(line.productId());
+    item.setVariantId(normalizeVariantId(line.variantId()));
     item.setQuantity(line.quantity());
     return item;
+  }
+
+  private void awardLoyaltyPoints(Order order) {
+    if (!"PAID".equals(order.getPaymentStatus())) {
+      return;
+    }
+    int points =
+        order.getGrandTotal().divide(BigDecimal.TEN, 0, RoundingMode.DOWN).intValue();
+    if (points > 0) {
+      authClient.addLoyaltyPoints(order.getUserId(), points);
+    }
   }
 
   private void queueOrderConfirmation(
@@ -276,6 +296,7 @@ public class CheckoutService {
             order.getOrderNumber(),
             user.email(),
             user.name(),
+            order.getShipToPhone(),
             order.getStatus(),
             order.getGrandTotal(),
             settings.effectiveCurrencyCode(),
@@ -304,10 +325,13 @@ public class CheckoutService {
       List<CartItem> cartItems, String couponCode) {
     Map<String, CatalogProductSnapshot> products = new LinkedHashMap<>();
     for (CartItem item : cartItems) {
+      String lineKey = lineKey(item.getProductId(), item.getVariantId());
       products.computeIfAbsent(
-          item.getProductId(),
-          productId -> {
-            CatalogProductSnapshot product = catalogClient.getProductForCart(productId, couponCode);
+          lineKey,
+          key -> {
+            CatalogProductSnapshot product =
+                catalogClient.getProductForCart(
+                    item.getProductId(), item.getVariantId(), couponCode);
             if (!product.visible()) {
               throw new BadRequestException("Product is no longer available: " + product.name());
             }
@@ -326,7 +350,7 @@ public class CheckoutService {
         .map(
             item ->
                 products
-                    .get(item.getProductId())
+                    .get(lineKey(item.getProductId(), item.getVariantId()))
                     .effectivePrice()
                     .multiply(BigDecimal.valueOf(item.getQuantity())))
         .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -377,11 +401,13 @@ public class CheckoutService {
     return cartItems.stream()
         .map(
             item -> {
-              CatalogProductSnapshot product = products.get(item.getProductId());
+              CatalogProductSnapshot product =
+                  products.get(lineKey(item.getProductId(), item.getVariantId()));
               OrderItem orderItem = new OrderItem();
               orderItem.setOrderId(order.getId());
               orderItem.setProductId(product.id());
-              orderItem.setProductName(product.name());
+              orderItem.setVariantId(item.getVariantId());
+              orderItem.setProductName(displayName(product));
               orderItem.setProductSlug(product.slug());
               orderItem.setUnitPrice(product.effectivePrice());
               orderItem.setQuantity(item.getQuantity());
@@ -390,6 +416,34 @@ public class CheckoutService {
               return orderItem;
             })
         .toList();
+  }
+
+  private String displayName(CatalogProductSnapshot product) {
+    if (product.variantSize() != null || product.variantColor() != null) {
+      StringBuilder builder = new StringBuilder(product.name());
+      if (product.variantSize() != null) {
+        builder.append(" (").append(product.variantSize());
+        if (product.variantColor() != null) {
+          builder.append(", ").append(product.variantColor());
+        }
+        builder.append(')');
+      } else if (product.variantColor() != null) {
+        builder.append(" (").append(product.variantColor()).append(')');
+      }
+      return builder.toString();
+    }
+    return product.name();
+  }
+
+  private String lineKey(String productId, String variantId) {
+    return productId + "::" + (variantId == null ? "" : variantId);
+  }
+
+  private String normalizeVariantId(String variantId) {
+    if (variantId == null || variantId.isBlank()) {
+      return null;
+    }
+    return variantId.trim();
   }
 
   private void validateCoupon(

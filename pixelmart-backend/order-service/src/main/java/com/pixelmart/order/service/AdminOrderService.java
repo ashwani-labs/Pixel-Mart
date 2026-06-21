@@ -1,5 +1,7 @@
 package com.pixelmart.order.service;
 
+import com.pixelmart.order.client.NotificationClient;
+import com.pixelmart.order.client.NotificationClient.WhatsAppOrderStatusPayload;
 import com.pixelmart.order.domain.Order;
 import com.pixelmart.order.domain.Payment;
 import com.pixelmart.order.dto.CheckoutDtos.OrderResponse;
@@ -23,14 +25,17 @@ public class AdminOrderService {
   private final OrderRepository orderRepository;
   private final OrderItemRepository orderItemRepository;
   private final PaymentRepository paymentRepository;
+  private final NotificationClient notificationClient;
 
   public AdminOrderService(
       OrderRepository orderRepository,
       OrderItemRepository orderItemRepository,
-      PaymentRepository paymentRepository) {
+      PaymentRepository paymentRepository,
+      NotificationClient notificationClient) {
     this.orderRepository = orderRepository;
     this.orderItemRepository = orderItemRepository;
     this.paymentRepository = paymentRepository;
+    this.notificationClient = notificationClient;
   }
 
   @Transactional(readOnly = true)
@@ -51,7 +56,17 @@ public class AdminOrderService {
         && (order.getTrackingNumber() == null || order.getTrackingNumber().isBlank())) {
       order.setTrackingNumber("PMX" + order.getOrderNumber().substring(2));
     }
-    return toResponse(orderRepository.save(order));
+    Order saved = orderRepository.save(order);
+    notificationClient.sendWhatsAppOrderStatus(
+        new WhatsAppOrderStatusPayload(
+            saved.getId(),
+            saved.getOrderNumber(),
+            saved.getShipToPhone(),
+            saved.getShipToName(),
+            saved.getStatus(),
+            saved.getGrandTotal(),
+            "INR"));
+    return toResponse(saved);
   }
 
   private OrderResponse toResponse(Order order) {

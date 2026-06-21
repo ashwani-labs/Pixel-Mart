@@ -50,7 +50,9 @@ public class CartService {
   @Transactional
   public CartResponse addItem(AddCartItemRequest request) {
     Cart cart = findOrCreateCart();
-    CatalogProductSnapshot product = catalogClient.getProductForCart(request.productId());
+    String variantId = normalizeVariantId(request.variantId());
+    CatalogProductSnapshot product =
+        catalogClient.getProductForCart(request.productId(), variantId);
     if (!product.visible()) {
       throw new BadRequestException("Product is not available");
     }
@@ -60,7 +62,9 @@ public class CartService {
     }
 
     CartItem item =
-        cartItemRepository.findByCartIdAndProductId(cart.getId(), product.id()).orElse(null);
+        cartItemRepository
+            .findByCartIdAndProductIdAndVariantId(cart.getId(), product.id(), variantId)
+            .orElse(null);
     if (item != null) {
       int newQty = item.getQuantity() + quantity;
       if (newQty > product.stockQty()) {
@@ -68,14 +72,15 @@ public class CartService {
       }
       item.setQuantity(newQty);
       item.setUnitPrice(product.effectivePrice());
-      item.setProductName(product.name());
+      item.setProductName(productDisplayName(product));
       item.setProductSlug(product.slug());
       cartItemRepository.save(item);
     } else {
       CartItem created = new CartItem();
       created.setCartId(cart.getId());
       created.setProductId(product.id());
-      created.setProductName(product.name());
+      created.setVariantId(variantId);
+      created.setProductName(productDisplayName(product));
       created.setProductSlug(product.slug());
       created.setUnitPrice(product.effectivePrice());
       created.setQuantity(quantity);
@@ -92,7 +97,8 @@ public class CartService {
             .findByIdAndCartId(itemId, cart.getId())
             .orElseThrow(() -> new ResourceNotFoundException("CartItem", itemId));
 
-    CatalogProductSnapshot product = catalogClient.getProductForCart(item.getProductId());
+    CatalogProductSnapshot product =
+        catalogClient.getProductForCart(item.getProductId(), item.getVariantId());
     if (!product.visible()) {
       throw new BadRequestException("Product is no longer available");
     }
@@ -155,6 +161,30 @@ public class CartService {
         subtotal,
         discount.discountTotal(),
         discount.offerName());
+  }
+
+  private String productDisplayName(CatalogProductSnapshot product) {
+    if (product.variantSize() != null || product.variantColor() != null) {
+      StringBuilder builder = new StringBuilder(product.name());
+      if (product.variantSize() != null) {
+        builder.append(" (").append(product.variantSize());
+        if (product.variantColor() != null) {
+          builder.append(", ").append(product.variantColor());
+        }
+        builder.append(')');
+      } else if (product.variantColor() != null) {
+        builder.append(" (").append(product.variantColor()).append(')');
+      }
+      return builder.toString();
+    }
+    return product.name();
+  }
+
+  private String normalizeVariantId(String variantId) {
+    if (variantId == null || variantId.isBlank()) {
+      return null;
+    }
+    return variantId.trim();
   }
 
   private String normalizeCoupon(String value) {

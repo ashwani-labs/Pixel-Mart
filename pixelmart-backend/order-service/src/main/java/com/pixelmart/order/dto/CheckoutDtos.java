@@ -30,7 +30,7 @@ public final class CheckoutDtos {
       @NotBlank String addressId, @NotNull PaymentMethod paymentMethod, String couponCode) {}
 
   public record GuestCartLineRequest(
-      @NotBlank String productId, @NotNull @Min(1) Integer quantity) {}
+      @NotBlank String productId, String variantId, @NotNull @Min(1) Integer quantity) {}
 
   public record GuestCheckoutRequest(
       @NotBlank @Email String email,
@@ -57,6 +57,7 @@ public final class CheckoutDtos {
 
   public record OrderItemResponse(
       String productId,
+      String variantId,
       String productName,
       String productSlug,
       BigDecimal unitPrice,
@@ -65,6 +66,7 @@ public final class CheckoutDtos {
     public static OrderItemResponse from(OrderItem item) {
       return new OrderItemResponse(
           item.getProductId(),
+          item.getVariantId(),
           item.getProductName(),
           item.getProductSlug(),
           item.getUnitPrice(),

@@ -58,9 +58,25 @@ public class AuthClient {
     }
   }
 
+  public void addLoyaltyPoints(String userId, int points) {
+    if (points <= 0) {
+      return;
+    }
+    String url = properties.getBaseUrl() + "/api/auth/internal/users/" + userId + "/loyalty-points";
+    HttpHeaders headers = internalHeaders();
+    try {
+      restTemplate.exchange(
+          url, HttpMethod.POST, new HttpEntity<>(new LoyaltyPointsPayload(points), headers), Void.class);
+    } catch (HttpStatusCodeException ex) {
+      throw new BadRequestException("Unable to award loyalty points");
+    }
+  }
+
   private HttpHeaders internalHeaders() {
     HttpHeaders headers = new HttpHeaders();
     headers.set("X-Internal-Service", properties.getInternalServiceName());
     return headers;
   }
+
+  public record LoyaltyPointsPayload(int points) {}
 }

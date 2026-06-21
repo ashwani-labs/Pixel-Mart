@@ -10,4 +10,8 @@ public record CatalogProductSnapshot(
     BigDecimal effectivePrice,
     int stockQty,
     boolean visible,
-    boolean couponMatched) {}
+    boolean couponMatched,
+    String variantId,
+    String variantSku,
+    String variantSize,
+    String variantColor) {}

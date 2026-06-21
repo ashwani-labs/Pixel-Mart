@@ -38,15 +38,39 @@ public class NotificationClient {
     }
   }
 
+  public void sendWhatsAppOrderStatus(WhatsAppOrderStatusPayload payload) {
+    String url = properties.getBaseUrl() + "/api/notifications/whatsapp/order-status";
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("X-Internal-Service", properties.getInternalServiceName());
+    try {
+      restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(payload, headers), Void.class);
+    } catch (Exception ex) {
+      log.warn(
+          "Failed to queue WhatsApp update for order {}: {}",
+          payload.orderNumber(),
+          ex.getMessage());
+    }
+  }
+
   public record OrderConfirmationPayload(
       String orderId,
       String orderNumber,
       String recipientEmail,
       String recipientName,
+      String recipientPhone,
       String status,
       BigDecimal grandTotal,
       String currencyCode,
       List<OrderLinePayload> items) {}
+
+  public record WhatsAppOrderStatusPayload(
+      String orderId,
+      String orderNumber,
+      String recipientPhone,
+      String recipientName,
+      String status,
+      BigDecimal grandTotal,
+      String currencyCode) {}
 
   public record OrderLinePayload(String productName, int quantity, BigDecimal lineTotal) {}
 

@@ -19,6 +19,9 @@ public class OrderItem {
   @Column(name = "product_id", length = 36, nullable = false)
   private String productId;
 
+  @Column(name = "variant_id", length = 36)
+  private String variantId;
+
   @Column(name = "product_name", nullable = false)
   private String productName;
 
@@ -65,6 +68,14 @@ public class OrderItem {
 
   public void setProductId(String productId) {
     this.productId = productId;
+  }
+
+  public String getVariantId() {
+    return variantId;
+  }
+
+  public void setVariantId(String variantId) {
+    this.variantId = variantId;
   }
 
   public String getProductName() {
