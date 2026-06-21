@@ -13,13 +13,11 @@ services:
     healthCheckPath: /api/auth/health
     envVars:
       - key: SPRING_PROFILES_ACTIVE
-        value: prod
+        value: dev
       - key: DB_HOST
         sync: false
       - key: DB_PORT
         value: "4000"
-      - key: DB_NAME
-        value: pixelmart-db
       - key: DB_USERNAME
         sync: false
       - key: DB_PASSWORD
@@ -43,13 +41,11 @@ services:
     healthCheckPath: /api/catalog/health
     envVars:
       - key: SPRING_PROFILES_ACTIVE
-        value: prod
+        value: dev
       - key: DB_HOST
         sync: false
       - key: DB_PORT
         value: "4000"
-      - key: DB_NAME
-        value: pixelmart-db
       - key: DB_USERNAME
         sync: false
       - key: DB_PASSWORD
@@ -87,13 +83,11 @@ services:
     healthCheckPath: /api/orders/health
     envVars:
       - key: SPRING_PROFILES_ACTIVE
-        value: prod
+        value: dev
       - key: DB_HOST
         sync: false
       - key: DB_PORT
         value: "4000"
-      - key: DB_NAME
-        value: pixelmart-db
       - key: DB_USERNAME
         sync: false
       - key: DB_PASSWORD
@@ -124,13 +118,11 @@ services:
     healthCheckPath: /api/internal/health
     envVars:
       - key: SPRING_PROFILES_ACTIVE
-        value: prod
+        value: dev
       - key: DB_HOST
         sync: false
       - key: DB_PORT
         value: "4000"
-      - key: DB_NAME
-        value: pixelmart-db
       - key: DB_USERNAME
         sync: false
       - key: DB_PASSWORD
@@ -156,7 +148,7 @@ services:
     healthCheckPath: /actuator/health
     envVars:
       - key: SPRING_PROFILES_ACTIVE
-        value: prod
+        value: dev
       - key: JWT_SECRET
         fromService:
           name: pixelmart-auth

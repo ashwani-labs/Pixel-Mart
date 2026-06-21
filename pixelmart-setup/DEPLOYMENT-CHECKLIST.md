@@ -10,7 +10,24 @@
 | notification-service | `notify` | 8084 |
 | api-gateway | (no DB) | 8080 |
 
-All services connect to **`pixelmart-db`** on TiDB Cloud (port **4000**). Hibernate `default_schema` routes each service to its schema database (`auth`, `catalog`, `orders`, `notify`).
+All services share the same TiDB cluster (`DB_HOST`, `DB_PORT`, credentials). Each microservice connects to its **own schema database** via JDBC (`DB_SCHEMA`: `auth`, `catalog`, `orders`, `notify`). In MySQL/TiDB, schema = database — Hibernate `default_schema` alone does not cross databases.
+
+## Spring profiles
+
+| Profile | Config file | Database |
+|---------|-------------|----------|
+| `local` | `application-local.yml` | Local Docker MySQL |
+| `dev` | `application-dev.yml` | TiDB Cloud |
+
+Set in each service's `application.yml`:
+
+```yaml
+spring:
+  profiles:
+    active: local  # change to dev for TiDB Cloud
+```
+
+Or override with `SPRING_PROFILES_ACTIVE=dev` in IntelliJ / Render.
 
 ---
 
@@ -33,12 +50,13 @@ All services connect to **`pixelmart-db`** on TiDB Cloud (port **4000**). Hibern
 
 | Variable | Example | Notes |
 |----------|---------|-------|
+| `SPRING_PROFILES_ACTIVE` | `dev` | Loads `application-dev.yml` |
 | `DB_HOST` | `gateway01.us-west-2.prod.aws.tidbcloud.com` | TiDB Cloud host |
 | `DB_PORT` | `4000` | TiDB MySQL protocol port |
-| `DB_NAME` | `pixelmart-db` | JDBC connection database |
 | `DB_USERNAME` | (from TiDB console) | Never commit real values |
 | `DB_PASSWORD` | (from TiDB console) | Never commit real values |
-| `DB_USE_SSL` | `true` | Set in prod (`application-prod.properties` enforces SSL) |
+
+Schema database per service (`auth`, `catalog`, `orders`, `notify`) is set in each service's `application-dev.yml`.
 
 ---
 
@@ -50,7 +68,7 @@ All services connect to **`pixelmart-db`** on TiDB Cloud (port **4000**). Hibern
 - [ ] Set `JWT_SECRET` on **pixelmart-auth** (or use Render-generated value; gateway inherits via blueprint)
 - [ ] Set SMTP vars on **pixelmart-notification**: `MAIL_HOST`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM`
 - [ ] Set S3 vars on **pixelmart-catalog**: `AWS_REGION`, `AWS_S3_BUCKET`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`
-- [ ] Confirm each service has `SPRING_PROFILES_ACTIVE=prod` (set in `render.yaml`)
+- [ ] Confirm each service has `SPRING_PROFILES_ACTIVE=dev` (set in `render.yaml`)
 - [ ] Deploy order: auth → catalog → notification → order → gateway (blueprint handles dependencies)
 - [ ] Health checks pass:
   - `https://<auth>/api/auth/health`
@@ -117,7 +135,7 @@ cp .env.example pixelmart-setup/.env
 cd pixelmart-setup && docker compose up --build
 ```
 
-Docker Compose sets `DB_HOST=mysql`, `DB_PORT=3306`, `DB_NAME=pixelmart-db`, `DB_USE_SSL=false`.
+Docker Compose sets `SPRING_PROFILES_ACTIVE=local`, `DB_HOST=mysql`, `DB_PORT=3306`.
 
 ---
 

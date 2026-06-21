@@ -28,12 +28,11 @@ services:
       mysql:
         condition: service_healthy
     environment:
+      SPRING_PROFILES_ACTIVE: local
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_NAME: ${DB_NAME:-pixelmart-db}
       DB_USERNAME: ${DB_USERNAME:-root}
       DB_PASSWORD: ${DB_PASSWORD:-root}
-      DB_USE_SSL: "false"
       JWT_SECRET: ${JWT_SECRET:-pixelmart-dev-secret-key-min-32-chars-long!!}
       JWT_ACCESS_EXPIRATION_MS: ${JWT_ACCESS_EXPIRATION_MS:-900000}
       JWT_REFRESH_EXPIRATION_MS: ${JWT_REFRESH_EXPIRATION_MS:-604800000}
@@ -57,12 +56,11 @@ services:
       mysql:
         condition: service_healthy
     environment:
+      SPRING_PROFILES_ACTIVE: local
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_NAME: ${DB_NAME:-pixelmart-db}
       DB_USERNAME: ${DB_USERNAME:-root}
       DB_PASSWORD: ${DB_PASSWORD:-root}
-      DB_USE_SSL: "false"
       STORAGE_TYPE: ${STORAGE_TYPE:-local}
       STORAGE_LOCAL_PATH: /app/data/uploads
       AWS_REGION: ${AWS_REGION:-us-east-1}
@@ -91,12 +89,11 @@ services:
       mysql:
         condition: service_healthy
     environment:
+      SPRING_PROFILES_ACTIVE: local
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_NAME: ${DB_NAME:-pixelmart-db}
       DB_USERNAME: ${DB_USERNAME:-root}
       DB_PASSWORD: ${DB_PASSWORD:-root}
-      DB_USE_SSL: "false"
       CATALOG_SERVICE_URL: http://catalog-service:8082
       AUTH_SERVICE_URL: http://auth-service:8081
       NOTIFICATION_SERVICE_URL: http://notification-service:8084
@@ -119,12 +116,11 @@ services:
       mysql:
         condition: service_healthy
     environment:
+      SPRING_PROFILES_ACTIVE: local
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_NAME: ${DB_NAME:-pixelmart-db}
       DB_USERNAME: ${DB_USERNAME:-root}
       DB_PASSWORD: ${DB_PASSWORD:-root}
-      DB_USE_SSL: "false"
       MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
       MAIL_PORT: ${MAIL_PORT:-587}
       MAIL_USERNAME: ${MAIL_USERNAME}
@@ -155,6 +151,7 @@ services:
       notification-service:
         condition: service_healthy
     environment:
+      SPRING_PROFILES_ACTIVE: local
       AUTH_SERVICE_URL: http://auth-service:8081
       CATALOG_SERVICE_URL: http://catalog-service:8082
       ORDER_SERVICE_URL: http://order-service:8083
