@@ -113,7 +113,7 @@ export function AppLayout() {
 
           <div className="flex shrink-0 items-center gap-2">
             <LanguageSwitcher compact />
-            <ThemeSwitcher compact />
+            <ThemeSwitcher compact onBrand />
             {isAuthenticated ? (
               <>
                 <span className="hidden text-sm text-on-brand sm:inline">

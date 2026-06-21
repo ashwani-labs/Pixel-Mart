@@ -29,7 +29,7 @@ export function StoreFooter() {
 
   return (
     <footer className="mt-auto border-t border-border bg-card">
-      <div className="border-b border-border bg-muted/40">
+      <div className="border-b border-border bg-brand-subtle">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <p className="m-0 text-lg font-bold text-card-foreground">{storeName}</p>

@@ -17,6 +17,7 @@
   --color-brand: #0875d4;
   --color-brand-dark: #065baa;
   --color-on-brand: #ffffff;
+  --color-brand-subtle: color-mix(in srgb, var(--color-brand) 8%, var(--color-background));
   /* Actions */
   --color-primary: #0875d4;
   --color-primary-foreground: #ffffff;
@@ -33,29 +34,11 @@
 }
 
 [data-theme-mode='dark'] {
-  --color-background: #0f1419;
-  --color-foreground: #e8edf4;
-  --color-card: #1a2332;
-  --color-card-foreground: #f1f5f9;
-  --color-muted: #243044;
-  --color-muted-foreground: #94a3b8;
-  --color-border: #3d4f66;
-  --color-brand: #1a8fe8;
-  --color-brand-dark: #0d74c2;
-  --color-on-brand: #ffffff;
-  --color-primary: #4db0f5;
-  --color-primary-foreground: #0f172a;
-  --color-accent: #ffc107;
-  --color-accent-foreground: #1a1a1a;
-  --color-deal: #14532d;
-  --color-deal-foreground: #86efac;
-  --color-success: #86efac;
-  --color-success-bg: #14532d;
   --color-destructive: #f87171;
   --color-destructive-foreground: #450a0a;
-  --color-input: #243044;
-  --color-ring: #4db0f5;
 }
+
+/* Theme preset surfaces, brand, primary, and accent are applied at runtime via applyTheme(). */
 
 :root {
   --background: var(--color-background);
