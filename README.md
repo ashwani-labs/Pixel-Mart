@@ -4,6 +4,12 @@
 
 PixelMart is a portfolio-grade e-commerce platform built as a Spring Boot microservices monorepo with a React storefront and MySQL persistence.
 
+## Screenshots
+
+| Storefront home | Product detail | Admin dashboard |
+|-----------------|----------------|-----------------|
+| ![Storefront home](docs/screenshots/storefront-home.png) | ![Product detail](docs/screenshots/product-detail.png) | ![Admin dashboard](docs/screenshots/admin-dashboard.png) |
+
 ## Repository layout
 
 Three main folders:
@@ -96,7 +102,7 @@ flowchart LR
 ### 1. Clone and configure
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/ashwani-labs/pixelmart.git
 cd pixelmart/pixelmart-setup
 cp .env.example .env
 ```
@@ -202,6 +208,11 @@ docker compose up --build
 ## Documentation
 
 - [Local setup guide](pixelmart-setup/SETUP.md) — clone, database, backend & frontend
+- [Deployment checklist](pixelmart-setup/DEPLOYMENT-CHECKLIST.md) — TiDB Cloud, Render, and Vercel
+
+## Contributing
+
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request. See [SECURITY.md](SECURITY.md) to report vulnerabilities and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for community standards.
 
 ## License
 
