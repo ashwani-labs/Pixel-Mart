@@ -27,6 +27,8 @@ public class SecurityConfig {
                     .permitAll()
                     .requestMatchers("/api/internal/email/**")
                     .permitAll()
+                    .requestMatchers("/api/notifications/whatsapp/**")
+                    .permitAll()
                     .anyRequest()
                     .denyAll())
         .addFilterBefore(internalFilter, UsernamePasswordAuthenticationFilter.class);

@@ -13,6 +13,7 @@ public record OrderConfirmationRequest(
     @NotBlank String orderNumber,
     @NotBlank @Email String recipientEmail,
     @NotBlank String recipientName,
+    String recipientPhone,
     @NotBlank String status,
     @NotNull BigDecimal grandTotal,
     String currencyCode,
