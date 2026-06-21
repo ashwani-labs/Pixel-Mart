@@ -14,6 +14,7 @@ import com.pixelmart.auth.repository.UserRepository;
 import com.pixelmart.auth.security.JwtService;
 import com.pixelmart.auth.security.RefreshTokenService;
 import com.pixelmart.auth.security.UserPrincipal;
+import com.pixelmart.auth.service.LoyaltyService;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,16 +29,19 @@ public class AuthService {
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
   private final RefreshTokenService refreshTokenService;
+  private final LoyaltyService loyaltyService;
 
   public AuthService(
       UserRepository userRepository,
       PasswordEncoder passwordEncoder,
       JwtService jwtService,
-      RefreshTokenService refreshTokenService) {
+      RefreshTokenService refreshTokenService,
+      LoyaltyService loyaltyService) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
     this.jwtService = jwtService;
     this.refreshTokenService = refreshTokenService;
+    this.loyaltyService = loyaltyService;
   }
 
   @Transactional
@@ -51,7 +55,9 @@ public class AuthService {
     user.setName(request.name().trim());
     user.setPasswordHash(passwordEncoder.encode(request.password()));
     user.setRoles(Set.of(Role.CUSTOMER));
+    loyaltyService.assignReferralCode(user);
     userRepository.save(user);
+    loyaltyService.applyReferral(request.referralCode(), user);
 
     return issueTokens(user);
   }

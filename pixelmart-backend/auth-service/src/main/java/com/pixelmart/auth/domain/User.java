@@ -26,6 +26,12 @@ public class User {
   @Column(nullable = false)
   private boolean enabled = true;
 
+  @Column(name = "loyalty_points", nullable = false)
+  private int loyaltyPoints = 0;
+
+  @Column(name = "referral_code", length = 16, unique = true)
+  private String referralCode;
+
   @Column(name = "created_at", nullable = false, updatable = false)
   private Instant createdAt;
 
@@ -83,6 +89,22 @@ public class User {
 
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
+  }
+
+  public int getLoyaltyPoints() {
+    return loyaltyPoints;
+  }
+
+  public void setLoyaltyPoints(int loyaltyPoints) {
+    this.loyaltyPoints = loyaltyPoints;
+  }
+
+  public String getReferralCode() {
+    return referralCode;
+  }
+
+  public void setReferralCode(String referralCode) {
+    this.referralCode = referralCode;
   }
 
   public Instant getCreatedAt() {
