@@ -31,6 +31,7 @@ CREATE TABLE products (
     stock_qty INT NOT NULL DEFAULT 0,
     visible BOOLEAN NOT NULL DEFAULT TRUE,
     featured BOOLEAN NOT NULL DEFAULT FALSE,
+    highlights_json JSON NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT uk_products_slug UNIQUE (slug),
@@ -333,3 +334,71 @@ INSERT INTO reviews (id, product_id, user_id, reviewer_name, rating, title, body
 ('rev-008', 'prod-048', 'demo-customer-3', 'Neha S.', 5, 'Best basmati', 'Long grains and aroma — reordering every month.', 'APPROVED', TRUE),
 ('rev-009', 'prod-061', 'demo-customer-4', 'Vikram P.', 4, 'Skin feels brighter', 'Light texture, no sticky finish. Using daily for 3 weeks.', 'APPROVED', FALSE),
 ('rev-010', 'prod-077', 'demo-customer-1', 'Asha K.', 5, 'Must read', 'Practical advice I actually applied at work.', 'APPROVED', TRUE);
+
+UPDATE products SET highlights_json = JSON_ARRAY(
+    JSON_OBJECT('label', 'Driver size', 'value', '11 mm dynamic'),
+    JSON_OBJECT('label', 'Battery life', 'value', 'Up to 30 hours with case'),
+    JSON_OBJECT('label', 'Connectivity', 'value', 'Bluetooth 5.3, multipoint')
+) WHERE id = 'prod-001';
+
+UPDATE products SET highlights_json = JSON_ARRAY(
+    JSON_OBJECT('label', 'Display', 'value', '6.5\" OLED 120 Hz'),
+    JSON_OBJECT('label', 'Storage', 'value', '128 GB'),
+    JSON_OBJECT('label', 'Battery', 'value', '5000 mAh all-day use')
+) WHERE id = 'prod-016';
+
+CREATE TABLE product_variants (
+    id CHAR(36) NOT NULL PRIMARY KEY,
+    product_id CHAR(36) NOT NULL,
+    sku VARCHAR(64) NOT NULL,
+    size VARCHAR(32) NULL,
+    color VARCHAR(64) NULL,
+    price DECIMAL(12, 2) NOT NULL,
+    stock_qty INT NOT NULL DEFAULT 0,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uk_variants_sku UNIQUE (sku),
+    CONSTRAINT fk_variants_product FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_variants_product_id ON product_variants (product_id);
+
+INSERT INTO product_variants (id, product_id, sku, size, color, price, stock_qty, active) VALUES
+('var-005-s-blue', 'prod-005', 'DENIM-JKT-S-BLU', 'S', 'Blue', 3999.00, 20, TRUE),
+('var-005-m-blue', 'prod-005', 'DENIM-JKT-M-BLU', 'M', 'Blue', 3999.00, 25, TRUE),
+('var-005-l-indigo', 'prod-005', 'DENIM-JKT-L-IND', 'L', 'Indigo', 4099.00, 15, TRUE);
+
+CREATE TABLE review_images (
+    id CHAR(36) NOT NULL PRIMARY KEY,
+    review_id VARCHAR(36) NOT NULL,
+    storage_key VARCHAR(512) NOT NULL,
+    sort_order INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_review_images_review FOREIGN KEY (review_id) REFERENCES reviews (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_review_images_review_id ON review_images (review_id);
+
+CREATE TABLE search_events (
+    id CHAR(36) NOT NULL PRIMARY KEY,
+    term VARCHAR(255) NOT NULL,
+    result_count INT NOT NULL DEFAULT 0,
+    session_id VARCHAR(64) NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_search_events_term_created ON search_events (term, created_at DESC);
+CREATE INDEX idx_search_events_created_at ON search_events (created_at DESC);
+
+CREATE TABLE analytics_events (
+    id CHAR(36) NOT NULL PRIMARY KEY,
+    event_type VARCHAR(32) NOT NULL,
+    product_id CHAR(36) NULL,
+    session_id VARCHAR(64) NULL,
+    user_id CHAR(36) NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_analytics_event_type CHECK (event_type IN ('PRODUCT_VIEW', 'ADD_TO_CART', 'CHECKOUT_START'))
+);
+
+CREATE INDEX idx_analytics_events_type_created ON analytics_events (event_type, created_at DESC);
+CREATE INDEX idx_analytics_events_created_at ON analytics_events (created_at DESC);

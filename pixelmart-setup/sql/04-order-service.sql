@@ -21,6 +21,7 @@ CREATE TABLE cart_items (
     id CHAR(36) NOT NULL PRIMARY KEY,
     cart_id CHAR(36) NOT NULL,
     product_id CHAR(36) NOT NULL,
+    variant_id CHAR(36) NULL,
     product_name VARCHAR(255) NOT NULL,
     product_slug VARCHAR(255) NOT NULL,
     unit_price DECIMAL(12, 2) NOT NULL,
@@ -28,11 +29,11 @@ CREATE TABLE cart_items (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_cart_items_cart FOREIGN KEY (cart_id) REFERENCES carts (id) ON DELETE CASCADE,
-    CONSTRAINT uq_cart_items_cart_product UNIQUE (cart_id, product_id),
     CONSTRAINT chk_cart_items_quantity CHECK (quantity > 0)
 );
 
 CREATE INDEX idx_cart_items_cart_id ON cart_items (cart_id);
+CREATE UNIQUE INDEX uq_cart_items_line ON cart_items (cart_id, product_id, (IFNULL(variant_id, '')));
 
 CREATE TABLE addresses (
     id CHAR(36) NOT NULL PRIMARY KEY,
@@ -97,6 +98,7 @@ CREATE TABLE order_items (
     id CHAR(36) NOT NULL PRIMARY KEY,
     order_id CHAR(36) NOT NULL,
     product_id CHAR(36) NOT NULL,
+    variant_id CHAR(36) NULL,
     product_name VARCHAR(255) NOT NULL,
     product_slug VARCHAR(255) NOT NULL,
     unit_price DECIMAL(12, 2) NOT NULL,
