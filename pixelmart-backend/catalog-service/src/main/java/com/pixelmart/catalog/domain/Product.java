@@ -40,6 +40,9 @@ public class Product {
   @Column(nullable = false)
   private boolean featured = false;
 
+  @Column(name = "highlights_json", columnDefinition = "JSON")
+  private String highlightsJson;
+
   @Column(name = "created_at", nullable = false, updatable = false)
   private Instant createdAt;
 
@@ -141,6 +144,14 @@ public class Product {
 
   public void setFeatured(boolean featured) {
     this.featured = featured;
+  }
+
+  public String getHighlightsJson() {
+    return highlightsJson;
+  }
+
+  public void setHighlightsJson(String highlightsJson) {
+    this.highlightsJson = highlightsJson;
   }
 
   public Instant getCreatedAt() {

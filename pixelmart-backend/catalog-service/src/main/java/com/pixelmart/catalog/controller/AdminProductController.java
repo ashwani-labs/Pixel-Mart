@@ -1,5 +1,6 @@
 package com.pixelmart.catalog.controller;
 
+import com.pixelmart.catalog.dto.BulkStockRequests.BulkStockUpdateRequest;
 import com.pixelmart.catalog.dto.PageResponse;
 import com.pixelmart.catalog.dto.ProductImageResponse;
 import com.pixelmart.catalog.dto.ProductRequests.CreateProductRequest;
@@ -77,5 +78,11 @@ public class AdminProductController {
       @RequestParam("file") MultipartFile file,
       @RequestParam(required = false) String altText) {
     return productImageService.upload(id, file, altText);
+  }
+
+  @PostMapping("/stock/bulk")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkUpdateStock(@Valid @RequestBody BulkStockUpdateRequest request) {
+    productService.bulkUpdateStock(request);
   }
 }

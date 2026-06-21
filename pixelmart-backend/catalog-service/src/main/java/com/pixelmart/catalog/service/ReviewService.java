@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class ReviewService {
@@ -34,6 +35,7 @@ public class ReviewService {
   private final OrderClient orderClient;
   private final AuthClient authClient;
   private final AuditLogService auditLogService;
+  private final ReviewImageService reviewImageService;
 
   public ReviewService(
       ReviewRepository reviewRepository,
@@ -41,13 +43,15 @@ public class ReviewService {
       ProductService productService,
       OrderClient orderClient,
       AuthClient authClient,
-      AuditLogService auditLogService) {
+      AuditLogService auditLogService,
+      ReviewImageService reviewImageService) {
     this.reviewRepository = reviewRepository;
     this.productRepository = productRepository;
     this.productService = productService;
     this.orderClient = orderClient;
     this.authClient = authClient;
     this.auditLogService = auditLogService;
+    this.reviewImageService = reviewImageService;
   }
 
   @Transactional(readOnly = true)
@@ -56,7 +60,7 @@ public class ReviewService {
     return reviewRepository
         .findByProductIdAndStatusOrderByCreatedAtDesc(productId, ReviewStatus.APPROVED)
         .stream()
-        .map(ReviewResponse::fromPublic)
+        .map(review -> toPublicResponse(review))
         .toList();
   }
 
@@ -65,12 +69,17 @@ public class ReviewService {
     String userId = CurrentUser.requireUserId();
     return reviewRepository
         .findByUserIdAndProductId(userId, productId)
-        .map(ReviewResponse::fromPublic)
+        .map(this::toPublicResponse)
         .orElse(null);
   }
 
   @Transactional
   public ReviewResponse submit(SubmitReviewRequest request) {
+    return submit(request, List.of());
+  }
+
+  @Transactional
+  public ReviewResponse submit(SubmitReviewRequest request, List<MultipartFile> images) {
     String userId = CurrentUser.requireUserId();
     Product product = productService.findProduct(request.productId());
     if (!product.isVisible()) {
@@ -94,7 +103,20 @@ public class ReviewService {
     review.setBody(request.body().trim());
     review.setStatus(ReviewStatus.PENDING);
     review.setVerifiedPurchase(true);
-    return ReviewResponse.fromPublic(reviewRepository.save(review));
+    Review saved = reviewRepository.save(review);
+    reviewImageService.uploadImages(saved.getId(), userId, images);
+    return toPublicResponse(saved);
+  }
+
+  @Transactional
+  public ReviewResponse addImages(String reviewId, List<MultipartFile> images) {
+    String userId = CurrentUser.requireUserId();
+    Review review =
+        reviewRepository
+            .findById(reviewId)
+            .orElseThrow(() -> new ResourceNotFoundException("Review", reviewId));
+    reviewImageService.uploadImages(reviewId, userId, images);
+    return toPublicResponse(review);
   }
 
   @Transactional(readOnly = true)
@@ -117,7 +139,11 @@ public class ReviewService {
     List<ReviewResponse> content =
         page.getContent().stream()
             .map(
-                review -> ReviewResponse.fromAdmin(review, productsById.get(review.getProductId())))
+                review ->
+                    ReviewResponse.fromAdmin(
+                        review,
+                        productsById.get(review.getProductId()),
+                        reviewImageService.listImageUrls(review.getId())))
             .toList();
     return new PageResponse<>(
         content,
@@ -148,7 +174,12 @@ public class ReviewService {
         id,
         Map.of("status", previousStatus.name()),
         Map.of("status", saved.getStatus().name()));
-    return ReviewResponse.fromAdmin(saved, product);
+    return ReviewResponse.fromAdmin(
+        saved, product, reviewImageService.listImageUrls(saved.getId()));
+  }
+
+  private ReviewResponse toPublicResponse(Review review) {
+    return ReviewResponse.fromPublic(review, reviewImageService.listImageUrls(review.getId()));
   }
 
   private ReviewStatus parseModerationStatus(String status) {

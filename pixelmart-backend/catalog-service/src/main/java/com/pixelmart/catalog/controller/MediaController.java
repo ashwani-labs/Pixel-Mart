@@ -1,6 +1,7 @@
 package com.pixelmart.catalog.controller;
 
 import com.pixelmart.catalog.service.ProductImageService;
+import com.pixelmart.catalog.service.ReviewImageService;
 import com.pixelmart.catalog.service.StoreSettingsService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -16,12 +17,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class MediaController {
 
   private final ProductImageService productImageService;
+  private final ReviewImageService reviewImageService;
   private final StoreSettingsService storeSettingsService;
 
   public MediaController(
-      ProductImageService productImageService, StoreSettingsService storeSettingsService) {
+      ProductImageService productImageService,
+      ReviewImageService reviewImageService,
+      StoreSettingsService storeSettingsService) {
     this.productImageService = productImageService;
+    this.reviewImageService = reviewImageService;
     this.storeSettingsService = storeSettingsService;
+  }
+
+  @GetMapping("/reviews/{id}")
+  public ResponseEntity<Resource> reviewImage(@PathVariable String id) {
+    return toResponse(reviewImageService.getReviewImage(id));
   }
 
   @GetMapping("/{id}")

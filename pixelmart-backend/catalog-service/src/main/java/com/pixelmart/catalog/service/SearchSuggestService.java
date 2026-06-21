@@ -16,15 +16,19 @@ public class SearchSuggestService {
 
   private final ProductRepository productRepository;
   private final CategoryRepository categoryRepository;
+  private final SearchEventService searchEventService;
 
   public SearchSuggestService(
-      ProductRepository productRepository, CategoryRepository categoryRepository) {
+      ProductRepository productRepository,
+      CategoryRepository categoryRepository,
+      SearchEventService searchEventService) {
     this.productRepository = productRepository;
     this.categoryRepository = categoryRepository;
+    this.searchEventService = searchEventService;
   }
 
-  @Transactional(readOnly = true)
-  public SearchSuggestResponse suggest(String query) {
+  @Transactional
+  public SearchSuggestResponse suggest(String query, String sessionId) {
     if (query == null || query.trim().length() < 2) {
       return new SearchSuggestResponse(List.of(), List.of());
     }
@@ -40,6 +44,7 @@ public class SearchSuggestService {
             .stream()
             .map(this::toCategoryItem)
             .toList();
+    searchEventService.logSearch(term, products.size() + categories.size(), sessionId);
     return new SearchSuggestResponse(products, categories);
   }
 

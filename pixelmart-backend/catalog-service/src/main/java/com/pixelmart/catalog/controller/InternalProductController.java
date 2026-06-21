@@ -24,8 +24,10 @@ public class InternalProductController {
 
   @GetMapping("/{id}")
   public InternalProductResponse getById(
-      @PathVariable String id, @RequestParam(required = false) String couponCode) {
-    return productService.getInternalById(id, couponCode);
+      @PathVariable String id,
+      @RequestParam(required = false) String variantId,
+      @RequestParam(required = false) String couponCode) {
+    return productService.getInternalById(id, variantId, couponCode);
   }
 
   @PostMapping("/reserve-stock")

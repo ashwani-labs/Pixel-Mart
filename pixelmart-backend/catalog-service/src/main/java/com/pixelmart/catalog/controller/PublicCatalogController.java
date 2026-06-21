@@ -43,8 +43,9 @@ public class PublicCatalogController {
   }
 
   @GetMapping("/search/suggest")
-  public SearchSuggestResponse searchSuggest(@RequestParam String q) {
-    return searchSuggestService.suggest(q);
+  public SearchSuggestResponse searchSuggest(
+      @RequestParam String q, @RequestParam(required = false) String sessionId) {
+    return searchSuggestService.suggest(q, sessionId);
   }
 
   @GetMapping("/products")

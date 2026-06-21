@@ -1,6 +1,7 @@
 package com.pixelmart.catalog.client;
 
 import com.pixelmart.catalog.exception.BadRequestException;
+import java.time.Instant;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -42,5 +43,26 @@ public class OrderClient {
     }
   }
 
+  public long countOrdersSince(Instant since) {
+    String url =
+        UriComponentsBuilder.fromUriString(
+                properties.getBaseUrl() + "/api/orders/internal/stats/order-count")
+            .queryParam("since", since.toString())
+            .toUriString();
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("X-Internal-Service", properties.getInternalServiceName());
+    try {
+      ResponseEntity<OrderCountResponse> response =
+          restTemplate.exchange(
+              url, HttpMethod.GET, new HttpEntity<>(headers), OrderCountResponse.class);
+      OrderCountResponse body = response.getBody();
+      return body != null ? body.count() : 0L;
+    } catch (HttpStatusCodeException ex) {
+      return 0L;
+    }
+  }
+
   public record PurchaseVerificationResponse(boolean verified) {}
+
+  public record OrderCountResponse(long count) {}
 }

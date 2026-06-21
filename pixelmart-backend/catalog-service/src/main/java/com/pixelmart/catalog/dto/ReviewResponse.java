@@ -4,6 +4,7 @@ import com.pixelmart.catalog.domain.Product;
 import com.pixelmart.catalog.domain.Review;
 import com.pixelmart.catalog.domain.ReviewStatus;
 import java.time.Instant;
+import java.util.List;
 
 public record ReviewResponse(
     String id,
@@ -15,8 +16,9 @@ public record ReviewResponse(
     String body,
     ReviewStatus status,
     boolean verifiedPurchase,
-    Instant createdAt) {
-  public static ReviewResponse fromPublic(Review review) {
+    Instant createdAt,
+    List<String> imageUrls) {
+  public static ReviewResponse fromPublic(Review review, List<String> imageUrls) {
     return new ReviewResponse(
         review.getId(),
         review.getProductId(),
@@ -27,10 +29,11 @@ public record ReviewResponse(
         review.getBody(),
         review.getStatus(),
         review.isVerifiedPurchase(),
-        review.getCreatedAt());
+        review.getCreatedAt(),
+        imageUrls);
   }
 
-  public static ReviewResponse fromAdmin(Review review, Product product) {
+  public static ReviewResponse fromAdmin(Review review, Product product, List<String> imageUrls) {
     return new ReviewResponse(
         review.getId(),
         review.getProductId(),
@@ -41,6 +44,7 @@ public record ReviewResponse(
         review.getBody(),
         review.getStatus(),
         review.isVerifiedPurchase(),
-        review.getCreatedAt());
+        review.getCreatedAt(),
+        imageUrls);
   }
 }

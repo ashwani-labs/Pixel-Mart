@@ -34,6 +34,8 @@ public class SecurityConfig {
                     .permitAll()
                     .requestMatchers("/api/catalog/internal/**")
                     .permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/catalog/analytics/events")
+                    .permitAll()
                     .requestMatchers("/api/catalog/wishlist", "/api/catalog/wishlist/**")
                     .authenticated()
                     .requestMatchers("/api/catalog/reviews", "/api/catalog/reviews/**")

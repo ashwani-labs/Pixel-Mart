@@ -2,6 +2,7 @@ package com.pixelmart.catalog.dto;
 
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
+import java.util.List;
 
 public final class ProductRequests {
 
@@ -16,7 +17,8 @@ public final class ProductRequests {
       @DecimalMin("0.0") BigDecimal compareAtPrice,
       @Min(0) int stockQty,
       boolean visible,
-      boolean featured) {}
+      boolean featured,
+      List<ProductHighlightItem> highlights) {}
 
   public record UpdateProductRequest(
       @NotBlank String categoryId,
@@ -27,7 +29,8 @@ public final class ProductRequests {
       @DecimalMin("0.0") BigDecimal compareAtPrice,
       @Min(0) int stockQty,
       boolean visible,
-      boolean featured) {}
+      boolean featured,
+      List<ProductHighlightItem> highlights) {}
 
   public record UpdateProductVisibilityRequest(boolean visible) {}
 }

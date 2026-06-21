@@ -17,9 +17,15 @@ public record ProductDetailResponse(
     String offerName,
     int stockQty,
     boolean featured,
+    List<ProductHighlightItem> highlights,
+    List<ProductVariantResponse> variants,
     List<ProductImageResponse> images) {
   public static ProductDetailResponse fromPublic(
-      Product product, OfferPricing pricing, List<ProductImageResponse> images) {
+      Product product,
+      OfferPricing pricing,
+      List<ProductHighlightItem> highlights,
+      List<ProductVariantResponse> variants,
+      List<ProductImageResponse> images) {
     return new ProductDetailResponse(
         product.getId(),
         product.getCategoryId(),
@@ -32,6 +38,8 @@ public record ProductDetailResponse(
         pricing.offerName(),
         product.getStockQty(),
         product.isFeatured(),
+        highlights,
+        variants,
         images);
   }
 }

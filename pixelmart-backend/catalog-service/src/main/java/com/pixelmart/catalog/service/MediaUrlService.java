@@ -11,6 +11,10 @@ public class MediaUrlService {
     return "/api/catalog/media/" + imageId;
   }
 
+  public String reviewImageUrl(String imageId) {
+    return "/api/catalog/media/reviews/" + imageId;
+  }
+
   public String brandLogoUrl() {
     return BRAND_LOGO_PATH;
   }

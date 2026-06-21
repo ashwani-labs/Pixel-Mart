@@ -6,4 +6,6 @@ public record AdminCatalogDashboardResponse(
     int lowStockThreshold,
     long lowStockCount,
     List<ProductResponse> lowStockProducts,
-    long pendingReviewCount) {}
+    long pendingReviewCount,
+    List<SearchTermStat> topSearchTerms,
+    FunnelStats funnelStats) {}

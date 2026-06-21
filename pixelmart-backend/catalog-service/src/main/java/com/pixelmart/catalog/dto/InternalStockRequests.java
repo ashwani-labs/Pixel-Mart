@@ -12,5 +12,6 @@ public final class InternalStockRequests {
 
   public record ReserveStockRequest(@NotEmpty List<@Valid ReserveStockLine> items) {}
 
-  public record ReserveStockLine(@NotBlank String productId, @Min(1) int quantity) {}
+  public record ReserveStockLine(
+      @NotBlank String productId, String variantId, @Min(1) int quantity) {}
 }
