@@ -114,51 +114,53 @@ export function CartPage() {
             {items.map((item) => (
                 <li key={item.key}>
                   <Card>
-                    <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex min-w-0 items-center gap-3">
-                        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-muted text-xl font-bold text-primary">
-                          {item.productName.charAt(0)}
-                        </span>
-                        <div className="min-w-0">
-                          <Link
-                            to={`/products/${item.productSlug}`}
-                            className="block truncate font-semibold no-underline hover:text-primary hover:no-underline"
-                          >
-                            {item.productName}
-                          </Link>
-                          <p className="m-0 mt-0.5 text-sm text-muted-foreground">
-                            {formatPrice(item.unitPrice, marketLocale, marketCurrencyCode)} each
-                          </p>
+                    <CardContent className="p-4">
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex min-w-0 flex-1 items-center gap-3">
+                          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-muted text-xl font-bold text-primary">
+                            {item.productName.charAt(0)}
+                          </span>
+                          <div className="min-w-0">
+                            <Link
+                              to={`/products/${item.productSlug}`}
+                              className="block truncate font-semibold no-underline hover:text-primary hover:no-underline"
+                            >
+                              {item.productName}
+                            </Link>
+                            <p className="m-0 mt-0.5 text-sm text-muted-foreground">
+                              {formatPrice(item.unitPrice, marketLocale, marketCurrencyCode)} each
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex flex-wrap items-center gap-3">
-                        <label className="flex items-center gap-2 text-sm font-medium">
-                          Qty
-                          <input
-                            type="number"
-                            min={1}
-                            className="h-9 w-16 rounded-md border border-border bg-input px-2 text-center text-foreground"
-                            value={item.quantity}
-                            onChange={(e) => {
-                              const qty = parseInt(e.target.value, 10);
-                              if (qty >= 1) {
-                                void item.onUpdateQty(qty);
-                              }
-                            }}
-                          />
-                        </label>
-                        <span className="min-w-[5rem] text-right font-bold">
-                          {formatPrice(item.lineTotal, marketLocale, marketCurrencyCode)}
-                        </span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="text-destructive hover:text-destructive"
-                          onClick={() => void item.onRemove()}
-                        >
-                          Remove
-                        </Button>
+                        <div className="flex shrink-0 items-center justify-between gap-4 sm:justify-end sm:gap-6">
+                          <label className="flex items-center gap-2 whitespace-nowrap text-sm font-medium">
+                            Qty
+                            <input
+                              type="number"
+                              min={1}
+                              className="h-9 w-16 rounded-md border border-border bg-input px-2 text-center text-foreground"
+                              value={item.quantity}
+                              onChange={(e) => {
+                                const qty = parseInt(e.target.value, 10);
+                                if (qty >= 1) {
+                                  void item.onUpdateQty(qty);
+                                }
+                              }}
+                            />
+                          </label>
+                          <span className="min-w-[5.5rem] text-right font-bold tabular-nums whitespace-nowrap">
+                            {formatPrice(item.lineTotal, marketLocale, marketCurrencyCode)}
+                          </span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="shrink-0 text-destructive hover:text-destructive"
+                            onClick={() => void item.onRemove()}
+                          >
+                            Remove
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -184,20 +186,23 @@ export function CartPage() {
                 </span>
               </div>
               <p className="m-0 text-xs text-primary">{freeDeliveryMessage(summary.subtotal)}</p>
-              <div className="border-t border-border pt-4">
+              <div className="flex flex-col gap-3 border-t border-border pt-4">
                 <div className="flex justify-between text-base font-extrabold">
                   <span>Estimated total</span>
                   <span>{formatPrice(orderTotal, marketLocale, marketCurrencyCode)}</span>
                 </div>
-              </div>
-              <Button variant="accent" size="lg" className="w-full" asChild>
-                <Link to="/checkout" className="no-underline hover:no-underline">
-                  Proceed to checkout
+                <Button variant="accent" size="lg" className="w-full" asChild>
+                  <Link to="/checkout" className="no-underline hover:no-underline">
+                    Proceed to checkout
+                  </Link>
+                </Button>
+                <Link
+                  to="/products"
+                  className="text-center text-sm font-medium text-primary hover:underline"
+                >
+                  Continue shopping
                 </Link>
-              </Button>
-              <Link to="/products" className="text-center text-sm font-medium">
-                Continue shopping
-              </Link>
+              </div>
             </CardContent>
           </Card>
         </div>

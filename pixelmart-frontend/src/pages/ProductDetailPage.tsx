@@ -202,7 +202,7 @@ export function ProductDetailPage() {
             <DeliveryEstimate />
           </div>
 
-          <div ref={addToCartRef} className="mt-5">
+          <div ref={addToCartRef} className="mt-5 flex flex-wrap items-center gap-3">
             <Button
               variant="accent"
               size="lg"
@@ -216,16 +216,16 @@ export function ProductDetailPage() {
                   ? t('cart.outOfStock')
                   : t('cart.addToCart').toUpperCase()}
             </Button>
-            <Button type="button" variant="outline" className="mt-3" onClick={() => void handleWishlistToggle()}>
+            <Button type="button" variant="outline" onClick={() => void handleWishlistToggle()}>
               {isWishlisted ? '♥ Remove from wishlist' : '♡ Add to wishlist'}
             </Button>
-            {cartMessage && <p className="mt-2 text-sm text-primary">{cartMessage}</p>}
             {isAuthenticated && (
-              <Link to="/cart" className="mt-2 inline-block text-sm">
+              <Link to="/cart" className="text-sm font-medium text-primary hover:underline">
                 {t('cart.viewCart')}
               </Link>
             )}
           </div>
+          {cartMessage && <p className="mt-2 text-sm text-primary">{cartMessage}</p>}
         </div>
       </div>
 

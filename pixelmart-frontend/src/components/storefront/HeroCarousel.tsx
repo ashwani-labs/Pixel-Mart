@@ -67,6 +67,25 @@ const HERO_SLIDES: HeroSlide[] = [
 
 const AUTOPLAY_MS = 5500;
 
+function ChevronIcon({ direction }: { direction: 'left' | 'right' }) {
+  return (
+    <svg
+      className={styles.navIcon}
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden
+    >
+      <path
+        d={direction === 'left' ? 'M10 3.5L5.5 8 10 12.5' : 'M6 3.5L10.5 8 6 12.5'}
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 interface HeroCarouselProps {
   slides?: HeroSlide[];
 }
@@ -161,7 +180,7 @@ export function HeroCarousel({ slides = HERO_SLIDES }: HeroCarouselProps) {
             onClick={goPrev}
             aria-label="Previous slide"
           >
-            ‹
+            <ChevronIcon direction="left" />
           </button>
           <button
             type="button"
@@ -169,7 +188,7 @@ export function HeroCarousel({ slides = HERO_SLIDES }: HeroCarouselProps) {
             onClick={goNext}
             aria-label="Next slide"
           >
-            ›
+            <ChevronIcon direction="right" />
           </button>
 
           <div className={styles.dots} role="tablist" aria-label="Choose slide">

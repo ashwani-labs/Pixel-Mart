@@ -26,6 +26,24 @@ import {
 } from '@/store/api/orderApi';
 import { selectIsAuthenticated } from '@/store/slices/authSlice';
 
+function StepperIcon({ type }: { type: 'minus' | 'plus' }) {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      className="block h-3.5 w-3.5 shrink-0"
+      aria-hidden
+      fill="none"
+    >
+      <path
+        d={type === 'minus' ? 'M3.5 8h9' : 'M8 3.5v9M3.5 8h9'}
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 interface ProductCardProps {
   product: Product;
   formatPrice: (value: number) => string;
@@ -228,42 +246,36 @@ export function ProductCard({
           <div className="mt-auto pt-0.5">
             {quantity > 0 ? (
               <div
-                className="qty-stepper flex h-9 w-full items-stretch overflow-hidden rounded-lg border-2 border-accent bg-card shadow-sm ring-1 ring-accent/20"
+                className="qty-stepper flex h-9 w-full items-center justify-between gap-1 rounded-full border-2 border-accent bg-card px-1 shadow-sm ring-1 ring-accent/20"
                 role="group"
                 aria-label={`Quantity for ${product.name}`}
               >
                 <button
                   type="button"
-                  className="flex w-10 shrink-0 items-center justify-center border-0 bg-accent text-accent-foreground transition hover:brightness-105 active:scale-95 disabled:opacity-60"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-0 bg-accent p-0 text-accent-foreground shadow-sm transition hover:brightness-105 active:scale-95 disabled:opacity-60"
                   disabled={busy}
                   aria-label="Decrease quantity"
                   onClick={(e) => void handleDecrement(e)}
                 >
-                  <span className="text-lg font-bold leading-none" aria-hidden>
-                    −
-                  </span>
+                  <StepperIcon type="minus" />
                 </button>
-                <div className="flex min-w-0 flex-1 items-center justify-center border-x border-accent/25 bg-accent/8 px-1">
-                  <span
-                    className={cn(
-                      'text-sm font-extrabold tabular-nums text-foreground',
-                      busy && 'animate-pulse opacity-70',
-                    )}
-                  >
-                    {busy ? '…' : quantity}
-                  </span>
-                </div>
+                <span
+                  className={cn(
+                    'min-w-[1.75rem] flex-1 text-center text-sm font-extrabold tabular-nums text-foreground',
+                    busy && 'animate-pulse opacity-70',
+                  )}
+                >
+                  {busy ? '…' : quantity}
+                </span>
                 <button
                   type="button"
-                  className="flex w-10 shrink-0 items-center justify-center border-0 bg-accent text-accent-foreground transition hover:brightness-105 active:scale-95 disabled:opacity-40"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-0 bg-accent p-0 text-accent-foreground shadow-sm transition hover:brightness-105 active:scale-95 disabled:opacity-40"
                   disabled={busy || quantity >= product.stockQty}
                   aria-label="Increase quantity"
                   title={quantity >= product.stockQty ? 'Maximum stock reached' : undefined}
                   onClick={(e) => void handleIncrement(e)}
                 >
-                  <span className="text-lg font-bold leading-none" aria-hidden>
-                    +
-                  </span>
+                  <StepperIcon type="plus" />
                 </button>
               </div>
             ) : (
@@ -271,7 +283,7 @@ export function ProductCard({
                 type="button"
                 variant="accent"
                 size="sm"
-                className="h-9 w-full font-bold tracking-wide shadow-sm transition active:scale-[0.98]"
+                className="h-9 w-full rounded-full font-bold tracking-wide shadow-sm transition active:scale-[0.98]"
                 disabled={outOfStock || adding}
                 onClick={(e) => void handleAdd(e)}
               >

@@ -59,7 +59,7 @@ export function AdminDashboardPage() {
   const { data: catalogStats, isLoading: catalogLoading } = useGetCatalogDashboardStatsQuery();
 
   const chartData =
-    orderStats?.trends.map((point) => ({
+    orderStats?.trends?.map((point) => ({
       date: formatTrendDate(point.date),
       orders: point.orderCount,
       revenue: Number(point.revenue),
@@ -69,11 +69,13 @@ export function AdminDashboardPage() {
   const weekRevenue = chartData.reduce((sum, point) => sum + point.revenue, 0);
 
   const paymentChartData =
-    orderStats?.paymentMethodBreakdown.map((row) => ({
+    orderStats?.paymentMethodBreakdown?.map((row) => ({
       method: formatPaymentMethod(row.method),
       orders: row.orderCount,
       revenue: Number(row.revenue),
     })) ?? [];
+
+  const topCoupons = orderStats?.topCoupons ?? [];
 
   const topSearchTerms = catalogStats?.topSearchTerms ?? [];
   const funnel = catalogStats?.funnelStats ?? {
@@ -309,9 +311,9 @@ export function AdminDashboardPage() {
             </Typography>
             {ordersLoading ? (
               <Typography color="text.secondary">Loading…</Typography>
-            ) : (orderStats?.topCoupons.length ?? 0) > 0 ? (
+            ) : topCoupons.length > 0 ? (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                {orderStats!.topCoupons.map((coupon) => (
+                {topCoupons.map((coupon) => (
                   <Box
                     key={coupon.couponCode}
                     sx={{
@@ -427,9 +429,9 @@ export function AdminDashboardPage() {
           </Box>
           {catalogLoading ? (
             <Typography color="text.secondary">Loading…</Typography>
-          ) : catalogStats && catalogStats.lowStockProducts.length > 0 ? (
+          ) : (catalogStats?.lowStockProducts?.length ?? 0) > 0 ? (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              {catalogStats.lowStockProducts.map((product) => (
+              {(catalogStats?.lowStockProducts ?? []).map((product) => (
                 <Box
                   key={product.id}
                   sx={{
