@@ -40,6 +40,14 @@ cd pixelmart-frontend && npm ci && npm run build
 cd pixelmart-frontend && npm run lint
 ```
 
+To refresh README screenshots (requires the app running on `localhost:5173`):
+
+```bash
+npm install --no-save playwright
+npx playwright install chromium
+node scripts/capture-screenshots.mjs
+```
+
 CI runs `mvn verify` and `npm run build` on every push and pull request to `main`.
 
 ## Pull request workflow
