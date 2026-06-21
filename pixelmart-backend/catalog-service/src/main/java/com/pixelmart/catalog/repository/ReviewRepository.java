@@ -17,4 +17,6 @@ public interface ReviewRepository extends JpaRepository<Review, String> {
   Page<Review> findByStatusOrderByCreatedAtDesc(ReviewStatus status, Pageable pageable);
 
   Page<Review> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
+  long countByStatus(ReviewStatus status);
 }

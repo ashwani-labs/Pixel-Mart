@@ -57,6 +57,7 @@ public class PublicCatalogController {
       @RequestParam(required = false) BigDecimal maxPrice,
       @RequestParam(required = false) Boolean inStockOnly,
       @RequestParam(required = false) Boolean onSaleOnly,
+      @RequestParam(required = false) Integer minRating,
       @PageableDefault(size = 12, sort = "name", direction = Sort.Direction.ASC)
           Pageable pageable) {
     if (Boolean.TRUE.equals(featured)) {
@@ -71,6 +72,7 @@ public class PublicCatalogController {
             maxPrice,
             inStockOnly,
             onSaleOnly,
+            minRating,
             pageable));
   }
 

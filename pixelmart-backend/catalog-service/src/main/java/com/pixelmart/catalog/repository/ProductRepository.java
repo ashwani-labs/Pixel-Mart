@@ -36,6 +36,10 @@ public interface ProductRepository extends JpaRepository<Product, String> {
               AND (:inStockOnly IS NULL OR :inStockOnly = false OR p.stockQty > 0)
               AND (:onSaleOnly IS NULL OR :onSaleOnly = false
                    OR (p.compareAtPrice IS NOT NULL AND p.compareAtPrice > p.basePrice))
+              AND (:minRating IS NULL OR :minRating <= (
+                   SELECT COALESCE(AVG(r.rating), 0) FROM Review r
+                   WHERE r.productId = p.id AND r.status = com.pixelmart.catalog.domain.ReviewStatus.APPROVED
+              ))
             """)
   Page<Product> findPublicProducts(
       @Param("categoryId") String categoryId,
@@ -45,6 +49,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
       @Param("maxPrice") BigDecimal maxPrice,
       @Param("inStockOnly") Boolean inStockOnly,
       @Param("onSaleOnly") Boolean onSaleOnly,
+      @Param("minRating") Integer minRating,
       Pageable pageable);
 
   @Query(

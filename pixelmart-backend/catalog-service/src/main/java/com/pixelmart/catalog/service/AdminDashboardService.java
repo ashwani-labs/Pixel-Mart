@@ -1,8 +1,10 @@
 package com.pixelmart.catalog.service;
 
+import com.pixelmart.catalog.domain.ReviewStatus;
 import com.pixelmart.catalog.dto.AdminCatalogDashboardResponse;
 import com.pixelmart.catalog.dto.ProductResponse;
 import com.pixelmart.catalog.repository.ProductRepository;
+import com.pixelmart.catalog.repository.ReviewRepository;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -14,9 +16,12 @@ public class AdminDashboardService {
   public static final int LOW_STOCK_THRESHOLD = 5;
 
   private final ProductRepository productRepository;
+  private final ReviewRepository reviewRepository;
 
-  public AdminDashboardService(ProductRepository productRepository) {
+  public AdminDashboardService(
+      ProductRepository productRepository, ReviewRepository reviewRepository) {
     this.productRepository = productRepository;
+    this.reviewRepository = reviewRepository;
   }
 
   @Transactional(readOnly = true)
@@ -29,7 +34,11 @@ public class AdminDashboardService {
             .stream()
             .map(ProductResponse::from)
             .toList();
-    return new AdminCatalogDashboardResponse(LOW_STOCK_THRESHOLD, lowStockCount, lowStockProducts);
+    return new AdminCatalogDashboardResponse(
+        LOW_STOCK_THRESHOLD,
+        lowStockCount,
+        lowStockProducts,
+        reviewRepository.countByStatus(ReviewStatus.PENDING));
   }
 
   @Transactional(readOnly = true)
