@@ -10,19 +10,19 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/admin/settings/hero-slides")
 public class AdminHeroSlideController {
 
-    private final HeroSlideService heroSlideService;
+  private final HeroSlideService heroSlideService;
 
-    public AdminHeroSlideController(HeroSlideService heroSlideService) {
-        this.heroSlideService = heroSlideService;
-    }
+  public AdminHeroSlideController(HeroSlideService heroSlideService) {
+    this.heroSlideService = heroSlideService;
+  }
 
-    @GetMapping
-    public HeroSlidesResponse get() {
-        return heroSlideService.getAdmin();
-    }
+  @GetMapping
+  public HeroSlidesResponse get() {
+    return heroSlideService.getAdmin();
+  }
 
-    @PutMapping
-    public HeroSlidesResponse update(@Valid @RequestBody UpdateHeroSlidesRequest request) {
-        return heroSlideService.update(request);
-    }
+  @PutMapping
+  public HeroSlidesResponse update(@Valid @RequestBody UpdateHeroSlidesRequest request) {
+    return heroSlideService.update(request);
+  }
 }

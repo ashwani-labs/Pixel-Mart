@@ -18,33 +18,34 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminOfferController {
 
-    private final OfferService offerService;
+  private final OfferService offerService;
 
-    public AdminOfferController(OfferService offerService) {
-        this.offerService = offerService;
-    }
+  public AdminOfferController(OfferService offerService) {
+    this.offerService = offerService;
+  }
 
-    @GetMapping
-    public PageResponse<OfferResponse> list(
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
-        return PageResponse.from(offerService.listAdmin(pageable));
-    }
+  @GetMapping
+  public PageResponse<OfferResponse> list(
+      @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
+          Pageable pageable) {
+    return PageResponse.from(offerService.listAdmin(pageable));
+  }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public OfferResponse create(@Valid @RequestBody CreateOfferRequest request) {
-        return offerService.create(request);
-    }
+  @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
+  public OfferResponse create(@Valid @RequestBody CreateOfferRequest request) {
+    return offerService.create(request);
+  }
 
-    @PutMapping("/{id}")
-    public OfferResponse update(@PathVariable String id, @Valid @RequestBody UpdateOfferRequest request) {
-        return offerService.update(id, request);
-    }
+  @PutMapping("/{id}")
+  public OfferResponse update(
+      @PathVariable String id, @Valid @RequestBody UpdateOfferRequest request) {
+    return offerService.update(id, request);
+  }
 
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable String id) {
-        offerService.delete(id);
-    }
+  @DeleteMapping("/{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void delete(@PathVariable String id) {
+    offerService.delete(id);
+  }
 }

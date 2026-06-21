@@ -1,20 +1,20 @@
 package com.pixelmart.catalog.repository;
 
 import com.pixelmart.catalog.domain.Offer;
+import java.time.Instant;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.Instant;
-import java.util.List;
-
 public interface OfferRepository extends JpaRepository<Offer, String> {
 
-    Page<Offer> findAllByOrderByCreatedAtDesc(Pageable pageable);
+  Page<Offer> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
-    @Query("""
+  @Query(
+      """
             SELECT o FROM Offer o
             WHERE o.active = true
               AND o.startsAt <= :now
@@ -22,9 +22,10 @@ public interface OfferRepository extends JpaRepository<Offer, String> {
               AND o.couponCode IS NULL
             ORDER BY o.startsAt DESC
             """)
-    List<Offer> findActiveAutomaticOffers(@Param("now") Instant now);
+  List<Offer> findActiveAutomaticOffers(@Param("now") Instant now);
 
-    @Query("""
+  @Query(
+      """
             SELECT o FROM Offer o
             WHERE o.active = true
               AND o.startsAt <= :now
@@ -34,14 +35,14 @@ public interface OfferRepository extends JpaRepository<Offer, String> {
               AND (o.couponCode IS NULL
                    OR (:couponCode IS NOT NULL AND UPPER(o.couponCode) = UPPER(:couponCode)))
             """)
-    List<Offer> findActiveProductOffers(
-            @Param("productId") String productId,
-            @Param("categoryId") String categoryId,
-            @Param("couponCode") String couponCode,
-            @Param("now") Instant now
-    );
+  List<Offer> findActiveProductOffers(
+      @Param("productId") String productId,
+      @Param("categoryId") String categoryId,
+      @Param("couponCode") String couponCode,
+      @Param("now") Instant now);
 
-    @Query("""
+  @Query(
+      """
             SELECT o FROM Offer o
             WHERE o.active = true
               AND o.startsAt <= :now
@@ -50,8 +51,6 @@ public interface OfferRepository extends JpaRepository<Offer, String> {
               AND (o.couponCode IS NULL
                    OR (:couponCode IS NOT NULL AND UPPER(o.couponCode) = UPPER(:couponCode)))
             """)
-    List<Offer> findActiveCartOffers(
-            @Param("couponCode") String couponCode,
-            @Param("now") Instant now
-    );
+  List<Offer> findActiveCartOffers(
+      @Param("couponCode") String couponCode, @Param("now") Instant now);
 }

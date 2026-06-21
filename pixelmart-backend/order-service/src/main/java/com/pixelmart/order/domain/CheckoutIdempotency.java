@@ -8,68 +8,68 @@ import java.util.UUID;
 @Table(name = "checkout_idempotency")
 public class CheckoutIdempotency {
 
-    @Id
-    @Column(length = 36, nullable = false)
-    private String id;
+  @Id
+  @Column(length = 36, nullable = false)
+  private String id;
 
-    @Column(name = "user_id", length = 36, nullable = false)
-    private String userId;
+  @Column(name = "user_id", length = 36, nullable = false)
+  private String userId;
 
-    @Column(name = "idempotency_key", length = 128, nullable = false)
-    private String idempotencyKey;
+  @Column(name = "idempotency_key", length = 128, nullable = false)
+  private String idempotencyKey;
 
-    @Column(name = "request_hash", length = 64, nullable = false)
-    private String requestHash;
+  @Column(name = "request_hash", length = 64, nullable = false)
+  private String requestHash;
 
-    @Column(name = "order_id", length = 36, nullable = false)
-    private String orderId;
+  @Column(name = "order_id", length = 36, nullable = false)
+  private String orderId;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
+  @Column(name = "created_at", nullable = false, updatable = false)
+  private Instant createdAt;
 
-    @PrePersist
-    void onCreate() {
-        if (id == null) {
-            id = UUID.randomUUID().toString();
-        }
-        if (createdAt == null) {
-            createdAt = Instant.now();
-        }
+  @PrePersist
+  void onCreate() {
+    if (id == null) {
+      id = UUID.randomUUID().toString();
     }
-
-    public String getId() {
-        return id;
+    if (createdAt == null) {
+      createdAt = Instant.now();
     }
+  }
 
-    public String getUserId() {
-        return userId;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
+  public String getUserId() {
+    return userId;
+  }
 
-    public String getIdempotencyKey() {
-        return idempotencyKey;
-    }
+  public void setUserId(String userId) {
+    this.userId = userId;
+  }
 
-    public void setIdempotencyKey(String idempotencyKey) {
-        this.idempotencyKey = idempotencyKey;
-    }
+  public String getIdempotencyKey() {
+    return idempotencyKey;
+  }
 
-    public String getRequestHash() {
-        return requestHash;
-    }
+  public void setIdempotencyKey(String idempotencyKey) {
+    this.idempotencyKey = idempotencyKey;
+  }
 
-    public void setRequestHash(String requestHash) {
-        this.requestHash = requestHash;
-    }
+  public String getRequestHash() {
+    return requestHash;
+  }
 
-    public String getOrderId() {
-        return orderId;
-    }
+  public void setRequestHash(String requestHash) {
+    this.requestHash = requestHash;
+  }
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
+  public String getOrderId() {
+    return orderId;
+  }
+
+  public void setOrderId(String orderId) {
+    this.orderId = orderId;
+  }
 }

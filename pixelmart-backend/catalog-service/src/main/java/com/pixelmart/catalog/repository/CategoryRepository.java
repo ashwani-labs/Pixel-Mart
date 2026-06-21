@@ -1,30 +1,27 @@
 package com.pixelmart.catalog.repository;
 
 import com.pixelmart.catalog.domain.Category;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-import java.util.Optional;
-
 public interface CategoryRepository extends JpaRepository<Category, String> {
 
-    boolean existsBySlug(String slug);
+  boolean existsBySlug(String slug);
 
-    Optional<Category> findBySlug(String slug);
+  Optional<Category> findBySlug(String slug);
 
-    List<Category> findByActiveTrueOrderBySortOrderAscNameAsc();
+  List<Category> findByActiveTrueOrderBySortOrderAscNameAsc();
 
-    List<Category> findByParentIdIsNullAndActiveTrueOrderBySortOrderAscNameAsc();
+  List<Category> findByParentIdIsNullAndActiveTrueOrderBySortOrderAscNameAsc();
 
-    List<Category> findByParentIdIsNotNullAndActiveTrueOrderBySortOrderAscNameAsc();
+  List<Category> findByParentIdIsNotNullAndActiveTrueOrderBySortOrderAscNameAsc();
 
-    List<Category> findAllByOrderBySortOrderAscNameAsc();
+  List<Category> findAllByOrderBySortOrderAscNameAsc();
 
-    long countByParentId(String parentId);
+  long countByParentId(String parentId);
 
-    List<Category> findByActiveTrueAndNameContainingIgnoreCaseOrderBySortOrderAscNameAsc(
-            String name,
-            Pageable pageable
-    );
+  List<Category> findByActiveTrueAndNameContainingIgnoreCaseOrderBySortOrderAscNameAsc(
+      String name, Pageable pageable);
 }

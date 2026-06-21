@@ -1,37 +1,37 @@
 package com.pixelmart.notification.service;
 
 import com.pixelmart.notification.dto.OrderConfirmationRequest;
-
 import java.math.BigDecimal;
 
 final class OrderConfirmationTemplate {
 
-    private OrderConfirmationTemplate() {
-    }
+  private OrderConfirmationTemplate() {}
 
-    static String subject(String orderNumber) {
-        return "Order confirmed — " + orderNumber;
-    }
+  static String subject(String orderNumber) {
+    return "Order confirmed — " + orderNumber;
+  }
 
-    static String html(OrderConfirmationRequest request) {
-        String currency = request.currencyCode() == null || request.currencyCode().isBlank()
-                ? "INR"
-                : request.currencyCode();
-        StringBuilder rows = new StringBuilder();
-        for (OrderConfirmationRequest.OrderLine line : request.items()) {
-            rows.append("""
+  static String html(OrderConfirmationRequest request) {
+    String currency =
+        request.currencyCode() == null || request.currencyCode().isBlank()
+            ? "INR"
+            : request.currencyCode();
+    StringBuilder rows = new StringBuilder();
+    for (OrderConfirmationRequest.OrderLine line : request.items()) {
+      rows.append(
+          """
                     <tr>
                       <td style="padding:8px 0;border-bottom:1px solid #e5e7eb;">%s</td>
                       <td style="padding:8px 0;border-bottom:1px solid #e5e7eb;text-align:center;">%d</td>
                       <td style="padding:8px 0;border-bottom:1px solid #e5e7eb;text-align:right;">%s</td>
                     </tr>
-                    """.formatted(
-                    escape(line.productName()),
-                    line.quantity(),
-                    formatMoney(line.lineTotal(), currency)
-            ));
-        }
-        return """
+                    """
+              .formatted(
+                  escape(line.productName()),
+                  line.quantity(),
+                  formatMoney(line.lineTotal(), currency)));
+    }
+    return """
                 <!DOCTYPE html>
                 <html>
                 <body style="font-family:Segoe UI,Arial,sans-serif;background:#f8fafc;color:#0f172a;margin:0;padding:24px;">
@@ -55,24 +55,24 @@ final class OrderConfirmationTemplate {
                   </div>
                 </body>
                 </html>
-                """.formatted(
-                escape(request.recipientName()),
-                escape(request.orderNumber()),
-                escape(request.status()),
-                rows,
-                formatMoney(request.grandTotal(), currency)
-        );
-    }
+                """
+        .formatted(
+            escape(request.recipientName()),
+            escape(request.orderNumber()),
+            escape(request.status()),
+            rows,
+            formatMoney(request.grandTotal(), currency));
+  }
 
-    private static String formatMoney(BigDecimal amount, String currency) {
-        return amount.setScale(2, java.math.RoundingMode.HALF_UP) + " " + currency;
-    }
+  private static String formatMoney(BigDecimal amount, String currency) {
+    return amount.setScale(2, java.math.RoundingMode.HALF_UP) + " " + currency;
+  }
 
-    private static String escape(String value) {
-        return value
-                .replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace("\"", "&quot;");
-    }
+  private static String escape(String value) {
+    return value
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\"", "&quot;");
+  }
 }

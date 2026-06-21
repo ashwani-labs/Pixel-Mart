@@ -1,25 +1,25 @@
 package com.pixelmart.order.repository;
 
 import com.pixelmart.order.domain.Address;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
-import java.util.Optional;
-
 public interface AddressRepository extends JpaRepository<Address, String> {
 
-    List<Address> findByUserIdOrderByDefaultAddressDescCreatedAtDesc(String userId);
+  List<Address> findByUserIdOrderByDefaultAddressDescCreatedAtDesc(String userId);
 
-    Optional<Address> findByIdAndUserId(String id, String userId);
+  Optional<Address> findByIdAndUserId(String id, String userId);
 
-    @Modifying
-    @Query("UPDATE Address a SET a.defaultAddress = false WHERE a.userId = :userId AND a.id <> :excludeId")
-    void clearDefaultExcept(@Param("userId") String userId, @Param("excludeId") String excludeId);
+  @Modifying
+  @Query(
+      "UPDATE Address a SET a.defaultAddress = false WHERE a.userId = :userId AND a.id <> :excludeId")
+  void clearDefaultExcept(@Param("userId") String userId, @Param("excludeId") String excludeId);
 
-    @Modifying
-    @Query("UPDATE Address a SET a.defaultAddress = false WHERE a.userId = :userId")
-    void clearAllDefaults(@Param("userId") String userId);
+  @Modifying
+  @Query("UPDATE Address a SET a.defaultAddress = false WHERE a.userId = :userId")
+  void clearAllDefaults(@Param("userId") String userId);
 }

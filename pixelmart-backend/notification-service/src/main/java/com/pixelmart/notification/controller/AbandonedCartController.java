@@ -11,15 +11,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/internal/email")
 public class AbandonedCartController {
 
-    private final AbandonedCartEmailService emailService;
+  private final AbandonedCartEmailService emailService;
 
-    public AbandonedCartController(AbandonedCartEmailService emailService) {
-        this.emailService = emailService;
-    }
+  public AbandonedCartController(AbandonedCartEmailService emailService) {
+    this.emailService = emailService;
+  }
 
-    @PostMapping("/abandoned-cart")
-    @ResponseStatus(HttpStatus.CREATED)
-    public EmailOutboxResponse abandonedCart(@Valid @RequestBody AbandonedCartRequest request) {
-        return emailService.queue(request);
-    }
+  @PostMapping("/abandoned-cart")
+  @ResponseStatus(HttpStatus.CREATED)
+  public EmailOutboxResponse abandonedCart(@Valid @RequestBody AbandonedCartRequest request) {
+    return emailService.queue(request);
+  }
 }

@@ -4,11 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 
 public final class WishlistRequests {
 
-    private WishlistRequests() {
-    }
+  private WishlistRequests() {}
 
-    public record ToggleWishlistRequest(
-            @NotBlank String productId
-    ) {
-    }
+  public record ToggleWishlistRequest(@NotBlank String productId) {}
 }

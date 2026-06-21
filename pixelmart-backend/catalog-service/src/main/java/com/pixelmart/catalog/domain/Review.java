@@ -8,7 +8,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-
 import java.time.Instant;
 import java.util.UUID;
 
@@ -16,127 +15,127 @@ import java.util.UUID;
 @Table(name = "reviews")
 public class Review {
 
-    @Id
-    @Column(length = 36, nullable = false)
-    private String id;
+  @Id
+  @Column(length = 36, nullable = false)
+  private String id;
 
-    @Column(name = "product_id", length = 36, nullable = false)
-    private String productId;
+  @Column(name = "product_id", length = 36, nullable = false)
+  private String productId;
 
-    @Column(name = "user_id", length = 36, nullable = false)
-    private String userId;
+  @Column(name = "user_id", length = 36, nullable = false)
+  private String userId;
 
-    @Column(name = "reviewer_name", nullable = false)
-    private String reviewerName;
+  @Column(name = "reviewer_name", nullable = false)
+  private String reviewerName;
 
-    @Column(nullable = false)
-    private int rating;
+  @Column(nullable = false)
+  private int rating;
 
-    @Column(length = 255)
-    private String title;
+  @Column(length = 255)
+  private String title;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String body;
+  @Column(nullable = false, columnDefinition = "TEXT")
+  private String body;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 16)
-    private ReviewStatus status = ReviewStatus.PENDING;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 16)
+  private ReviewStatus status = ReviewStatus.PENDING;
 
-    @Column(name = "verified_purchase", nullable = false)
-    private boolean verifiedPurchase;
+  @Column(name = "verified_purchase", nullable = false)
+  private boolean verifiedPurchase;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
+  @Column(name = "created_at", nullable = false, updatable = false)
+  private Instant createdAt;
 
-    @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt;
+  @Column(name = "updated_at", nullable = false)
+  private Instant updatedAt;
 
-    @PrePersist
-    void onCreate() {
-        if (id == null) {
-            id = UUID.randomUUID().toString();
-        }
-        Instant now = Instant.now();
-        if (createdAt == null) {
-            createdAt = now;
-        }
-        updatedAt = now;
+  @PrePersist
+  void onCreate() {
+    if (id == null) {
+      id = UUID.randomUUID().toString();
     }
-
-    @PreUpdate
-    void onUpdate() {
-        updatedAt = Instant.now();
+    Instant now = Instant.now();
+    if (createdAt == null) {
+      createdAt = now;
     }
+    updatedAt = now;
+  }
 
-    public String getId() {
-        return id;
-    }
+  @PreUpdate
+  void onUpdate() {
+    updatedAt = Instant.now();
+  }
 
-    public String getProductId() {
-        return productId;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public void setProductId(String productId) {
-        this.productId = productId;
-    }
+  public String getProductId() {
+    return productId;
+  }
 
-    public String getUserId() {
-        return userId;
-    }
+  public void setProductId(String productId) {
+    this.productId = productId;
+  }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
+  public String getUserId() {
+    return userId;
+  }
 
-    public String getReviewerName() {
-        return reviewerName;
-    }
+  public void setUserId(String userId) {
+    this.userId = userId;
+  }
 
-    public void setReviewerName(String reviewerName) {
-        this.reviewerName = reviewerName;
-    }
+  public String getReviewerName() {
+    return reviewerName;
+  }
 
-    public int getRating() {
-        return rating;
-    }
+  public void setReviewerName(String reviewerName) {
+    this.reviewerName = reviewerName;
+  }
 
-    public void setRating(int rating) {
-        this.rating = rating;
-    }
+  public int getRating() {
+    return rating;
+  }
 
-    public String getTitle() {
-        return title;
-    }
+  public void setRating(int rating) {
+    this.rating = rating;
+  }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+  public String getTitle() {
+    return title;
+  }
 
-    public String getBody() {
-        return body;
-    }
+  public void setTitle(String title) {
+    this.title = title;
+  }
 
-    public void setBody(String body) {
-        this.body = body;
-    }
+  public String getBody() {
+    return body;
+  }
 
-    public ReviewStatus getStatus() {
-        return status;
-    }
+  public void setBody(String body) {
+    this.body = body;
+  }
 
-    public void setStatus(ReviewStatus status) {
-        this.status = status;
-    }
+  public ReviewStatus getStatus() {
+    return status;
+  }
 
-    public boolean isVerifiedPurchase() {
-        return verifiedPurchase;
-    }
+  public void setStatus(ReviewStatus status) {
+    this.status = status;
+  }
 
-    public void setVerifiedPurchase(boolean verifiedPurchase) {
-        this.verifiedPurchase = verifiedPurchase;
-    }
+  public boolean isVerifiedPurchase() {
+    return verifiedPurchase;
+  }
 
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
+  public void setVerifiedPurchase(boolean verifiedPurchase) {
+    this.verifiedPurchase = verifiedPurchase;
+  }
+
+  public Instant getCreatedAt() {
+    return createdAt;
+  }
 }

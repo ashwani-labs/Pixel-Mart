@@ -13,14 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/catalog/internal/offers")
 public class InternalOfferController {
 
-    private final OfferService offerService;
+  private final OfferService offerService;
 
-    public InternalOfferController(OfferService offerService) {
-        this.offerService = offerService;
-    }
+  public InternalOfferController(OfferService offerService) {
+    this.offerService = offerService;
+  }
 
-    @PostMapping("/cart-discount")
-    public CartDiscountResponse cartDiscount(@Valid @RequestBody CartDiscountRequest request) {
-        return CartDiscountResponse.from(offerService.cartDiscount(request.subtotal(), request.couponCode()));
-    }
+  @PostMapping("/cart-discount")
+  public CartDiscountResponse cartDiscount(@Valid @RequestBody CartDiscountRequest request) {
+    return CartDiscountResponse.from(
+        offerService.cartDiscount(request.subtotal(), request.couponCode()));
+  }
 }

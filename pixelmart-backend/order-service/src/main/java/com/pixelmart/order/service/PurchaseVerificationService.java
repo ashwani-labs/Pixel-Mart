@@ -7,14 +7,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PurchaseVerificationService {
 
-    private final OrderItemRepository orderItemRepository;
+  private final OrderItemRepository orderItemRepository;
 
-    public PurchaseVerificationService(OrderItemRepository orderItemRepository) {
-        this.orderItemRepository = orderItemRepository;
-    }
+  public PurchaseVerificationService(OrderItemRepository orderItemRepository) {
+    this.orderItemRepository = orderItemRepository;
+  }
 
-    @Transactional(readOnly = true)
-    public boolean hasDeliveredPurchase(String userId, String productId) {
-        return orderItemRepository.existsDeliveredPurchase(userId, productId);
-    }
+  @Transactional(readOnly = true)
+  public boolean hasDeliveredPurchase(String userId, String productId) {
+    return orderItemRepository.existsDeliveredPurchase(userId, productId);
+  }
 }

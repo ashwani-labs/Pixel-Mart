@@ -8,60 +8,60 @@ import java.util.UUID;
 @Table(name = "carts")
 public class Cart {
 
-    @Id
-    @Column(length = 36, nullable = false)
-    private String id;
+  @Id
+  @Column(length = 36, nullable = false)
+  private String id;
 
-    @Column(name = "user_id", length = 36, nullable = false, unique = true)
-    private String userId;
+  @Column(name = "user_id", length = 36, nullable = false, unique = true)
+  private String userId;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
+  @Column(name = "created_at", nullable = false, updatable = false)
+  private Instant createdAt;
 
-    @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt;
+  @Column(name = "updated_at", nullable = false)
+  private Instant updatedAt;
 
-    @Column(name = "abandoned_cart_email_sent_at")
-    private Instant abandonedCartEmailSentAt;
+  @Column(name = "abandoned_cart_email_sent_at")
+  private Instant abandonedCartEmailSentAt;
 
-    @PrePersist
-    void onCreate() {
-        if (id == null) {
-            id = UUID.randomUUID().toString();
-        }
-        Instant now = Instant.now();
-        if (createdAt == null) {
-            createdAt = now;
-        }
-        updatedAt = now;
+  @PrePersist
+  void onCreate() {
+    if (id == null) {
+      id = UUID.randomUUID().toString();
     }
-
-    @PreUpdate
-    void onUpdate() {
-        updatedAt = Instant.now();
+    Instant now = Instant.now();
+    if (createdAt == null) {
+      createdAt = now;
     }
+    updatedAt = now;
+  }
 
-    public String getId() {
-        return id;
-    }
+  @PreUpdate
+  void onUpdate() {
+    updatedAt = Instant.now();
+  }
 
-    public String getUserId() {
-        return userId;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
+  public String getUserId() {
+    return userId;
+  }
 
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
+  public void setUserId(String userId) {
+    this.userId = userId;
+  }
 
-    public Instant getAbandonedCartEmailSentAt() {
-        return abandonedCartEmailSentAt;
-    }
+  public Instant getUpdatedAt() {
+    return updatedAt;
+  }
 
-    public void setAbandonedCartEmailSentAt(Instant abandonedCartEmailSentAt) {
-        this.abandonedCartEmailSentAt = abandonedCartEmailSentAt;
-    }
+  public Instant getAbandonedCartEmailSentAt() {
+    return abandonedCartEmailSentAt;
+  }
+
+  public void setAbandonedCartEmailSentAt(Instant abandonedCartEmailSentAt) {
+    this.abandonedCartEmailSentAt = abandonedCartEmailSentAt;
+  }
 }

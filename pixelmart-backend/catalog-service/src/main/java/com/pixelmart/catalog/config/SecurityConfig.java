@@ -17,25 +17,35 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Bean
-    SecurityFilterChain securityFilterChain(
-            HttpSecurity http,
-            InternalServiceAuthFilter internalServiceAuthFilter,
-            GatewayHeaderAuthenticationFilter gatewayFilter
-    ) throws Exception {
-        http.csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/**", "/api/catalog/health").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/api/catalog/internal/**").permitAll()
-                        .requestMatchers("/api/catalog/wishlist", "/api/catalog/wishlist/**").authenticated()
-                        .requestMatchers("/api/catalog/reviews", "/api/catalog/reviews/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/catalog/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated())
-                .addFilterBefore(internalServiceAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(gatewayFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
+  @Bean
+  SecurityFilterChain securityFilterChain(
+      HttpSecurity http,
+      InternalServiceAuthFilter internalServiceAuthFilter,
+      GatewayHeaderAuthenticationFilter gatewayFilter)
+      throws Exception {
+    http.csrf(csrf -> csrf.disable())
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers("/actuator/**", "/api/catalog/health")
+                    .permitAll()
+                    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
+                    .permitAll()
+                    .requestMatchers("/api/catalog/internal/**")
+                    .permitAll()
+                    .requestMatchers("/api/catalog/wishlist", "/api/catalog/wishlist/**")
+                    .authenticated()
+                    .requestMatchers("/api/catalog/reviews", "/api/catalog/reviews/**")
+                    .authenticated()
+                    .requestMatchers(HttpMethod.GET, "/api/catalog/**")
+                    .permitAll()
+                    .requestMatchers("/api/admin/**")
+                    .hasRole("ADMIN")
+                    .anyRequest()
+                    .authenticated())
+        .addFilterBefore(internalServiceAuthFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(gatewayFilter, UsernamePasswordAuthenticationFilter.class);
+    return http.build();
+  }
 }

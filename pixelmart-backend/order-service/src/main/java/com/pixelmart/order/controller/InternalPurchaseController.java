@@ -10,22 +10,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/orders/internal")
 public class InternalPurchaseController {
 
-    private final PurchaseVerificationService purchaseVerificationService;
+  private final PurchaseVerificationService purchaseVerificationService;
 
-    public InternalPurchaseController(PurchaseVerificationService purchaseVerificationService) {
-        this.purchaseVerificationService = purchaseVerificationService;
-    }
+  public InternalPurchaseController(PurchaseVerificationService purchaseVerificationService) {
+    this.purchaseVerificationService = purchaseVerificationService;
+  }
 
-    @GetMapping("/purchase-verification")
-    public PurchaseVerificationResponse verify(
-            @RequestParam String userId,
-            @RequestParam String productId
-    ) {
-        return new PurchaseVerificationResponse(
-                purchaseVerificationService.hasDeliveredPurchase(userId, productId)
-        );
-    }
+  @GetMapping("/purchase-verification")
+  public PurchaseVerificationResponse verify(
+      @RequestParam String userId, @RequestParam String productId) {
+    return new PurchaseVerificationResponse(
+        purchaseVerificationService.hasDeliveredPurchase(userId, productId));
+  }
 
-    public record PurchaseVerificationResponse(boolean verified) {
-    }
+  public record PurchaseVerificationResponse(boolean verified) {}
 }

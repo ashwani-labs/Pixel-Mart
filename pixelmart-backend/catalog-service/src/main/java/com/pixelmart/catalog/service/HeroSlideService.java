@@ -7,56 +7,54 @@ import com.pixelmart.catalog.dto.HeroSlideDtos.HeroSlideDto;
 import com.pixelmart.catalog.dto.HeroSlideDtos.HeroSlidesResponse;
 import com.pixelmart.catalog.dto.HeroSlideDtos.UpdateHeroSlidesRequest;
 import com.pixelmart.catalog.exception.BadRequestException;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 public class HeroSlideService {
 
-    private static final TypeReference<List<HeroSlideDto>> SLIDE_LIST_TYPE = new TypeReference<>() {
-    };
+  private static final TypeReference<List<HeroSlideDto>> SLIDE_LIST_TYPE = new TypeReference<>() {};
 
-    private final StoreSettingsService storeSettingsService;
-    private final ObjectMapper objectMapper;
+  private final StoreSettingsService storeSettingsService;
+  private final ObjectMapper objectMapper;
 
-    public HeroSlideService(StoreSettingsService storeSettingsService, ObjectMapper objectMapper) {
-        this.storeSettingsService = storeSettingsService;
-        this.objectMapper = objectMapper;
+  public HeroSlideService(StoreSettingsService storeSettingsService, ObjectMapper objectMapper) {
+    this.storeSettingsService = storeSettingsService;
+    this.objectMapper = objectMapper;
+  }
+
+  @Transactional(readOnly = true)
+  public HeroSlidesResponse getPublic() {
+    return new HeroSlidesResponse(loadSlides());
+  }
+
+  @Transactional(readOnly = true)
+  public HeroSlidesResponse getAdmin() {
+    return new HeroSlidesResponse(loadSlides());
+  }
+
+  @Transactional
+  public HeroSlidesResponse update(UpdateHeroSlidesRequest request) {
+    StoreSettings settings = storeSettingsService.findSettings();
+    try {
+      settings.setHeroSlidesJson(objectMapper.writeValueAsString(request.slides()));
+    } catch (Exception ex) {
+      throw new BadRequestException("Could not save hero slides");
     }
+    storeSettingsService.save(settings);
+    return new HeroSlidesResponse(request.slides());
+  }
 
-    @Transactional(readOnly = true)
-    public HeroSlidesResponse getPublic() {
-        return new HeroSlidesResponse(loadSlides());
+  List<HeroSlideDto> loadSlides() {
+    StoreSettings settings = storeSettingsService.findSettings();
+    if (settings.getHeroSlidesJson() == null || settings.getHeroSlidesJson().isBlank()) {
+      return HeroSlideDefaults.defaultSlides();
     }
-
-    @Transactional(readOnly = true)
-    public HeroSlidesResponse getAdmin() {
-        return new HeroSlidesResponse(loadSlides());
+    try {
+      return objectMapper.readValue(settings.getHeroSlidesJson(), SLIDE_LIST_TYPE);
+    } catch (Exception ex) {
+      return HeroSlideDefaults.defaultSlides();
     }
-
-    @Transactional
-    public HeroSlidesResponse update(UpdateHeroSlidesRequest request) {
-        StoreSettings settings = storeSettingsService.findSettings();
-        try {
-            settings.setHeroSlidesJson(objectMapper.writeValueAsString(request.slides()));
-        } catch (Exception ex) {
-            throw new BadRequestException("Could not save hero slides");
-        }
-        storeSettingsService.save(settings);
-        return new HeroSlidesResponse(request.slides());
-    }
-
-    List<HeroSlideDto> loadSlides() {
-        StoreSettings settings = storeSettingsService.findSettings();
-        if (settings.getHeroSlidesJson() == null || settings.getHeroSlidesJson().isBlank()) {
-            return HeroSlideDefaults.defaultSlides();
-        }
-        try {
-            return objectMapper.readValue(settings.getHeroSlidesJson(), SLIDE_LIST_TYPE);
-        } catch (Exception ex) {
-            return HeroSlideDefaults.defaultSlides();
-        }
-    }
+  }
 }

@@ -8,87 +8,87 @@ import java.util.UUID;
 @Table(name = "categories")
 public class Category {
 
-    @Id
-    @Column(length = 36, nullable = false)
-    private String id;
+  @Id
+  @Column(length = 36, nullable = false)
+  private String id;
 
-    @Column(nullable = false)
-    private String name;
+  @Column(nullable = false)
+  private String name;
 
-    @Column(nullable = false, unique = true)
-    private String slug;
+  @Column(nullable = false, unique = true)
+  private String slug;
 
-    @Column(name = "parent_id", length = 36)
-    private String parentId;
+  @Column(name = "parent_id", length = 36)
+  private String parentId;
 
-    @Column(name = "sort_order", nullable = false)
-    private int sortOrder;
+  @Column(name = "sort_order", nullable = false)
+  private int sortOrder;
 
-    @Column(nullable = false)
-    private boolean active = true;
+  @Column(nullable = false)
+  private boolean active = true;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
+  @Column(name = "created_at", nullable = false, updatable = false)
+  private Instant createdAt;
 
-    @PrePersist
-    void onCreate() {
-        if (id == null) {
-            id = UUID.randomUUID().toString();
-        }
-        if (createdAt == null) {
-            createdAt = Instant.now();
-        }
+  @PrePersist
+  void onCreate() {
+    if (id == null) {
+      id = UUID.randomUUID().toString();
     }
-
-    public String getId() {
-        return id;
+    if (createdAt == null) {
+      createdAt = Instant.now();
     }
+  }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public void setId(String id) {
+    this.id = id;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getSlug() {
-        return slug;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public void setSlug(String slug) {
-        this.slug = slug;
-    }
+  public String getSlug() {
+    return slug;
+  }
 
-    public String getParentId() {
-        return parentId;
-    }
+  public void setSlug(String slug) {
+    this.slug = slug;
+  }
 
-    public void setParentId(String parentId) {
-        this.parentId = parentId;
-    }
+  public String getParentId() {
+    return parentId;
+  }
 
-    public int getSortOrder() {
-        return sortOrder;
-    }
+  public void setParentId(String parentId) {
+    this.parentId = parentId;
+  }
 
-    public void setSortOrder(int sortOrder) {
-        this.sortOrder = sortOrder;
-    }
+  public int getSortOrder() {
+    return sortOrder;
+  }
 
-    public boolean isActive() {
-        return active;
-    }
+  public void setSortOrder(int sortOrder) {
+    this.sortOrder = sortOrder;
+  }
 
-    public void setActive(boolean active) {
-        this.active = active;
-    }
+  public boolean isActive() {
+    return active;
+  }
 
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
+  public void setActive(boolean active) {
+    this.active = active;
+  }
+
+  public Instant getCreatedAt() {
+    return createdAt;
+  }
 }

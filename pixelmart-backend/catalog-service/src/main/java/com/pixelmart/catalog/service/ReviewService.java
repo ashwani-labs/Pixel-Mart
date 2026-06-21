@@ -16,147 +16,154 @@ import com.pixelmart.catalog.exception.ResourceNotFoundException;
 import com.pixelmart.catalog.repository.ProductRepository;
 import com.pixelmart.catalog.repository.ReviewRepository;
 import com.pixelmart.catalog.security.CurrentUser;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 @Service
 public class ReviewService {
 
-    private final ReviewRepository reviewRepository;
-    private final ProductRepository productRepository;
-    private final ProductService productService;
-    private final OrderClient orderClient;
-    private final AuthClient authClient;
-    private final AuditLogService auditLogService;
+  private final ReviewRepository reviewRepository;
+  private final ProductRepository productRepository;
+  private final ProductService productService;
+  private final OrderClient orderClient;
+  private final AuthClient authClient;
+  private final AuditLogService auditLogService;
 
-    public ReviewService(
-            ReviewRepository reviewRepository,
-            ProductRepository productRepository,
-            ProductService productService,
-            OrderClient orderClient,
-            AuthClient authClient,
-            AuditLogService auditLogService
-    ) {
-        this.reviewRepository = reviewRepository;
-        this.productRepository = productRepository;
-        this.productService = productService;
-        this.orderClient = orderClient;
-        this.authClient = authClient;
-        this.auditLogService = auditLogService;
+  public ReviewService(
+      ReviewRepository reviewRepository,
+      ProductRepository productRepository,
+      ProductService productService,
+      OrderClient orderClient,
+      AuthClient authClient,
+      AuditLogService auditLogService) {
+    this.reviewRepository = reviewRepository;
+    this.productRepository = productRepository;
+    this.productService = productService;
+    this.orderClient = orderClient;
+    this.authClient = authClient;
+    this.auditLogService = auditLogService;
+  }
+
+  @Transactional(readOnly = true)
+  public List<ReviewResponse> listApprovedForProduct(String productId) {
+    productService.findProduct(productId);
+    return reviewRepository
+        .findByProductIdAndStatusOrderByCreatedAtDesc(productId, ReviewStatus.APPROVED)
+        .stream()
+        .map(ReviewResponse::fromPublic)
+        .toList();
+  }
+
+  @Transactional(readOnly = true)
+  public ReviewResponse getCurrentUserReview(String productId) {
+    String userId = CurrentUser.requireUserId();
+    return reviewRepository
+        .findByUserIdAndProductId(userId, productId)
+        .map(ReviewResponse::fromPublic)
+        .orElse(null);
+  }
+
+  @Transactional
+  public ReviewResponse submit(SubmitReviewRequest request) {
+    String userId = CurrentUser.requireUserId();
+    Product product = productService.findProduct(request.productId());
+    if (!product.isVisible()) {
+      throw new BadRequestException("Product is not available for review");
+    }
+    if (reviewRepository.findByUserIdAndProductId(userId, request.productId()).isPresent()) {
+      throw new ConflictException("You have already reviewed this product");
+    }
+    if (!orderClient.hasDeliveredPurchase(userId, request.productId())) {
+      throw new BadRequestException(
+          "Only customers with a delivered order can review this product");
     }
 
-    @Transactional(readOnly = true)
-    public List<ReviewResponse> listApprovedForProduct(String productId) {
-        productService.findProduct(productId);
-        return reviewRepository.findByProductIdAndStatusOrderByCreatedAtDesc(productId, ReviewStatus.APPROVED).stream()
-                .map(ReviewResponse::fromPublic)
-                .toList();
+    AuthUserSnapshot user = authClient.getUser(userId);
+    Review review = new Review();
+    review.setProductId(request.productId());
+    review.setUserId(userId);
+    review.setReviewerName(user.name());
+    review.setRating(request.rating());
+    review.setTitle(normalize(request.title()));
+    review.setBody(request.body().trim());
+    review.setStatus(ReviewStatus.PENDING);
+    review.setVerifiedPurchase(true);
+    return ReviewResponse.fromPublic(reviewRepository.save(review));
+  }
+
+  @Transactional(readOnly = true)
+  public PageResponse<ReviewResponse> listAdmin(String status, Pageable pageable) {
+    Page<Review> page;
+    if (status == null || status.isBlank()) {
+      page = reviewRepository.findAllByOrderByCreatedAtDesc(pageable);
+    } else {
+      ReviewStatus reviewStatus = parseModerationStatus(status);
+      page = reviewRepository.findByStatusOrderByCreatedAtDesc(reviewStatus, pageable);
     }
 
-    @Transactional(readOnly = true)
-    public ReviewResponse getCurrentUserReview(String productId) {
-        String userId = CurrentUser.requireUserId();
-        return reviewRepository.findByUserIdAndProductId(userId, productId)
-                .map(ReviewResponse::fromPublic)
-                .orElse(null);
+    Map<String, Product> productsById =
+        productRepository
+            .findAllById(
+                page.getContent().stream().map(Review::getProductId).collect(Collectors.toSet()))
+            .stream()
+            .collect(Collectors.toMap(Product::getId, Function.identity()));
+
+    List<ReviewResponse> content =
+        page.getContent().stream()
+            .map(
+                review -> ReviewResponse.fromAdmin(review, productsById.get(review.getProductId())))
+            .toList();
+    return new PageResponse<>(
+        content,
+        page.getNumber(),
+        page.getSize(),
+        page.getTotalElements(),
+        page.getTotalPages(),
+        page.isLast());
+  }
+
+  @Transactional
+  public ReviewResponse moderate(String id, ModerateReviewRequest request) {
+    Review review =
+        reviewRepository
+            .findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Review", id));
+    ReviewStatus nextStatus = parseModerationStatus(request.status());
+    if (nextStatus == ReviewStatus.PENDING) {
+      throw new BadRequestException("Moderation status must be APPROVED or REJECTED");
     }
+    ReviewStatus previousStatus = review.getStatus();
+    review.setStatus(nextStatus);
+    Product product = productRepository.findById(review.getProductId()).orElse(null);
+    Review saved = reviewRepository.save(review);
+    auditLogService.log(
+        "REVIEW_MODERATED",
+        "review",
+        id,
+        Map.of("status", previousStatus.name()),
+        Map.of("status", saved.getStatus().name()));
+    return ReviewResponse.fromAdmin(saved, product);
+  }
 
-    @Transactional
-    public ReviewResponse submit(SubmitReviewRequest request) {
-        String userId = CurrentUser.requireUserId();
-        Product product = productService.findProduct(request.productId());
-        if (!product.isVisible()) {
-            throw new BadRequestException("Product is not available for review");
-        }
-        if (reviewRepository.findByUserIdAndProductId(userId, request.productId()).isPresent()) {
-            throw new ConflictException("You have already reviewed this product");
-        }
-        if (!orderClient.hasDeliveredPurchase(userId, request.productId())) {
-            throw new BadRequestException("Only customers with a delivered order can review this product");
-        }
-
-        AuthUserSnapshot user = authClient.getUser(userId);
-        Review review = new Review();
-        review.setProductId(request.productId());
-        review.setUserId(userId);
-        review.setReviewerName(user.name());
-        review.setRating(request.rating());
-        review.setTitle(normalize(request.title()));
-        review.setBody(request.body().trim());
-        review.setStatus(ReviewStatus.PENDING);
-        review.setVerifiedPurchase(true);
-        return ReviewResponse.fromPublic(reviewRepository.save(review));
+  private ReviewStatus parseModerationStatus(String status) {
+    try {
+      return ReviewStatus.valueOf(status.trim().toUpperCase());
+    } catch (IllegalArgumentException ex) {
+      throw new BadRequestException("Invalid review status: " + status);
     }
+  }
 
-    @Transactional(readOnly = true)
-    public PageResponse<ReviewResponse> listAdmin(String status, Pageable pageable) {
-        Page<Review> page;
-        if (status == null || status.isBlank()) {
-            page = reviewRepository.findAllByOrderByCreatedAtDesc(pageable);
-        } else {
-            ReviewStatus reviewStatus = parseModerationStatus(status);
-            page = reviewRepository.findByStatusOrderByCreatedAtDesc(reviewStatus, pageable);
-        }
-
-        Map<String, Product> productsById = productRepository.findAllById(
-                page.getContent().stream().map(Review::getProductId).collect(Collectors.toSet())
-        ).stream().collect(Collectors.toMap(Product::getId, Function.identity()));
-
-        List<ReviewResponse> content = page.getContent().stream()
-                .map(review -> ReviewResponse.fromAdmin(review, productsById.get(review.getProductId())))
-                .toList();
-        return new PageResponse<>(
-                content,
-                page.getNumber(),
-                page.getSize(),
-                page.getTotalElements(),
-                page.getTotalPages(),
-                page.isLast()
-        );
+  private String normalize(String value) {
+    if (value == null) {
+      return null;
     }
-
-    @Transactional
-    public ReviewResponse moderate(String id, ModerateReviewRequest request) {
-        Review review = reviewRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Review", id));
-        ReviewStatus nextStatus = parseModerationStatus(request.status());
-        if (nextStatus == ReviewStatus.PENDING) {
-            throw new BadRequestException("Moderation status must be APPROVED or REJECTED");
-        }
-        ReviewStatus previousStatus = review.getStatus();
-        review.setStatus(nextStatus);
-        Product product = productRepository.findById(review.getProductId()).orElse(null);
-        Review saved = reviewRepository.save(review);
-        auditLogService.log(
-                "REVIEW_MODERATED",
-                "review",
-                id,
-                Map.of("status", previousStatus.name()),
-                Map.of("status", saved.getStatus().name())
-        );
-        return ReviewResponse.fromAdmin(saved, product);
-    }
-
-    private ReviewStatus parseModerationStatus(String status) {
-        try {
-            return ReviewStatus.valueOf(status.trim().toUpperCase());
-        } catch (IllegalArgumentException ex) {
-            throw new BadRequestException("Invalid review status: " + status);
-        }
-    }
-
-    private String normalize(String value) {
-        if (value == null) {
-            return null;
-        }
-        String trimmed = value.trim();
-        return trimmed.isEmpty() ? null : trimmed;
-    }
+    String trimmed = value.trim();
+    return trimmed.isEmpty() ? null : trimmed;
+  }
 }

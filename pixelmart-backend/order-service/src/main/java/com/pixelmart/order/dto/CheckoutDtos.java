@@ -3,162 +3,137 @@ package com.pixelmart.order.dto;
 import com.pixelmart.order.domain.Order;
 import com.pixelmart.order.domain.OrderItem;
 import com.pixelmart.order.domain.Payment;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.Valid;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
 public final class CheckoutDtos {
 
-    private CheckoutDtos() {
-    }
+  private CheckoutDtos() {}
 
-    public enum PaymentMethod {
-        MOCK_CARD,
-        MOCK_UPI,
-        MOCK_WALLET,
-        MOCK_COD
-    }
+  public enum PaymentMethod {
+    MOCK_CARD,
+    MOCK_UPI,
+    MOCK_WALLET,
+    MOCK_COD
+  }
 
-    public record CheckoutRequest(
-            @NotBlank String addressId,
-            @NotNull PaymentMethod paymentMethod,
-            String couponCode
-    ) {
-    }
+  public record CheckoutRequest(
+      @NotBlank String addressId, @NotNull PaymentMethod paymentMethod, String couponCode) {}
 
-    public record GuestCartLineRequest(
-            @NotBlank String productId,
-            @NotNull @Min(1) Integer quantity
-    ) {
-    }
+  public record GuestCartLineRequest(
+      @NotBlank String productId, @NotNull @Min(1) Integer quantity) {}
 
-    public record GuestCheckoutRequest(
-            @NotBlank @Email String email,
-            @NotBlank String fullName,
-            @NotBlank String phone,
-            @NotBlank String addressLine1,
-            String addressLine2,
-            @NotBlank String city,
-            @NotBlank String state,
-            @NotBlank @Pattern(regexp = "^[0-9]{6}$") String pincode,
-            String country,
-            String postOfficeName,
-            @NotNull PaymentMethod paymentMethod,
-            String couponCode,
-            @NotEmpty List<@Valid GuestCartLineRequest> items
-    ) {
-    }
+  public record GuestCheckoutRequest(
+      @NotBlank @Email String email,
+      @NotBlank String fullName,
+      @NotBlank String phone,
+      @NotBlank String addressLine1,
+      String addressLine2,
+      @NotBlank String city,
+      @NotBlank String state,
+      @NotBlank @Pattern(regexp = "^[0-9]{6}$") String pincode,
+      String country,
+      String postOfficeName,
+      @NotNull PaymentMethod paymentMethod,
+      String couponCode,
+      @NotEmpty List<@Valid GuestCartLineRequest> items) {}
 
-    public record GuestCheckoutResponse(
-            OrderResponse order,
-            String accessToken,
-            long expiresIn,
-            String userId,
-            String email,
-            String userName
-    ) {
-    }
+  public record GuestCheckoutResponse(
+      OrderResponse order,
+      String accessToken,
+      long expiresIn,
+      String userId,
+      String email,
+      String userName) {}
 
-    public record OrderItemResponse(
-            String productId,
-            String productName,
-            String productSlug,
-            BigDecimal unitPrice,
-            int quantity,
-            BigDecimal lineTotal
-    ) {
-        public static OrderItemResponse from(OrderItem item) {
-            return new OrderItemResponse(
-                    item.getProductId(),
-                    item.getProductName(),
-                    item.getProductSlug(),
-                    item.getUnitPrice(),
-                    item.getQuantity(),
-                    item.getLineTotal()
-            );
-        }
+  public record OrderItemResponse(
+      String productId,
+      String productName,
+      String productSlug,
+      BigDecimal unitPrice,
+      int quantity,
+      BigDecimal lineTotal) {
+    public static OrderItemResponse from(OrderItem item) {
+      return new OrderItemResponse(
+          item.getProductId(),
+          item.getProductName(),
+          item.getProductSlug(),
+          item.getUnitPrice(),
+          item.getQuantity(),
+          item.getLineTotal());
     }
+  }
 
-    public record PaymentResponse(
-            String method,
-            String status,
-            BigDecimal amount,
-            String providerReference
-    ) {
-        public static PaymentResponse from(Payment payment) {
-            return new PaymentResponse(
-                    payment.getMethod(),
-                    payment.getStatus(),
-                    payment.getAmount(),
-                    payment.getProviderReference()
-            );
-        }
+  public record PaymentResponse(
+      String method, String status, BigDecimal amount, String providerReference) {
+    public static PaymentResponse from(Payment payment) {
+      return new PaymentResponse(
+          payment.getMethod(),
+          payment.getStatus(),
+          payment.getAmount(),
+          payment.getProviderReference());
     }
+  }
 
-    public record UpdateOrderStatusRequest(
-            @NotBlank String status
-    ) {
-    }
+  public record UpdateOrderStatusRequest(@NotBlank String status) {}
 
-    public record OrderResponse(
-            String id,
-            String orderNumber,
-            String status,
-            Instant createdAt,
-            BigDecimal subtotal,
-            BigDecimal discountTotal,
-            String discountLabel,
-            BigDecimal taxTotal,
-            BigDecimal grandTotal,
-            String taxLabel,
-            BigDecimal taxRatePercent,
-            String shipToName,
-            String shipToPhone,
-            String shipAddressLine1,
-            String shipAddressLine2,
-            String shipCity,
-            String shipState,
-            String shipPincode,
-            String shipCountry,
-            String shipPostOfficeName,
-            String trackingNumber,
-            List<OrderItemResponse> items,
-            PaymentResponse payment
-    ) {
-        public static OrderResponse from(Order order, List<OrderItem> items, Payment payment) {
-            return new OrderResponse(
-                    order.getId(),
-                    order.getOrderNumber(),
-                    order.getStatus(),
-                    order.getCreatedAt(),
-                    order.getSubtotal(),
-                    order.getDiscountTotal(),
-                    order.getDiscountLabel(),
-                    order.getTaxTotal(),
-                    order.getGrandTotal(),
-                    order.getTaxLabel(),
-                    order.getTaxRatePercent(),
-                    order.getShipToName(),
-                    order.getShipToPhone(),
-                    order.getShipAddressLine1(),
-                    order.getShipAddressLine2(),
-                    order.getShipCity(),
-                    order.getShipState(),
-                    order.getShipPincode(),
-                    order.getShipCountry(),
-                    order.getShipPostOfficeName(),
-                    order.getTrackingNumber(),
-                    items.stream().map(OrderItemResponse::from).toList(),
-                    PaymentResponse.from(payment)
-            );
-        }
+  public record OrderResponse(
+      String id,
+      String orderNumber,
+      String status,
+      Instant createdAt,
+      BigDecimal subtotal,
+      BigDecimal discountTotal,
+      String discountLabel,
+      BigDecimal taxTotal,
+      BigDecimal grandTotal,
+      String taxLabel,
+      BigDecimal taxRatePercent,
+      String shipToName,
+      String shipToPhone,
+      String shipAddressLine1,
+      String shipAddressLine2,
+      String shipCity,
+      String shipState,
+      String shipPincode,
+      String shipCountry,
+      String shipPostOfficeName,
+      String trackingNumber,
+      List<OrderItemResponse> items,
+      PaymentResponse payment) {
+    public static OrderResponse from(Order order, List<OrderItem> items, Payment payment) {
+      return new OrderResponse(
+          order.getId(),
+          order.getOrderNumber(),
+          order.getStatus(),
+          order.getCreatedAt(),
+          order.getSubtotal(),
+          order.getDiscountTotal(),
+          order.getDiscountLabel(),
+          order.getTaxTotal(),
+          order.getGrandTotal(),
+          order.getTaxLabel(),
+          order.getTaxRatePercent(),
+          order.getShipToName(),
+          order.getShipToPhone(),
+          order.getShipAddressLine1(),
+          order.getShipAddressLine2(),
+          order.getShipCity(),
+          order.getShipState(),
+          order.getShipPincode(),
+          order.getShipCountry(),
+          order.getShipPostOfficeName(),
+          order.getTrackingNumber(),
+          items.stream().map(OrderItemResponse::from).toList(),
+          PaymentResponse.from(payment));
     }
+  }
 }

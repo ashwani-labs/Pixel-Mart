@@ -11,15 +11,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/internal/email")
 public class OrderConfirmationController {
 
-    private final OrderConfirmationEmailService emailService;
+  private final OrderConfirmationEmailService emailService;
 
-    public OrderConfirmationController(OrderConfirmationEmailService emailService) {
-        this.emailService = emailService;
-    }
+  public OrderConfirmationController(OrderConfirmationEmailService emailService) {
+    this.emailService = emailService;
+  }
 
-    @PostMapping("/order-confirmation")
-    @ResponseStatus(HttpStatus.CREATED)
-    public EmailOutboxResponse orderConfirmation(@Valid @RequestBody OrderConfirmationRequest request) {
-        return emailService.sendOrderConfirmation(request);
-    }
+  @PostMapping("/order-confirmation")
+  @ResponseStatus(HttpStatus.CREATED)
+  public EmailOutboxResponse orderConfirmation(
+      @Valid @RequestBody OrderConfirmationRequest request) {
+    return emailService.sendOrderConfirmation(request);
+  }
 }

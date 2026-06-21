@@ -19,23 +19,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth/internal/users")
 public class InternalUserController {
 
-    private final UserRepository userRepository;
-    private final GuestAuthService guestAuthService;
+  private final UserRepository userRepository;
+  private final GuestAuthService guestAuthService;
 
-    public InternalUserController(UserRepository userRepository, GuestAuthService guestAuthService) {
-        this.userRepository = userRepository;
-        this.guestAuthService = guestAuthService;
-    }
+  public InternalUserController(UserRepository userRepository, GuestAuthService guestAuthService) {
+    this.userRepository = userRepository;
+    this.guestAuthService = guestAuthService;
+  }
 
-    @PostMapping("/guest-session")
-    public InternalGuestSessionResponse guestSession(@Valid @RequestBody InternalGuestSessionRequest request) {
-        return guestAuthService.createGuestSession(request);
-    }
+  @PostMapping("/guest-session")
+  public InternalGuestSessionResponse guestSession(
+      @Valid @RequestBody InternalGuestSessionRequest request) {
+    return guestAuthService.createGuestSession(request);
+  }
 
-    @GetMapping("/{id}")
-    public InternalUserResponse getById(@PathVariable String id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User", id));
-        return new InternalUserResponse(user.getId(), user.getEmail(), user.getName());
-    }
+  @GetMapping("/{id}")
+  public InternalUserResponse getById(@PathVariable String id) {
+    User user =
+        userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", id));
+    return new InternalUserResponse(user.getId(), user.getEmail(), user.getName());
+  }
 }

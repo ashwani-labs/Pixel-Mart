@@ -14,36 +14,33 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 public class OrderClient {
 
-    private final RestTemplate restTemplate;
-    private final OrderClientProperties properties;
+  private final RestTemplate restTemplate;
+  private final OrderClientProperties properties;
 
-    public OrderClient(RestTemplateBuilder builder, OrderClientProperties properties) {
-        this.restTemplate = builder.build();
-        this.properties = properties;
-    }
+  public OrderClient(RestTemplateBuilder builder, OrderClientProperties properties) {
+    this.restTemplate = builder.build();
+    this.properties = properties;
+  }
 
-    public boolean hasDeliveredPurchase(String userId, String productId) {
-        String url = UriComponentsBuilder
-                .fromUriString(properties.getBaseUrl() + "/api/orders/internal/purchase-verification")
-                .queryParam("userId", userId)
-                .queryParam("productId", productId)
-                .toUriString();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-Internal-Service", properties.getInternalServiceName());
-        try {
-            ResponseEntity<PurchaseVerificationResponse> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    new HttpEntity<>(headers),
-                    PurchaseVerificationResponse.class
-            );
-            PurchaseVerificationResponse body = response.getBody();
-            return body != null && body.verified();
-        } catch (HttpStatusCodeException ex) {
-            throw new BadRequestException("Unable to verify purchase history");
-        }
+  public boolean hasDeliveredPurchase(String userId, String productId) {
+    String url =
+        UriComponentsBuilder.fromUriString(
+                properties.getBaseUrl() + "/api/orders/internal/purchase-verification")
+            .queryParam("userId", userId)
+            .queryParam("productId", productId)
+            .toUriString();
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("X-Internal-Service", properties.getInternalServiceName());
+    try {
+      ResponseEntity<PurchaseVerificationResponse> response =
+          restTemplate.exchange(
+              url, HttpMethod.GET, new HttpEntity<>(headers), PurchaseVerificationResponse.class);
+      PurchaseVerificationResponse body = response.getBody();
+      return body != null && body.verified();
+    } catch (HttpStatusCodeException ex) {
+      throw new BadRequestException("Unable to verify purchase history");
     }
+  }
 
-    public record PurchaseVerificationResponse(boolean verified) {
-    }
+  public record PurchaseVerificationResponse(boolean verified) {}
 }

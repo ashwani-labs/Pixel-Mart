@@ -8,19 +8,13 @@ import jakarta.validation.constraints.Size;
 
 public final class ReviewRequests {
 
-    private ReviewRequests() {
-    }
+  private ReviewRequests() {}
 
-    public record SubmitReviewRequest(
-            @NotBlank String productId,
-            @NotNull @Min(1) @Max(5) Integer rating,
-            @Size(max = 255) String title,
-            @NotBlank @Size(max = 2000) String body
-    ) {
-    }
+  public record SubmitReviewRequest(
+      @NotBlank String productId,
+      @NotNull @Min(1) @Max(5) Integer rating,
+      @Size(max = 255) String title,
+      @NotBlank @Size(max = 2000) String body) {}
 
-    public record ModerateReviewRequest(
-            @NotBlank String status
-    ) {
-    }
+  public record ModerateReviewRequest(@NotBlank String status) {}
 }

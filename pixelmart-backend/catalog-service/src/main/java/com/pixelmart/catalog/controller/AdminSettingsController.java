@@ -14,24 +14,24 @@ import org.springframework.web.multipart.MultipartFile;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminSettingsController {
 
-    private final StoreSettingsService storeSettingsService;
+  private final StoreSettingsService storeSettingsService;
 
-    public AdminSettingsController(StoreSettingsService storeSettingsService) {
-        this.storeSettingsService = storeSettingsService;
-    }
+  public AdminSettingsController(StoreSettingsService storeSettingsService) {
+    this.storeSettingsService = storeSettingsService;
+  }
 
-    @GetMapping("/store")
-    public AdminStoreSettingsResponse get() {
-        return storeSettingsService.getAdmin();
-    }
+  @GetMapping("/store")
+  public AdminStoreSettingsResponse get() {
+    return storeSettingsService.getAdmin();
+  }
 
-    @PutMapping("/store")
-    public AdminStoreSettingsResponse update(@Valid @RequestBody UpdateStoreSettingsRequest request) {
-        return storeSettingsService.update(request);
-    }
+  @PutMapping("/store")
+  public AdminStoreSettingsResponse update(@Valid @RequestBody UpdateStoreSettingsRequest request) {
+    return storeSettingsService.update(request);
+  }
 
-    @PostMapping(value = "/logo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public AdminStoreSettingsResponse uploadLogo(@RequestParam("file") MultipartFile file) {
-        return storeSettingsService.uploadLogo(file);
-    }
+  @PostMapping(value = "/logo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public AdminStoreSettingsResponse uploadLogo(@RequestParam("file") MultipartFile file) {
+    return storeSettingsService.uploadLogo(file);
+  }
 }

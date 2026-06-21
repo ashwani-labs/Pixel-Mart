@@ -17,20 +17,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/catalog/reviews")
 public class ReviewController {
 
-    private final ReviewService reviewService;
+  private final ReviewService reviewService;
 
-    public ReviewController(ReviewService reviewService) {
-        this.reviewService = reviewService;
-    }
+  public ReviewController(ReviewService reviewService) {
+    this.reviewService = reviewService;
+  }
 
-    @GetMapping("/me")
-    public ReviewResponse myReview(@RequestParam String productId) {
-        return reviewService.getCurrentUserReview(productId);
-    }
+  @GetMapping("/me")
+  public ReviewResponse myReview(@RequestParam String productId) {
+    return reviewService.getCurrentUserReview(productId);
+  }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public ReviewResponse submit(@Valid @RequestBody SubmitReviewRequest request) {
-        return reviewService.submit(request);
-    }
+  @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
+  public ReviewResponse submit(@Valid @RequestBody SubmitReviewRequest request) {
+    return reviewService.submit(request);
+  }
 }

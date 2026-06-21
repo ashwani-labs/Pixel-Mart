@@ -9,10 +9,9 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableConfigurationProperties({
-        CatalogClientProperties.class,
-        PincodeClientProperties.class,
-        AuthClientProperties.class,
-        NotificationClientProperties.class
+  CatalogClientProperties.class,
+  PincodeClientProperties.class,
+  AuthClientProperties.class,
+  NotificationClientProperties.class
 })
-public class CatalogClientConfig {
-}
+public class CatalogClientConfig {}

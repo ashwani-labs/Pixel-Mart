@@ -12,30 +12,31 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/orders/cart/items")
 public class CartController {
 
-    private final CartService cartService;
+  private final CartService cartService;
 
-    public CartController(CartService cartService) {
-        this.cartService = cartService;
-    }
+  public CartController(CartService cartService) {
+    this.cartService = cartService;
+  }
 
-    @GetMapping
-    public CartResponse list(@RequestParam(required = false) String couponCode) {
-        return cartService.getCart(couponCode);
-    }
+  @GetMapping
+  public CartResponse list(@RequestParam(required = false) String couponCode) {
+    return cartService.getCart(couponCode);
+  }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public CartResponse add(@Valid @RequestBody AddCartItemRequest request) {
-        return cartService.addItem(request);
-    }
+  @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
+  public CartResponse add(@Valid @RequestBody AddCartItemRequest request) {
+    return cartService.addItem(request);
+  }
 
-    @PatchMapping("/{id}")
-    public CartResponse update(@PathVariable String id, @Valid @RequestBody UpdateCartItemRequest request) {
-        return cartService.updateItem(id, request);
-    }
+  @PatchMapping("/{id}")
+  public CartResponse update(
+      @PathVariable String id, @Valid @RequestBody UpdateCartItemRequest request) {
+    return cartService.updateItem(id, request);
+  }
 
-    @DeleteMapping("/{id}")
-    public CartResponse remove(@PathVariable String id) {
-        return cartService.removeItem(id);
-    }
+  @DeleteMapping("/{id}")
+  public CartResponse remove(@PathVariable String id) {
+    return cartService.removeItem(id);
+  }
 }

@@ -9,100 +9,100 @@ import java.util.UUID;
 @Table(name = "cart_items")
 public class CartItem {
 
-    @Id
-    @Column(length = 36, nullable = false)
-    private String id;
+  @Id
+  @Column(length = 36, nullable = false)
+  private String id;
 
-    @Column(name = "cart_id", length = 36, nullable = false)
-    private String cartId;
+  @Column(name = "cart_id", length = 36, nullable = false)
+  private String cartId;
 
-    @Column(name = "product_id", length = 36, nullable = false)
-    private String productId;
+  @Column(name = "product_id", length = 36, nullable = false)
+  private String productId;
 
-    @Column(name = "product_name", nullable = false)
-    private String productName;
+  @Column(name = "product_name", nullable = false)
+  private String productName;
 
-    @Column(name = "product_slug", nullable = false)
-    private String productSlug;
+  @Column(name = "product_slug", nullable = false)
+  private String productSlug;
 
-    @Column(name = "unit_price", nullable = false, precision = 12, scale = 2)
-    private BigDecimal unitPrice;
+  @Column(name = "unit_price", nullable = false, precision = 12, scale = 2)
+  private BigDecimal unitPrice;
 
-    @Column(nullable = false)
-    private int quantity;
+  @Column(nullable = false)
+  private int quantity;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
+  @Column(name = "created_at", nullable = false, updatable = false)
+  private Instant createdAt;
 
-    @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt;
+  @Column(name = "updated_at", nullable = false)
+  private Instant updatedAt;
 
-    @PrePersist
-    void onCreate() {
-        if (id == null) {
-            id = UUID.randomUUID().toString();
-        }
-        Instant now = Instant.now();
-        if (createdAt == null) {
-            createdAt = now;
-        }
-        updatedAt = now;
+  @PrePersist
+  void onCreate() {
+    if (id == null) {
+      id = UUID.randomUUID().toString();
     }
-
-    @PreUpdate
-    void onUpdate() {
-        updatedAt = Instant.now();
+    Instant now = Instant.now();
+    if (createdAt == null) {
+      createdAt = now;
     }
+    updatedAt = now;
+  }
 
-    public String getId() {
-        return id;
-    }
+  @PreUpdate
+  void onUpdate() {
+    updatedAt = Instant.now();
+  }
 
-    public String getCartId() {
-        return cartId;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public void setCartId(String cartId) {
-        this.cartId = cartId;
-    }
+  public String getCartId() {
+    return cartId;
+  }
 
-    public String getProductId() {
-        return productId;
-    }
+  public void setCartId(String cartId) {
+    this.cartId = cartId;
+  }
 
-    public void setProductId(String productId) {
-        this.productId = productId;
-    }
+  public String getProductId() {
+    return productId;
+  }
 
-    public String getProductName() {
-        return productName;
-    }
+  public void setProductId(String productId) {
+    this.productId = productId;
+  }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
+  public String getProductName() {
+    return productName;
+  }
 
-    public String getProductSlug() {
-        return productSlug;
-    }
+  public void setProductName(String productName) {
+    this.productName = productName;
+  }
 
-    public void setProductSlug(String productSlug) {
-        this.productSlug = productSlug;
-    }
+  public String getProductSlug() {
+    return productSlug;
+  }
 
-    public BigDecimal getUnitPrice() {
-        return unitPrice;
-    }
+  public void setProductSlug(String productSlug) {
+    this.productSlug = productSlug;
+  }
 
-    public void setUnitPrice(BigDecimal unitPrice) {
-        this.unitPrice = unitPrice;
-    }
+  public BigDecimal getUnitPrice() {
+    return unitPrice;
+  }
 
-    public int getQuantity() {
-        return quantity;
-    }
+  public void setUnitPrice(BigDecimal unitPrice) {
+    this.unitPrice = unitPrice;
+  }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
+  public int getQuantity() {
+    return quantity;
+  }
+
+  public void setQuantity(int quantity) {
+    this.quantity = quantity;
+  }
 }

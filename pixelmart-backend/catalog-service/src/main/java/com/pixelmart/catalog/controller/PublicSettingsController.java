@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/catalog/settings")
 public class PublicSettingsController {
 
-    private final StoreSettingsService storeSettingsService;
+  private final StoreSettingsService storeSettingsService;
 
-    public PublicSettingsController(StoreSettingsService storeSettingsService) {
-        this.storeSettingsService = storeSettingsService;
-    }
+  public PublicSettingsController(StoreSettingsService storeSettingsService) {
+    this.storeSettingsService = storeSettingsService;
+  }
 
-    @GetMapping("/public")
-    public PublicStoreSettingsResponse getPublic() {
-        return storeSettingsService.getPublic();
-    }
+  @GetMapping("/public")
+  public PublicStoreSettingsResponse getPublic() {
+    return storeSettingsService.getPublic();
+  }
 }

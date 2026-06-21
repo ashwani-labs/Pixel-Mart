@@ -14,155 +14,161 @@ import com.pixelmart.order.exception.ResourceNotFoundException;
 import com.pixelmart.order.repository.CartItemRepository;
 import com.pixelmart.order.repository.CartRepository;
 import com.pixelmart.order.security.GatewayPrincipal;
+import java.math.BigDecimal;
+import java.util.List;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 @Service
 public class CartService {
 
-    private final CartRepository cartRepository;
-    private final CartItemRepository cartItemRepository;
-    private final CatalogClient catalogClient;
+  private final CartRepository cartRepository;
+  private final CartItemRepository cartItemRepository;
+  private final CatalogClient catalogClient;
 
-    public CartService(
-            CartRepository cartRepository,
-            CartItemRepository cartItemRepository,
-            CatalogClient catalogClient
-    ) {
-        this.cartRepository = cartRepository;
-        this.cartItemRepository = cartItemRepository;
-        this.catalogClient = catalogClient;
+  public CartService(
+      CartRepository cartRepository,
+      CartItemRepository cartItemRepository,
+      CatalogClient catalogClient) {
+    this.cartRepository = cartRepository;
+    this.cartItemRepository = cartItemRepository;
+    this.catalogClient = catalogClient;
+  }
+
+  @Transactional(readOnly = true)
+  public CartResponse getCart() {
+    return getCart(null);
+  }
+
+  @Transactional(readOnly = true)
+  public CartResponse getCart(String couponCode) {
+    return buildResponse(findOrEmptyItems(), couponCode);
+  }
+
+  @Transactional
+  public CartResponse addItem(AddCartItemRequest request) {
+    Cart cart = findOrCreateCart();
+    CatalogProductSnapshot product = catalogClient.getProductForCart(request.productId());
+    if (!product.visible()) {
+      throw new BadRequestException("Product is not available");
+    }
+    int quantity = request.resolvedQuantity();
+    if (product.stockQty() < quantity) {
+      throw new BadRequestException("Insufficient stock");
     }
 
-    @Transactional(readOnly = true)
-    public CartResponse getCart() {
-        return getCart(null);
+    CartItem item =
+        cartItemRepository.findByCartIdAndProductId(cart.getId(), product.id()).orElse(null);
+    if (item != null) {
+      int newQty = item.getQuantity() + quantity;
+      if (newQty > product.stockQty()) {
+        throw new BadRequestException("Insufficient stock");
+      }
+      item.setQuantity(newQty);
+      item.setUnitPrice(product.effectivePrice());
+      item.setProductName(product.name());
+      item.setProductSlug(product.slug());
+      cartItemRepository.save(item);
+    } else {
+      CartItem created = new CartItem();
+      created.setCartId(cart.getId());
+      created.setProductId(product.id());
+      created.setProductName(product.name());
+      created.setProductSlug(product.slug());
+      created.setUnitPrice(product.effectivePrice());
+      created.setQuantity(quantity);
+      cartItemRepository.save(created);
+    }
+    return buildResponse(cartItemRepository.findByCartIdOrderByCreatedAtAsc(cart.getId()), null);
+  }
+
+  @Transactional
+  public CartResponse updateItem(String itemId, UpdateCartItemRequest request) {
+    Cart cart = findOrCreateCart();
+    CartItem item =
+        cartItemRepository
+            .findByIdAndCartId(itemId, cart.getId())
+            .orElseThrow(() -> new ResourceNotFoundException("CartItem", itemId));
+
+    CatalogProductSnapshot product = catalogClient.getProductForCart(item.getProductId());
+    if (!product.visible()) {
+      throw new BadRequestException("Product is no longer available");
+    }
+    if (request.quantity() > product.stockQty()) {
+      throw new BadRequestException("Insufficient stock");
     }
 
-    @Transactional(readOnly = true)
-    public CartResponse getCart(String couponCode) {
-        return buildResponse(findOrEmptyItems(), couponCode);
+    item.setQuantity(request.quantity());
+    item.setUnitPrice(product.effectivePrice());
+    cartItemRepository.save(item);
+    return buildResponse(cartItemRepository.findByCartIdOrderByCreatedAtAsc(cart.getId()), null);
+  }
+
+  @Transactional
+  public CartResponse removeItem(String itemId) {
+    Cart cart = findOrCreateCart();
+    CartItem item =
+        cartItemRepository
+            .findByIdAndCartId(itemId, cart.getId())
+            .orElseThrow(() -> new ResourceNotFoundException("CartItem", itemId));
+    cartItemRepository.delete(item);
+    return buildResponse(cartItemRepository.findByCartIdOrderByCreatedAtAsc(cart.getId()), null);
+  }
+
+  private List<CartItem> findOrEmptyItems() {
+    return cartRepository
+        .findByUserId(currentUserId())
+        .map(cart -> cartItemRepository.findByCartIdOrderByCreatedAtAsc(cart.getId()))
+        .orElse(List.of());
+  }
+
+  private Cart findOrCreateCart() {
+    String userId = currentUserId();
+    return cartRepository
+        .findByUserId(userId)
+        .orElseGet(
+            () -> {
+              Cart cart = new Cart();
+              cart.setUserId(userId);
+              return cartRepository.save(cart);
+            });
+  }
+
+  private CartResponse buildResponse(List<CartItem> items, String couponCode) {
+    List<CartItemResponse> responses = items.stream().map(CartItemResponse::from).toList();
+    int totalQuantity = items.stream().mapToInt(CartItem::getQuantity).sum();
+    BigDecimal subtotal =
+        responses.stream()
+            .map(CartItemResponse::lineTotal)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    if (items.isEmpty()) {
+      return CartResponse.withoutDiscount(responses, responses.size(), totalQuantity, subtotal);
     }
+    CatalogCartDiscountSnapshot discount =
+        catalogClient.getCartDiscount(subtotal, normalizeCoupon(couponCode));
+    return new CartResponse(
+        responses,
+        responses.size(),
+        totalQuantity,
+        subtotal,
+        discount.discountTotal(),
+        discount.offerName());
+  }
 
-    @Transactional
-    public CartResponse addItem(AddCartItemRequest request) {
-        Cart cart = findOrCreateCart();
-        CatalogProductSnapshot product = catalogClient.getProductForCart(request.productId());
-        if (!product.visible()) {
-            throw new BadRequestException("Product is not available");
-        }
-        int quantity = request.resolvedQuantity();
-        if (product.stockQty() < quantity) {
-            throw new BadRequestException("Insufficient stock");
-        }
-
-        CartItem item = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.id())
-                .orElse(null);
-        if (item != null) {
-            int newQty = item.getQuantity() + quantity;
-            if (newQty > product.stockQty()) {
-                throw new BadRequestException("Insufficient stock");
-            }
-            item.setQuantity(newQty);
-            item.setUnitPrice(product.effectivePrice());
-            item.setProductName(product.name());
-            item.setProductSlug(product.slug());
-            cartItemRepository.save(item);
-        } else {
-            CartItem created = new CartItem();
-            created.setCartId(cart.getId());
-            created.setProductId(product.id());
-            created.setProductName(product.name());
-            created.setProductSlug(product.slug());
-            created.setUnitPrice(product.effectivePrice());
-            created.setQuantity(quantity);
-            cartItemRepository.save(created);
-        }
-        return buildResponse(cartItemRepository.findByCartIdOrderByCreatedAtAsc(cart.getId()), null);
+  private String normalizeCoupon(String value) {
+    if (value == null || value.isBlank()) {
+      return null;
     }
+    return value.trim().toUpperCase();
+  }
 
-    @Transactional
-    public CartResponse updateItem(String itemId, UpdateCartItemRequest request) {
-        Cart cart = findOrCreateCart();
-        CartItem item = cartItemRepository.findByIdAndCartId(itemId, cart.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("CartItem", itemId));
-
-        CatalogProductSnapshot product = catalogClient.getProductForCart(item.getProductId());
-        if (!product.visible()) {
-            throw new BadRequestException("Product is no longer available");
-        }
-        if (request.quantity() > product.stockQty()) {
-            throw new BadRequestException("Insufficient stock");
-        }
-
-        item.setQuantity(request.quantity());
-        item.setUnitPrice(product.effectivePrice());
-        cartItemRepository.save(item);
-        return buildResponse(cartItemRepository.findByCartIdOrderByCreatedAtAsc(cart.getId()), null);
+  private String currentUserId() {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth != null && auth.getPrincipal() instanceof GatewayPrincipal principal) {
+      return principal.userId();
     }
-
-    @Transactional
-    public CartResponse removeItem(String itemId) {
-        Cart cart = findOrCreateCart();
-        CartItem item = cartItemRepository.findByIdAndCartId(itemId, cart.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("CartItem", itemId));
-        cartItemRepository.delete(item);
-        return buildResponse(cartItemRepository.findByCartIdOrderByCreatedAtAsc(cart.getId()), null);
-    }
-
-    private List<CartItem> findOrEmptyItems() {
-        return cartRepository.findByUserId(currentUserId())
-                .map(cart -> cartItemRepository.findByCartIdOrderByCreatedAtAsc(cart.getId()))
-                .orElse(List.of());
-    }
-
-    private Cart findOrCreateCart() {
-        String userId = currentUserId();
-        return cartRepository.findByUserId(userId)
-                .orElseGet(() -> {
-                    Cart cart = new Cart();
-                    cart.setUserId(userId);
-                    return cartRepository.save(cart);
-                });
-    }
-
-    private CartResponse buildResponse(List<CartItem> items, String couponCode) {
-        List<CartItemResponse> responses = items.stream().map(CartItemResponse::from).toList();
-        int totalQuantity = items.stream().mapToInt(CartItem::getQuantity).sum();
-        BigDecimal subtotal = responses.stream()
-                .map(CartItemResponse::lineTotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        if (items.isEmpty()) {
-            return CartResponse.withoutDiscount(responses, responses.size(), totalQuantity, subtotal);
-        }
-        CatalogCartDiscountSnapshot discount = catalogClient.getCartDiscount(subtotal, normalizeCoupon(couponCode));
-        return new CartResponse(
-                responses,
-                responses.size(),
-                totalQuantity,
-                subtotal,
-                discount.discountTotal(),
-                discount.offerName()
-        );
-    }
-
-    private String normalizeCoupon(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        return value.trim().toUpperCase();
-    }
-
-    private String currentUserId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.getPrincipal() instanceof GatewayPrincipal principal) {
-            return principal.userId();
-        }
-        throw new BadRequestException("Authentication required");
-    }
+    throw new BadRequestException("Authentication required");
+  }
 }

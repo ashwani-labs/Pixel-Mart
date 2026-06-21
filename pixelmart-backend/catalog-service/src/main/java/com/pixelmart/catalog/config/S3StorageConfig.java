@@ -11,10 +11,8 @@ import software.amazon.awssdk.services.s3.S3Client;
 @ConditionalOnProperty(name = "pixelmart.storage.type", havingValue = "s3")
 public class S3StorageConfig {
 
-    @Bean
-    S3Client s3Client(StorageProperties properties) {
-        return S3Client.builder()
-                .region(Region.of(properties.getS3().getRegion()))
-                .build();
-    }
+  @Bean
+  S3Client s3Client(StorageProperties properties) {
+    return S3Client.builder().region(Region.of(properties.getS3().getRegion())).build();
+  }
 }

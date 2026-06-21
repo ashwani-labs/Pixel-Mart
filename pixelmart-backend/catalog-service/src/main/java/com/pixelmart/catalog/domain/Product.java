@@ -9,145 +9,145 @@ import java.util.UUID;
 @Table(name = "products")
 public class Product {
 
-    @Id
-    @Column(length = 36, nullable = false)
-    private String id;
+  @Id
+  @Column(length = 36, nullable = false)
+  private String id;
 
-    @Column(name = "category_id", length = 36, nullable = false)
-    private String categoryId;
+  @Column(name = "category_id", length = 36, nullable = false)
+  private String categoryId;
 
-    @Column(nullable = false)
-    private String name;
+  @Column(nullable = false)
+  private String name;
 
-    @Column(nullable = false, unique = true)
-    private String slug;
+  @Column(nullable = false, unique = true)
+  private String slug;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
+  @Column(columnDefinition = "TEXT")
+  private String description;
 
-    @Column(name = "base_price", nullable = false, precision = 12, scale = 2)
-    private BigDecimal basePrice;
+  @Column(name = "base_price", nullable = false, precision = 12, scale = 2)
+  private BigDecimal basePrice;
 
-    @Column(name = "compare_at_price", precision = 12, scale = 2)
-    private BigDecimal compareAtPrice;
+  @Column(name = "compare_at_price", precision = 12, scale = 2)
+  private BigDecimal compareAtPrice;
 
-    @Column(name = "stock_qty", nullable = false)
-    private int stockQty;
+  @Column(name = "stock_qty", nullable = false)
+  private int stockQty;
 
-    @Column(nullable = false)
-    private boolean visible = true;
+  @Column(nullable = false)
+  private boolean visible = true;
 
-    @Column(nullable = false)
-    private boolean featured = false;
+  @Column(nullable = false)
+  private boolean featured = false;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
+  @Column(name = "created_at", nullable = false, updatable = false)
+  private Instant createdAt;
 
-    @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt;
+  @Column(name = "updated_at", nullable = false)
+  private Instant updatedAt;
 
-    @PrePersist
-    void onCreate() {
-        if (id == null) {
-            id = UUID.randomUUID().toString();
-        }
-        Instant now = Instant.now();
-        if (createdAt == null) {
-            createdAt = now;
-        }
-        updatedAt = now;
+  @PrePersist
+  void onCreate() {
+    if (id == null) {
+      id = UUID.randomUUID().toString();
     }
-
-    @PreUpdate
-    void onUpdate() {
-        updatedAt = Instant.now();
+    Instant now = Instant.now();
+    if (createdAt == null) {
+      createdAt = now;
     }
+    updatedAt = now;
+  }
 
-    public String getId() {
-        return id;
-    }
+  @PreUpdate
+  void onUpdate() {
+    updatedAt = Instant.now();
+  }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+  public String getId() {
+    return id;
+  }
 
-    public String getCategoryId() {
-        return categoryId;
-    }
+  public void setId(String id) {
+    this.id = id;
+  }
 
-    public void setCategoryId(String categoryId) {
-        this.categoryId = categoryId;
-    }
+  public String getCategoryId() {
+    return categoryId;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public void setCategoryId(String categoryId) {
+    this.categoryId = categoryId;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getSlug() {
-        return slug;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public void setSlug(String slug) {
-        this.slug = slug;
-    }
+  public String getSlug() {
+    return slug;
+  }
 
-    public String getDescription() {
-        return description;
-    }
+  public void setSlug(String slug) {
+    this.slug = slug;
+  }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+  public String getDescription() {
+    return description;
+  }
 
-    public BigDecimal getBasePrice() {
-        return basePrice;
-    }
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-    public void setBasePrice(BigDecimal basePrice) {
-        this.basePrice = basePrice;
-    }
+  public BigDecimal getBasePrice() {
+    return basePrice;
+  }
 
-    public BigDecimal getCompareAtPrice() {
-        return compareAtPrice;
-    }
+  public void setBasePrice(BigDecimal basePrice) {
+    this.basePrice = basePrice;
+  }
 
-    public void setCompareAtPrice(BigDecimal compareAtPrice) {
-        this.compareAtPrice = compareAtPrice;
-    }
+  public BigDecimal getCompareAtPrice() {
+    return compareAtPrice;
+  }
 
-    public int getStockQty() {
-        return stockQty;
-    }
+  public void setCompareAtPrice(BigDecimal compareAtPrice) {
+    this.compareAtPrice = compareAtPrice;
+  }
 
-    public void setStockQty(int stockQty) {
-        this.stockQty = stockQty;
-    }
+  public int getStockQty() {
+    return stockQty;
+  }
 
-    public boolean isVisible() {
-        return visible;
-    }
+  public void setStockQty(int stockQty) {
+    this.stockQty = stockQty;
+  }
 
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-    }
+  public boolean isVisible() {
+    return visible;
+  }
 
-    public boolean isFeatured() {
-        return featured;
-    }
+  public void setVisible(boolean visible) {
+    this.visible = visible;
+  }
 
-    public void setFeatured(boolean featured) {
-        this.featured = featured;
-    }
+  public boolean isFeatured() {
+    return featured;
+  }
 
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
+  public void setFeatured(boolean featured) {
+    this.featured = featured;
+  }
 
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
+  public Instant getCreatedAt() {
+    return createdAt;
+  }
+
+  public Instant getUpdatedAt() {
+    return updatedAt;
+  }
 }
