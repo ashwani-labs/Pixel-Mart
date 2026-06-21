@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: api-gateway
+  profiles:
+    active: local # switch to dev for TiDB Cloud / Render
   cloud:
     gateway:
       routes:

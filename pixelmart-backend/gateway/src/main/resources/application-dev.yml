@@ -1,0 +1,2 @@
+# TiDB Cloud / Render — set service URLs via environment variables
+# AUTH_SERVICE_URL, CATALOG_SERVICE_URL, ORDER_SERVICE_URL, NOTIFICATION_SERVICE_URL

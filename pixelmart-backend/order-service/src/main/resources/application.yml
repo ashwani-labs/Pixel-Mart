@@ -4,11 +4,8 @@ server:
 spring:
   application:
     name: order-service
-  datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:pixelmart-db}?allowPublicKeyRetrieval=true&useSSL=${DB_USE_SSL:false}&serverTimezone=UTC&characterEncoding=utf8
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:root}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+  profiles:
+    active: local # switch to dev for TiDB Cloud
   jpa:
     hibernate:
       ddl-auto: none
@@ -16,7 +13,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-        default_schema: orders
   flyway:
     enabled: false
 

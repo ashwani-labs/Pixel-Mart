@@ -1,0 +1,5 @@
+# Local development — services on localhost (default routes in application.yml)
+management:
+  endpoint:
+    health:
+      show-details: always
