@@ -14,7 +14,6 @@ import com.pixelmart.auth.repository.UserRepository;
 import com.pixelmart.auth.security.JwtService;
 import com.pixelmart.auth.security.RefreshTokenService;
 import com.pixelmart.auth.security.UserPrincipal;
-import com.pixelmart.auth.service.LoyaltyService;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.security.core.context.SecurityContextHolder;

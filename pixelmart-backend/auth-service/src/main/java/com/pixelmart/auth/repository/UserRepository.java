@@ -17,7 +17,6 @@ public interface UserRepository extends JpaRepository<User, String> {
 
   Optional<User> findByReferralCodeIgnoreCase(String referralCode);
 
-  @Query(
-      "SELECT u FROM User u JOIN u.roles r WHERE r = :role ORDER BY u.createdAt DESC")
+  @Query("SELECT u FROM User u JOIN u.roles r WHERE r = :role ORDER BY u.createdAt DESC")
   Page<User> findByRolesContaining(@Param("role") Role role, Pageable pageable);
 }
