@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { guestCartSummary, getGuestCart } from '@/lib/guestCart';
+import { useGuestCartTotalQuantity } from '@/lib/guestCart';
 import type { RootState } from '@/store';
 import { useGetCartQuery } from '@/store/api/orderApi';
 import { selectIsAuthenticated } from '@/store/slices/authSlice';
@@ -16,9 +16,8 @@ export function MobileBottomNav() {
   const location = useLocation();
   const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
   const { data: cart } = useGetCartQuery(undefined, { skip: !isAuthenticated });
-  const cartQty = isAuthenticated
-    ? (cart?.totalQuantity ?? 0)
-    : guestCartSummary(getGuestCart()).totalQuantity;
+  const guestCartQty = useGuestCartTotalQuantity();
+  const cartQty = isAuthenticated ? (cart?.totalQuantity ?? 0) : guestCartQty;
 
   const accountPath = isAuthenticated ? '/orders' : '/login';
 

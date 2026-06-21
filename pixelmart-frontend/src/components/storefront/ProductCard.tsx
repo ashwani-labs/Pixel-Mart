@@ -1,10 +1,15 @@
-import type { MouseEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState, type MouseEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { addGuestCartItem } from '@/lib/guestCart';
+import {
+  addGuestCartItem,
+  getGuestCart,
+  removeGuestCartItem,
+  updateGuestCartQuantity,
+} from '@/lib/guestCart';
 import {
   discountPercent,
   getCategoryVisual,
@@ -13,7 +18,12 @@ import {
 } from '@/lib/categoryStyle';
 import type { Product } from '@/types/catalog';
 import type { RootState } from '@/store';
-import { useAddCartItemMutation } from '@/store/api/orderApi';
+import {
+  useAddCartItemMutation,
+  useGetCartQuery,
+  useRemoveCartItemMutation,
+  useUpdateCartItemMutation,
+} from '@/store/api/orderApi';
 import { selectIsAuthenticated } from '@/store/slices/authSlice';
 
 interface ProductCardProps {
@@ -35,18 +45,44 @@ export function ProductCard({
   showAddToCart = true,
   className,
 }: ProductCardProps) {
-  const navigate = useNavigate();
   const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
+  const { data: cart } = useGetCartQuery(undefined, { skip: !isAuthenticated });
   const [addToCart, { isLoading: adding }] = useAddCartItemMutation();
+  const [updateCartItem, { isLoading: updating }] = useUpdateCartItemMutation();
+  const [removeCartItem, { isLoading: removing }] = useRemoveCartItemMutation();
+  const [guestQty, setGuestQty] = useState(
+    () => getGuestCart().find((item) => item.productId === product.id)?.quantity ?? 0,
+  );
+
   const visual = getCategoryVisual(product.categoryId);
   const emoji = getProductEmoji(product.slug, product.categoryId);
   const savings = discountPercent(product.effectivePrice, product.compareAtPrice);
   const savedAmt = savingsAmount(product.effectivePrice, product.compareAtPrice);
   const outOfStock = product.stockQty <= 0;
+  const cartLine = cart?.items.find((item) => item.productId === product.id);
+  const quantity = isAuthenticated ? (cartLine?.quantity ?? 0) : guestQty;
+  const cartItemId = cartLine?.id;
+  const busy = adding || updating || removing;
 
-  const handleAdd = async (e: MouseEvent) => {
+  useEffect(() => {
+    if (isAuthenticated) return;
+    const syncGuestQty = () => {
+      setGuestQty(getGuestCart().find((item) => item.productId === product.id)?.quantity ?? 0);
+    };
+    syncGuestQty();
+    window.addEventListener('pixelmart-guest-cart-updated', syncGuestQty);
+    return () => window.removeEventListener('pixelmart-guest-cart-updated', syncGuestQty);
+  }, [isAuthenticated, product.id]);
+
+  const stopCardNav = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+  };
+
+  const handleAdd = async (e: MouseEvent) => {
+    stopCardNav(e);
+    if (outOfStock) return;
+
     if (!isAuthenticated) {
       addGuestCartItem({
         productId: product.id,
@@ -54,11 +90,53 @@ export function ProductCard({
         productSlug: product.slug,
         unitPrice: product.effectivePrice,
       });
-      navigate('/cart');
       return;
     }
+
     try {
       await addToCart({ productId: product.id, quantity: 1 }).unwrap();
+    } catch {
+      // toast could go here
+    }
+  };
+
+  const handleIncrement = async (e: MouseEvent) => {
+    stopCardNav(e);
+    if (quantity >= product.stockQty) return;
+
+    if (!isAuthenticated) {
+      updateGuestCartQuantity(product.id, quantity + 1);
+      return;
+    }
+
+    if (!cartItemId) return;
+    try {
+      await updateCartItem({ id: cartItemId, body: { quantity: quantity + 1 } }).unwrap();
+    } catch {
+      // toast could go here
+    }
+  };
+
+  const handleDecrement = async (e: MouseEvent) => {
+    stopCardNav(e);
+    if (quantity <= 0) return;
+
+    if (!isAuthenticated) {
+      if (quantity <= 1) {
+        removeGuestCartItem(product.id);
+      } else {
+        updateGuestCartQuantity(product.id, quantity - 1);
+      }
+      return;
+    }
+
+    if (!cartItemId) return;
+    try {
+      if (quantity <= 1) {
+        await removeCartItem(cartItemId).unwrap();
+      } else {
+        await updateCartItem({ id: cartItemId, body: { quantity: quantity - 1 } }).unwrap();
+      }
     } catch {
       // toast could go here
     }
@@ -147,16 +225,60 @@ export function ProductCard({
         )}
 
         {showAddToCart && (
-          <Button
-            type="button"
-            variant="accent"
-            size="sm"
-            className="mt-auto w-full font-bold tracking-wide"
-            disabled={outOfStock || adding}
-            onClick={handleAdd}
-          >
-            {outOfStock ? 'Out of stock' : adding ? 'Adding…' : 'ADD'}
-          </Button>
+          <div className="mt-auto pt-0.5">
+            {quantity > 0 ? (
+              <div
+                className="qty-stepper flex h-9 w-full items-stretch overflow-hidden rounded-lg border-2 border-accent bg-card shadow-sm ring-1 ring-accent/20"
+                role="group"
+                aria-label={`Quantity for ${product.name}`}
+              >
+                <button
+                  type="button"
+                  className="flex w-10 shrink-0 items-center justify-center border-0 bg-accent text-accent-foreground transition hover:brightness-105 active:scale-95 disabled:opacity-60"
+                  disabled={busy}
+                  aria-label="Decrease quantity"
+                  onClick={(e) => void handleDecrement(e)}
+                >
+                  <span className="text-lg font-bold leading-none" aria-hidden>
+                    −
+                  </span>
+                </button>
+                <div className="flex min-w-0 flex-1 items-center justify-center border-x border-accent/25 bg-accent/8 px-1">
+                  <span
+                    className={cn(
+                      'text-sm font-extrabold tabular-nums text-foreground',
+                      busy && 'animate-pulse opacity-70',
+                    )}
+                  >
+                    {busy ? '…' : quantity}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className="flex w-10 shrink-0 items-center justify-center border-0 bg-accent text-accent-foreground transition hover:brightness-105 active:scale-95 disabled:opacity-40"
+                  disabled={busy || quantity >= product.stockQty}
+                  aria-label="Increase quantity"
+                  title={quantity >= product.stockQty ? 'Maximum stock reached' : undefined}
+                  onClick={(e) => void handleIncrement(e)}
+                >
+                  <span className="text-lg font-bold leading-none" aria-hidden>
+                    +
+                  </span>
+                </button>
+              </div>
+            ) : (
+              <Button
+                type="button"
+                variant="accent"
+                size="sm"
+                className="h-9 w-full font-bold tracking-wide shadow-sm transition active:scale-[0.98]"
+                disabled={outOfStock || adding}
+                onClick={(e) => void handleAdd(e)}
+              >
+                {outOfStock ? 'Out of stock' : adding ? 'Adding…' : 'ADD'}
+              </Button>
+            )}
+          </div>
         )}
       </div>
     </article>

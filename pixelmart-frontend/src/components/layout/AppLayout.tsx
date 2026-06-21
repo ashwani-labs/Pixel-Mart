@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { guestCartSummary, getGuestCart } from '@/lib/guestCart';
+import { useGuestCartTotalQuantity } from '@/lib/guestCart';
 import type { RootState } from '../../store';
 import { FALLBACK_SUPER_CATEGORIES } from '../../lib/catalogFallbacks';
 import {
@@ -37,9 +37,8 @@ export function AppLayout() {
   const { data: cart } = useGetCartQuery(undefined, { skip: !isAuthenticated });
   const { data: superCategories } = useGetSuperCategoriesQuery();
   const navAisles = superCategories?.length ? superCategories : FALLBACK_AISLES;
-  const cartQty = isAuthenticated
-    ? (cart?.totalQuantity ?? 0)
-    : guestCartSummary(getGuestCart()).totalQuantity;
+  const guestCartQty = useGuestCartTotalQuantity();
+  const cartQty = isAuthenticated ? (cart?.totalQuantity ?? 0) : guestCartQty;
   const [search, setSearch] = useState('');
 
   const handleLogout = async () => {

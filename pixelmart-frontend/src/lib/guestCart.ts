@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 export interface GuestCartItem {
   productId: string;
   productName: string;
@@ -21,6 +23,7 @@ function readRaw(): GuestCartItem[] {
 
 function write(items: GuestCartItem[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  window.dispatchEvent(new CustomEvent('pixelmart-guest-cart-updated'));
 }
 
 export function getGuestCart(): GuestCartItem[] {
@@ -29,6 +32,7 @@ export function getGuestCart(): GuestCartItem[] {
 
 export function clearGuestCart() {
   localStorage.removeItem(STORAGE_KEY);
+  window.dispatchEvent(new CustomEvent('pixelmart-guest-cart-updated'));
 }
 
 export function guestCartSummary(items: GuestCartItem[]) {
@@ -62,4 +66,16 @@ export function removeGuestCartItem(productId: string): GuestCartItem[] {
   const next = readRaw().filter((item) => item.productId !== productId);
   write(next);
   return next;
+}
+
+export function useGuestCartTotalQuantity(): number {
+  const [total, setTotal] = useState(() => guestCartSummary(getGuestCart()).totalQuantity);
+
+  useEffect(() => {
+    const sync = () => setTotal(guestCartSummary(getGuestCart()).totalQuantity);
+    window.addEventListener('pixelmart-guest-cart-updated', sync);
+    return () => window.removeEventListener('pixelmart-guest-cart-updated', sync);
+  }, []);
+
+  return total;
 }
