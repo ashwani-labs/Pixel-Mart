@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
+import { useCatalogLabel } from '@/i18n/catalogI18n';
 import { DeliveryEstimate } from '@/components/product/DeliveryEstimate';
 import { clearGuestCart, getGuestCart, guestCartSummary } from '@/lib/guestCart';
 import { trackEvent } from '@/lib/analytics';
@@ -27,18 +29,13 @@ import {
 } from '@/lib/shipping';
 import styles from './CheckoutPage.module.css';
 
-const PAYMENT_METHODS: Array<{ id: PaymentMethod; title: string; description: string }> = [
-  { id: 'MOCK_UPI', title: 'UPI', description: 'Pay instantly with UPI (mock).' },
-  { id: 'MOCK_CARD', title: 'Card', description: 'Credit or debit card (mock).' },
-  { id: 'MOCK_WALLET', title: 'Wallet', description: 'Pay from wallet balance (mock).' },
-  { id: 'MOCK_COD', title: 'Cash on Delivery', description: 'Pay when your order arrives (up to ₹2000).' },
-];
-
 function formatPrice(value: number, locale: string, currency: string) {
   return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(value);
 }
 
 export function CheckoutPage() {
+  const { t } = useTranslation();
+  const catalogName = useCatalogLabel();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
@@ -74,9 +71,12 @@ export function CheckoutPage() {
 
   const paymentMethods = [
     ...(paymentConfig?.razorpayEnabled
-      ? [{ id: 'RAZORPAY' as PaymentMethod, title: 'Razorpay', description: 'UPI, cards, and wallets (live payment).' }]
+      ? [{ id: 'RAZORPAY' as PaymentMethod, title: t('checkout.razorpay'), description: t('checkout.razorpayDesc') }]
       : []),
-    ...PAYMENT_METHODS,
+    { id: 'MOCK_UPI' as PaymentMethod, title: t('checkout.upi'), description: t('checkout.upiDesc') },
+    { id: 'MOCK_CARD' as PaymentMethod, title: t('checkout.card'), description: t('checkout.cardDesc') },
+    { id: 'MOCK_WALLET' as PaymentMethod, title: t('checkout.wallet'), description: t('checkout.walletDesc') },
+    { id: 'MOCK_COD' as PaymentMethod, title: t('checkout.cod'), description: t('checkout.codDesc') },
   ];
 
   useEffect(() => {
@@ -132,7 +132,7 @@ export function CheckoutPage() {
       setGuestCity(result.city);
       setGuestState(result.state);
     } catch {
-      setError('Could not verify PIN code.');
+      setError(t('checkout.pinError'));
     }
   };
 
@@ -164,7 +164,7 @@ export function CheckoutPage() {
         }).unwrap();
         navigate(`/orders/${order.id}`, { state: { checkedOut: true } });
       },
-      onDismiss: () => setError('Payment was cancelled. Your order is saved as pending.'),
+      onDismiss: () => setError(t('checkout.payCancelled')),
     });
   };
 
@@ -172,7 +172,7 @@ export function CheckoutPage() {
     setError(null);
     if (!isAuthenticated) {
       if (!guestEmail || !guestFullName || !guestPhone || !guestAddressLine1 || !guestCity || !guestState || !guestPincode) {
-        setError('Fill in contact and delivery details to continue.');
+        setError(t('checkout.fillDetails'));
         return;
       }
       try {
@@ -213,13 +213,13 @@ export function CheckoutPage() {
         }
         navigate(`/orders/${response.order.id}`, { state: { checkedOut: true } });
       } catch {
-        setError('Could not place order. Check stock and delivery details.');
+        setError(t('checkout.placeFailedGuest'));
       }
       return;
     }
 
     if (!selectedAddressId) {
-      setError('Choose a delivery address before placing the order.');
+      setError(t('checkout.chooseAddress'));
       return;
     }
     try {
@@ -240,21 +240,21 @@ export function CheckoutPage() {
       }
       navigate(`/orders/${order.id}`, { state: { checkedOut: true } });
     } catch {
-      setError('Could not place order. Check stock, coupon, and try again.');
+      setError(t('checkout.placeFailed'));
     }
   };
 
   if ((isAuthenticated && loadingCart) || (isAuthenticated && loadingAddresses)) {
-    return <p className={styles.muted}>Loading checkout…</p>;
+    return <p className={styles.muted}>{t('checkout.loading')}</p>;
   }
 
   if (items.length === 0) {
     return (
       <div className={styles.page}>
-        <h1>Checkout</h1>
-        <p className={styles.muted}>Your cart is empty.</p>
+        <h1>{t('checkout.title')}</h1>
+        <p className={styles.muted}>{t('checkout.empty')}</p>
         <Link to="/products" className={styles.primaryLink}>
-          Browse products
+          {t('cart.browseProducts')}
         </Link>
       </div>
     );
@@ -262,22 +262,22 @@ export function CheckoutPage() {
 
   return (
     <div className={styles.page}>
-      <h1>Checkout</h1>
+      <h1>{t('checkout.title')}</h1>
       {!isAuthenticated && (
         <p className={styles.muted}>
-          Guest checkout — no password needed. We will email order updates to you.
+          {t('checkout.guestHint')}
         </p>
       )}
       <div className={styles.stepper}>
-        <span>1. Address</span>
-        <span>2. Payment</span>
-        <span>3. Review</span>
+        <span>{t('checkout.stepAddress')}</span>
+        <span>{t('checkout.stepPayment')}</span>
+        <span>{t('checkout.stepReview')}</span>
       </div>
 
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
-          <h2>Delivery address</h2>
-          {isAuthenticated && <Link to="/profile/addresses">Manage addresses</Link>}
+          <h2>{t('checkout.deliveryAddress')}</h2>
+          {isAuthenticated && <Link to="/profile/addresses">{t('checkout.manageAddresses')}</Link>}
         </div>
         {isAuthenticated ? (
           addresses && addresses.length > 0 ? (
@@ -293,8 +293,8 @@ export function CheckoutPage() {
                     checked={selectedAddressId === address.id}
                     onChange={() => setAddressId(address.id)}
                   />
-                  <strong>{address.label ?? 'Address'}</strong>
-                  {address.isDefault && <span className={styles.badge}>Default</span>}
+                  <strong>{address.label ?? t('checkout.address')}</strong>
+                  {address.isDefault && <span className={styles.badge}>{t('checkout.default')}</span>}
                   <span>{address.fullName} · {address.phone}</span>
                   <span>{address.addressLine1}</span>
                   <span>
@@ -304,32 +304,32 @@ export function CheckoutPage() {
               ))}
             </div>
           ) : (
-            <p className={styles.muted}>Add a delivery address from your profile before checkout.</p>
+            <p className={styles.muted}>{t('checkout.needAddress')}</p>
           )
         ) : (
           <div className={styles.addressGrid}>
             <label className={styles.couponField}>
-              Email
+              {t('checkout.email')}
               <input type="email" value={guestEmail} onChange={(e) => setGuestEmail(e.target.value)} />
             </label>
             <label className={styles.couponField}>
-              Full name
+              {t('checkout.fullName')}
               <input value={guestFullName} onChange={(e) => setGuestFullName(e.target.value)} />
             </label>
             <label className={styles.couponField}>
-              Phone
+              {t('checkout.phone')}
               <input value={guestPhone} onChange={(e) => setGuestPhone(e.target.value)} />
             </label>
             <label className={styles.couponField}>
-              Address line 1
+              {t('checkout.address1')}
               <input value={guestAddressLine1} onChange={(e) => setGuestAddressLine1(e.target.value)} />
             </label>
             <label className={styles.couponField}>
-              Address line 2
+              {t('checkout.address2')}
               <input value={guestAddressLine2} onChange={(e) => setGuestAddressLine2(e.target.value)} />
             </label>
             <label className={styles.couponField}>
-              PIN code
+              {t('checkout.pincode')}
               <input
                 value={guestPincode}
                 maxLength={6}
@@ -338,11 +338,11 @@ export function CheckoutPage() {
               />
             </label>
             <label className={styles.couponField}>
-              City
+              {t('checkout.city')}
               <input value={guestCity} onChange={(e) => setGuestCity(e.target.value)} />
             </label>
             <label className={styles.couponField}>
-              State
+              {t('checkout.state')}
               <input value={guestState} onChange={(e) => setGuestState(e.target.value)} />
             </label>
             <DeliveryEstimate compact />
@@ -351,8 +351,8 @@ export function CheckoutPage() {
       </section>
 
       <section className={styles.section} aria-labelledby="checkout-payment-heading">
-        <h2 id="checkout-payment-heading">Payment method</h2>
-        <div className={styles.paymentGrid} role="radiogroup" aria-label="Payment method">
+        <h2 id="checkout-payment-heading">{t('checkout.paymentMethod')}</h2>
+        <div className={styles.paymentGrid} role="radiogroup" aria-label={t('checkout.paymentMethod')}>
           {paymentMethods.map((method) => {
             const disabled = method.id === 'MOCK_COD' && !codAvailable;
             return (
@@ -370,7 +370,7 @@ export function CheckoutPage() {
               <strong>{method.title}</strong>
               <span>
                 {disabled
-                  ? `Not available above ₹${COD_MAX_ORDER_TOTAL}`
+                  ? t('checkout.codUnavailable', { max: COD_MAX_ORDER_TOTAL })
                   : method.description}
               </span>
             </label>
@@ -380,10 +380,10 @@ export function CheckoutPage() {
       </section>
 
       <section className={styles.section}>
-        <h2>Review order</h2>
+        <h2>{t('checkout.reviewOrder')}</h2>
         {isAuthenticated && (
           <label className={styles.couponField}>
-            Coupon code
+            {t('checkout.coupon')}
             <input
               value={couponCode}
               onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
@@ -395,7 +395,7 @@ export function CheckoutPage() {
           {items.map((item) => (
             <li key={item.id}>
               <span>
-                {item.productName} × {item.quantity}
+                {catalogName(item.productName)} × {item.quantity}
               </span>
               <strong>{formatPrice(item.lineTotal, marketLocale, marketCurrencyCode)}</strong>
             </li>
@@ -403,12 +403,12 @@ export function CheckoutPage() {
         </ul>
         <div className={styles.totals}>
           <p>
-            <span>Subtotal</span>
+            <span>{t('checkout.subtotal')}</span>
             <strong>{formatPrice(subtotal, marketLocale, marketCurrencyCode)}</strong>
           </p>
           {discountTotal > 0 && (
             <p>
-              <span>{cart?.discountLabel ?? 'Cart discount'}</span>
+              <span>{catalogName(cart?.discountLabel) || t('checkout.cartDiscount')}</span>
               <strong>-{formatPrice(discountTotal, marketLocale, marketCurrencyCode)}</strong>
             </p>
           )}
@@ -419,16 +419,16 @@ export function CheckoutPage() {
             <strong>{formatPrice(taxTotal, marketLocale, marketCurrencyCode)}</strong>
           </p>
           <p>
-            <span>Delivery</span>
+            <span>{t('checkout.delivery')}</span>
             <strong>
               {shippingTotal === 0
-                ? 'FREE'
+                ? t('checkout.free')
                 : formatPrice(shippingTotal, marketLocale, marketCurrencyCode)}
             </strong>
           </p>
           <p className={styles.muted}>{freeDeliveryMessage(discountedSubtotal)}</p>
           <p className={styles.grandTotal}>
-            <span>Total</span>
+            <span>{t('checkout.total')}</span>
             <strong>{formatPrice(grandTotal, marketLocale, marketCurrencyCode)}</strong>
           </p>
         </div>
@@ -436,7 +436,7 @@ export function CheckoutPage() {
 
       {error && <p className={styles.error} role="alert">{error}</p>}
       <div className={styles.actions}>
-        <Link to="/cart">← Back to cart</Link>
+        <Link to="/cart">{t('checkout.backToCart')}</Link>
         <button
           type="button"
           className={styles.placeOrderBtn}
@@ -444,10 +444,10 @@ export function CheckoutPage() {
           onClick={() => void placeOrder()}
         >
           {placingOrder || placingGuestOrder
-            ? 'Placing order…'
+            ? t('checkout.placing')
             : paymentMethod === 'RAZORPAY'
-              ? 'Pay with Razorpay'
-              : 'Place mock order'}
+              ? t('checkout.payRazorpay')
+              : t('checkout.placeMock')}
         </button>
       </div>
     </div>

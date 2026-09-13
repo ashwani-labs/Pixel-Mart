@@ -1,28 +1,29 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { useCatalogLabel } from '../../i18n/catalogI18n';
 import type { RootState } from '../../store';
 import { FALLBACK_SUPER_CATEGORIES } from '../../lib/catalogFallbacks';
 import { useGetSuperCategoriesQuery } from '../../store/api/catalogApi';
 import { selectIsAuthenticated } from '../../store/slices/authSlice';
 
-const HELP_LINKS = [
-  { label: 'Shipping & delivery', to: '/shipping' },
-  { label: 'Returns & refunds', to: '/returns' },
-  { label: 'FAQs', to: '/faq' },
-] as const;
-
-const LEGAL_LINKS = [
-  { label: 'Privacy policy', to: '/privacy' },
-  { label: 'Terms of use', to: '/terms' },
-] as const;
-
-const PAYMENT_BADGES = ['UPI', 'Cards', 'Net Banking', 'COD'] as const;
-
 export function StoreFooter() {
+  const { t } = useTranslation();
+  const catalogName = useCatalogLabel();
   const storeName = useSelector((s: RootState) => s.settings.storeName);
   const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
   const { data: superCategories } = useGetSuperCategoriesQuery();
   const aisles = superCategories?.length ? superCategories : FALLBACK_SUPER_CATEGORIES;
+  const helpLinks = [
+    { label: t('footer.shipping'), to: '/shipping' },
+    { label: t('footer.returns'), to: '/returns' },
+    { label: t('footer.faqs'), to: '/faq' },
+  ] as const;
+  const legalLinks = [
+    { label: t('footer.privacy'), to: '/privacy' },
+    { label: t('footer.terms'), to: '/terms' },
+  ] as const;
+  const paymentBadges = [t('footer.upi'), t('footer.cards'), t('footer.netBanking'), t('footer.cod')];
 
   const footerLink =
     'text-sm text-muted-foreground no-underline transition hover:text-primary hover:no-underline';
@@ -34,11 +35,10 @@ export function StoreFooter() {
           <div>
             <p className="m-0 text-lg font-bold text-card-foreground">{storeName}</p>
             <p className="m-0 mt-2 text-sm leading-relaxed text-muted-foreground">
-              Your neighbourhood value store — groceries, electronics, fashion and home essentials
-              at honest prices.
+              {t('footer.tagline')}
             </p>
             <p className="m-0 mt-4 text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">Need help?</span>
+              <span className="font-semibold text-foreground">{t('footer.needHelp')}</span>
               <br />
               <a href="mailto:support@pixelmart.local" className={footerLink}>
                 support@pixelmart.local
@@ -48,18 +48,18 @@ export function StoreFooter() {
 
           <div>
             <h3 className="m-0 mb-3 text-sm font-bold uppercase tracking-wide text-foreground">
-              Shop aisles
+              {t('footer.shopAisles')}
             </h3>
             <ul className="m-0 flex list-none flex-col gap-2 p-0">
               <li>
                 <Link to="/products" className={footerLink}>
-                  All products
+                  {t('nav.allProducts')}
                 </Link>
               </li>
               {aisles.map((aisle) => (
                 <li key={aisle.id}>
                   <Link to={`/products?superCategoryId=${aisle.id}`} className={footerLink}>
-                    {aisle.name}
+                    {catalogName(aisle.name)}
                   </Link>
                 </li>
               ))}
@@ -68,29 +68,29 @@ export function StoreFooter() {
 
           <div>
             <h3 className="m-0 mb-3 text-sm font-bold uppercase tracking-wide text-foreground">
-              My account
+              {t('footer.myAccount')}
             </h3>
             <ul className="m-0 flex list-none flex-col gap-2 p-0">
               {isAuthenticated ? (
                 <>
                   <li>
                     <Link to="/orders" className={footerLink}>
-                      My orders
+                      {t('footer.myOrders')}
                     </Link>
                   </li>
                   <li>
                     <Link to="/wishlist" className={footerLink}>
-                      Wishlist
+                      {t('nav.wishlist')}
                     </Link>
                   </li>
                   <li>
                     <Link to="/cart" className={footerLink}>
-                      Cart
+                      {t('nav.cart')}
                     </Link>
                   </li>
                   <li>
                     <Link to="/profile" className={footerLink}>
-                      Profile & addresses
+                      {t('footer.profileAddresses')}
                     </Link>
                   </li>
                 </>
@@ -98,12 +98,12 @@ export function StoreFooter() {
                 <>
                   <li>
                     <Link to="/login" className={footerLink}>
-                      Sign in
+                      {t('nav.signIn')}
                     </Link>
                   </li>
                   <li>
                     <Link to="/register" className={footerLink}>
-                      Create account
+                      {t('footer.createAccount')}
                     </Link>
                   </li>
                 </>
@@ -113,18 +113,18 @@ export function StoreFooter() {
 
           <div>
             <h3 className="m-0 mb-3 text-sm font-bold uppercase tracking-wide text-foreground">
-              Customer care
+              {t('footer.customerCare')}
             </h3>
             <ul className="m-0 flex list-none flex-col gap-2 p-0">
-              {HELP_LINKS.map((item) => (
-                <li key={item.label}>
+              {helpLinks.map((item) => (
+                <li key={item.to}>
                   <Link to={item.to} className={footerLink}>
                     {item.label}
                   </Link>
                 </li>
               ))}
-              {LEGAL_LINKS.map((item) => (
-                <li key={item.label}>
+              {legalLinks.map((item) => (
+                <li key={item.to}>
                   <Link to={item.to} className={footerLink}>
                     {item.label}
                   </Link>
@@ -132,7 +132,7 @@ export function StoreFooter() {
               ))}
               <li>
                 <span className="text-sm text-muted-foreground">
-                  GST-inclusive pricing on eligible items
+                  {t('footer.gstNote')}
                 </span>
               </li>
             </ul>
@@ -142,9 +142,9 @@ export function StoreFooter() {
 
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-3 px-4 py-4">
         <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          We accept
+          {t('footer.weAccept')}
         </span>
-        {PAYMENT_BADGES.map((badge) => (
+        {paymentBadges.map((badge) => (
           <span
             key={badge}
             className="rounded-md border border-border bg-background px-2.5 py-1 text-xs font-medium text-foreground"
@@ -156,10 +156,10 @@ export function StoreFooter() {
 
       <div className="bg-brand-dark py-4 text-center text-xs text-on-brand/90">
         <p className="m-0">
-          © {new Date().getFullYear()} {storeName}. All rights reserved.
+          {t('footer.rights', { year: new Date().getFullYear(), store: storeName })}
         </p>
         <p className="m-0 mt-1 opacity-80">
-          Prices and offers may change without notice. Images are for illustration only.
+          {t('footer.disclaimer')}
         </p>
       </div>
     </footer>

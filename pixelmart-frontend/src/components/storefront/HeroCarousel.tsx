@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { useCatalogLabel } from '@/i18n/catalogI18n';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { RootState } from '../../store';
@@ -91,6 +93,8 @@ interface HeroCarouselProps {
 }
 
 export function HeroCarousel({ slides = HERO_SLIDES }: HeroCarouselProps) {
+  const { t } = useTranslation();
+  const catalogName = useCatalogLabel();
   const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -122,7 +126,7 @@ export function HeroCarousel({ slides = HERO_SLIDES }: HeroCarouselProps) {
     <section
       className={styles.carousel}
       aria-roledescription="carousel"
-      aria-label="Featured promotions"
+      aria-label={t('home.featuredPromos')}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -136,7 +140,7 @@ export function HeroCarousel({ slides = HERO_SLIDES }: HeroCarouselProps) {
             <img
               className={styles.image}
               src={item.image}
-              alt={item.imageAlt}
+              alt={catalogName(item.imageAlt)}
               loading={index === 0 ? 'eager' : 'lazy'}
               decoding="async"
             />
@@ -147,25 +151,25 @@ export function HeroCarousel({ slides = HERO_SLIDES }: HeroCarouselProps) {
 
       <div className={styles.content}>
         <Badge className={`${styles.badge} mb-3 border-0 bg-accent text-accent-foreground`}>
-          {slide.badge}
+          {catalogName(slide.badge)}
         </Badge>
-        <h1 className={styles.title}>{slide.title}</h1>
-        <p className={styles.subtitle}>{slide.subtitle}</p>
+        <h1 className={styles.title}>{catalogName(slide.title)}</h1>
+        <p className={styles.subtitle}>{catalogName(slide.subtitle)}</p>
         <div className={styles.actions}>
           <Button variant="accent" size="lg" asChild>
             <Link to={slide.primaryCta.to} className="no-underline hover:no-underline">
-              {slide.primaryCta.label}
+              {catalogName(slide.primaryCta.label)}
             </Link>
           </Button>
           <Button variant="brandOutline" size="lg" asChild className={styles.secondaryBtn}>
             <Link to={slide.secondaryCta.to} className="no-underline hover:no-underline">
-              {slide.secondaryCta.label}
+              {catalogName(slide.secondaryCta.label)}
             </Link>
           </Button>
           {!isAuthenticated && (
             <Button variant="brandOutline" size="lg" asChild className={styles.secondaryBtn}>
               <Link to="/register" className="no-underline hover:no-underline">
-                Join free
+                {t('home.joinFree')}
               </Link>
             </Button>
           )}
@@ -178,7 +182,7 @@ export function HeroCarousel({ slides = HERO_SLIDES }: HeroCarouselProps) {
             type="button"
             className={`${styles.navBtn} ${styles.navPrev}`}
             onClick={goPrev}
-            aria-label="Previous slide"
+            aria-label={t('home.prevSlide')}
           >
             <ChevronIcon direction="left" />
           </button>
@@ -186,19 +190,19 @@ export function HeroCarousel({ slides = HERO_SLIDES }: HeroCarouselProps) {
             type="button"
             className={`${styles.navBtn} ${styles.navNext}`}
             onClick={goNext}
-            aria-label="Next slide"
+            aria-label={t('home.nextSlide')}
           >
             <ChevronIcon direction="right" />
           </button>
 
-          <div className={styles.dots} role="tablist" aria-label="Choose slide">
+          <div className={styles.dots} role="tablist" aria-label={t('home.chooseSlide')}>
             {slides.map((item, index) => (
               <button
                 key={item.id}
                 type="button"
                 role="tab"
                 aria-selected={index === activeIndex}
-                aria-label={`Go to slide ${index + 1}: ${item.title}`}
+                aria-label={t('home.goToSlide', { n: index + 1, title: catalogName(item.title) })}
                 className={`${styles.dot} ${index === activeIndex ? styles.dotActive : ''}`}
                 onClick={() => goTo(index)}
               />

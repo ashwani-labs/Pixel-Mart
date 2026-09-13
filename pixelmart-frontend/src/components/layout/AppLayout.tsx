@@ -16,6 +16,7 @@ import { useGetCartQuery } from '../../store/api/orderApi';
 import { clearCredentials, selectAuthUser, selectHasRole, selectIsAuthenticated } from '../../store/slices/authSlice';
 import { TrustBar } from '../storefront/TrustBar';
 import { ThemeSwitcher } from '../theme/ThemeSwitcher';
+import { useCatalogLabel } from '../../i18n/catalogI18n';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { MobileBottomNav } from './MobileBottomNav';
 import { SearchAutocomplete } from './SearchAutocomplete';
@@ -25,6 +26,7 @@ const FALLBACK_AISLES = FALLBACK_SUPER_CATEGORIES;
 
 export function AppLayout() {
   const { t } = useTranslation();
+  const catalogName = useCatalogLabel();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
@@ -67,7 +69,7 @@ export function AppLayout() {
     <div className="flex min-h-full flex-col bg-background">
       {showAdminPreview && (
         <div className="flex flex-wrap items-center justify-center gap-3 border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-950">
-          <span className="font-medium">Admin storefront preview</span>
+          <span className="font-medium">{t('adminPreview.banner')}</span>
           <button
             type="button"
             className="font-semibold text-primary underline-offset-2 hover:underline"
@@ -76,7 +78,7 @@ export function AppLayout() {
               navigate('/admin');
             }}
           >
-            Back to admin console
+            {t('adminPreview.back')}
           </button>
         </div>
       )}
@@ -117,7 +119,7 @@ export function AppLayout() {
             {isAuthenticated ? (
               <>
                 <span className="hidden text-sm text-on-brand sm:inline">
-                  Hi, <strong>{user?.name?.split(' ')[0]}</strong>
+                  {t('nav.hiUser', { name: user?.name?.split(' ')[0] ?? '' })}
                 </span>
                 <Button type="button" variant="brandOutline" size="sm" onClick={handleLogout}>
                   {t('nav.logout')}
@@ -144,7 +146,7 @@ export function AppLayout() {
           </div>
         </div>
 
-        <nav className="border-t border-white/20 bg-brand-dark" aria-label="Shop aisles">
+        <nav className="border-t border-white/20 bg-brand-dark" aria-label={t('nav.shopAisles')}>
           <div className="nav-scroll mx-auto flex max-w-6xl flex-nowrap items-center gap-1 overflow-x-auto px-4 py-2">
             <NavLink to="/" end className={navLinkClass}>
               {t('nav.home')}
@@ -158,7 +160,7 @@ export function AppLayout() {
                 to={`/products?superCategoryId=${aisle.id}`}
                 className={navLinkClass}
               >
-                {aisle.name}
+                {catalogName(aisle.name)}
               </NavLink>
             ))}
             {isAuthenticated && (

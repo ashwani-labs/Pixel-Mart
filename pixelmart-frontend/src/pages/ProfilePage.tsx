@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { z } from 'zod';
 import { RequireAuth } from '../components/auth/RequireAuth';
@@ -11,14 +12,16 @@ import { useMeQuery, useUpdateProfileMutation } from '../store/api/authApi';
 import { updateUser } from '../store/slices/authSlice';
 import styles from './AuthForm.module.css';
 
-const profileSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-});
-
-type ProfileForm = z.infer<typeof profileSchema>;
+type ProfileForm = {
+  name: string;
+};
 
 function ProfileForm() {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
+  const profileSchema = z.object({
+    name: z.string().min(2, t('auth.nameMin')),
+  });
   const storedUser = useSelector((s: RootState) => s.auth.user);
   const { data: me, isLoading } = useMeQuery();
   const [updateProfile, { isLoading: saving }] = useUpdateProfileMutation();
@@ -52,58 +55,58 @@ function ProfileForm() {
       setSaved(true);
     } catch (err) {
       const apiErr = err as { data?: ApiErrorBody };
-      setServerError(apiErr.data?.message ?? 'Could not update profile.');
+      setServerError(apiErr.data?.message ?? t('profile.updateFailed'));
     }
   };
 
   if (isLoading && !user) {
-    return <p>Loading profile…</p>;
+    return <p>{t('profile.loading')}</p>;
   }
 
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <h1 className={styles.title}>Your profile</h1>
+        <h1 className={styles.title}>{t('profile.title')}</h1>
         <p className={styles.subtitle}>{user?.email}</p>
-        <p className={styles.subtitle}>Roles: {user?.roles.join(', ')}</p>
+        <p className={styles.subtitle}>{t('profile.roles', { roles: user?.roles.join(', ') })}</p>
 
         {(user?.loyaltyPoints != null || user?.referralCode) && (
           <div>
             {user?.loyaltyPoints != null && (
               <p className={styles.subtitle}>
-                Loyalty points: <strong>{user.loyaltyPoints}</strong>
+                {t('profile.loyaltyPointsValue', { points: user.loyaltyPoints })}
               </p>
             )}
             {user?.referralCode && (
               <p className={styles.subtitle}>
-                Your referral code: <strong>{user.referralCode}</strong>
+                {t('profile.referralCodeValue', { code: user.referralCode })}
               </p>
             )}
           </div>
         )}
 
-        {saved && <div className={styles.bannerSuccess}>Profile updated.</div>}
+        {saved && <div className={styles.bannerSuccess}>{t('profile.updated')}</div>}
         {serverError && <div className={styles.bannerError}>{serverError}</div>}
 
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className={styles.field}>
-            <label htmlFor="name">Display name</label>
+            <label htmlFor="name">{t('profile.displayName')}</label>
             <input id="name" type="text" autoComplete="name" {...register('name')} />
             {errors.name && <span className={styles.error}>{errors.name.message}</span>}
           </div>
           <button type="submit" className={styles.submit} disabled={saving}>
-            {saving ? 'Saving…' : 'Save changes'}
+            {saving ? t('profile.saving') : t('profile.saveChanges')}
           </button>
         </form>
 
         <p className={styles.footer}>
-          <Link to="/orders">View order history →</Link>
+          <Link to="/orders">{t('profile.orderHistory')}</Link>
         </p>
         <p className={styles.footer}>
-          <Link to="/profile/addresses">Manage delivery addresses →</Link>
+          <Link to="/profile/addresses">{t('profile.manageAddresses')}</Link>
         </p>
         <p className={styles.footer}>
-          <Link to="/">← Back home</Link>
+          <Link to="/">{t('profile.backHome')}</Link>
         </p>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../../store';
 import { setMode, setPreset } from '../../store/slices/themeSlice';
@@ -10,6 +11,7 @@ interface ThemeSwitcherProps {
 }
 
 export function ThemeSwitcher({ compact = false, onBrand = false }: ThemeSwitcherProps) {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { presetId, mode } = useSelector((s: RootState) => s.theme);
 
@@ -26,13 +28,13 @@ export function ThemeSwitcher({ compact = false, onBrand = false }: ThemeSwitche
   return (
     <div className={`flex items-center gap-2 ${compact ? '' : 'flex-wrap'}`}>
       {!compact && (
-        <span className="text-xs font-medium text-muted-foreground">Theme</span>
+        <span className="text-xs font-medium text-muted-foreground">{t('theme.label')}</span>
       )}
       <Select
         className={fieldClass}
         value={presetId}
         onChange={(e) => dispatch(setPreset(e.target.value as ThemePresetId))}
-        aria-label="Color preset"
+        aria-label={t('theme.preset')}
       >
         {THEME_PRESETS.map((p) => (
           <option key={p.id} value={p.id}>
@@ -44,8 +46,8 @@ export function ThemeSwitcher({ compact = false, onBrand = false }: ThemeSwitche
         type="button"
         className={`flex h-9 min-w-9 items-center justify-center rounded-lg border px-2 text-sm transition ${modeBtnClass}`}
         onClick={() => dispatch(setMode(mode === 'light' ? 'dark' : ('light' as ThemeMode)))}
-        aria-label={mode === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-        title={mode === 'light' ? 'Dark mode' : 'Light mode'}
+        aria-label={mode === 'light' ? t('theme.switchToDark') : t('theme.switchToLight')}
+        title={mode === 'light' ? t('theme.dark') : t('theme.light')}
       >
         {mode === 'light' ? '🌙' : '☀️'}
       </button>

@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { useCatalogLabel } from '@/i18n/catalogI18n';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
@@ -21,14 +23,15 @@ function formatPrice(value: number) {
   return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(value);
 }
 
-const SORT_OPTIONS = [
-  { value: 'name,asc', label: 'Name A–Z' },
-  { value: 'basePrice,asc', label: 'Price: Low to high' },
-  { value: 'basePrice,desc', label: 'Price: High to low' },
-] as const;
-
 export function ProductListPage() {
+  const { t } = useTranslation();
+  const catalogName = useCatalogLabel();
   const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
+  const sortOptions = [
+    { value: 'name,asc', label: t('list.sortName') },
+    { value: 'basePrice,asc', label: t('list.sortPriceAsc') },
+    { value: 'basePrice,desc', label: t('list.sortPriceDesc') },
+  ] as const;
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryId = searchParams.get('categoryId') ?? undefined;
   const superCategoryId = searchParams.get('superCategoryId') ?? undefined;
@@ -186,15 +189,15 @@ export function ProductListPage() {
   };
 
   const pageTitle = featured
-    ? 'Featured products'
-    : activeSubCategory?.name ?? activeSuperCategory?.name ?? 'All products';
+    ? t('list.featured')
+    : catalogName(activeSubCategory?.name ?? activeSuperCategory?.name) || t('list.allProducts');
 
   return (
     <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
       <aside className="w-full shrink-0 lg:w-60">
         <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
           <h2 className="m-0 mb-3 text-sm font-bold uppercase tracking-wide text-muted-foreground">
-            Departments
+            {t('list.departments')}
           </h2>
           <ul className="m-0 flex flex-col gap-1 p-0">
             <li className="list-none">
@@ -205,7 +208,7 @@ export function ProductListPage() {
                 className="w-full justify-start"
                 onClick={() => setFilters(undefined, undefined)}
               >
-                All products
+                {t('list.allProducts')}
               </Button>
             </li>
             {superCategories.map((superCat) => {
@@ -224,7 +227,7 @@ export function ProductListPage() {
                     onClick={() => setFilters(superCat.id, undefined)}
                   >
                     <span aria-hidden>{visual.emoji}</span>
-                    {superCat.name}
+                    {catalogName(superCat.name)}
                   </Button>
                   {isExpanded && children.length > 0 && (
                     <ul className="m-0 mt-1 flex flex-col gap-0.5 border-l-2 border-border pl-2">
@@ -237,7 +240,7 @@ export function ProductListPage() {
                             className="h-8 w-full justify-start text-xs"
                             onClick={() => setFilters(superCat.id, sub.id)}
                           >
-                            {sub.name}
+                            {catalogName(sub.name)}
                           </Button>
                         </li>
                       ))}
@@ -250,29 +253,29 @@ export function ProductListPage() {
 
           <div className="mt-6 border-t border-border pt-4">
             <h2 className="m-0 mb-3 text-sm font-bold uppercase tracking-wide text-muted-foreground">
-              Price range (₹)
+              {t('list.priceRange')}
             </h2>
             <div className="flex flex-col gap-2">
               <Input
                 type="number"
                 min={0}
-                placeholder="Min"
+                placeholder={t('list.min')}
                 value={minPriceInput}
                 onChange={(e) => setMinPriceInput(e.target.value)}
                 className="h-9"
-                aria-label="Minimum price"
+                aria-label={t('list.minPrice')}
               />
               <Input
                 type="number"
                 min={0}
-                placeholder="Max"
+                placeholder={t('list.max')}
                 value={maxPriceInput}
                 onChange={(e) => setMaxPriceInput(e.target.value)}
                 className="h-9"
-                aria-label="Maximum price"
+                aria-label={t('list.maxPrice')}
               />
               <Button type="button" size="sm" variant="outline" onClick={applyPriceFilters}>
-                Apply
+                {t('list.apply')}
               </Button>
             </div>
             <label className="mt-4 flex cursor-pointer items-center gap-2 text-sm text-foreground">
@@ -282,7 +285,7 @@ export function ProductListPage() {
                 onChange={(e) => setInStockOnly(e.target.checked)}
                 className="h-4 w-4 accent-primary"
               />
-              In stock only
+              {t('list.inStockOnly')}
             </label>
             <label className="mt-2 flex cursor-pointer items-center gap-2 text-sm text-foreground">
               <input
@@ -291,11 +294,11 @@ export function ProductListPage() {
                 onChange={(e) => setOnSaleOnly(e.target.checked)}
                 className="h-4 w-4 accent-primary"
               />
-              On sale only
+              {t('list.onSaleOnly')}
             </label>
             <div className="mt-4">
               <h3 className="m-0 mb-2 text-sm font-bold uppercase tracking-wide text-muted-foreground">
-                Minimum rating
+                {t('list.minRating')}
               </h3>
               <Select
                 className="h-9 w-full"
@@ -303,12 +306,12 @@ export function ProductListPage() {
                 onChange={(e) =>
                   setMinRating(e.target.value ? Number(e.target.value) : undefined)
                 }
-                aria-label="Minimum rating filter"
+                aria-label={t('list.minRatingAria')}
               >
-                <option value="">Any rating</option>
-                <option value="3">3★ & up</option>
-                <option value="4">4★ & up</option>
-                <option value="5">5★ only</option>
+                <option value="">{t('list.anyRating')}</option>
+                <option value="3">{t('list.rating3')}</option>
+                <option value="4">{t('list.rating4')}</option>
+                <option value="5">{t('list.rating5')}</option>
               </Select>
             </div>
           </div>
@@ -321,21 +324,21 @@ export function ProductListPage() {
             <div>
               <h1 className="m-0 text-2xl font-bold text-foreground">{pageTitle}</h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                {data ? `${data.totalElements} items` : 'Browse our value range'}
-                {activeSuperCategory && activeSubCategory && ` · ${activeSuperCategory.name}`}
+                {data ? t('list.items', { count: data.totalElements }) : t('list.browseRange')}
+                {activeSuperCategory && activeSubCategory && ` · ${catalogName(activeSuperCategory.name)}`}
                 {search && ` · “${search}”`}
               </p>
             </div>
             <div className="flex w-full max-w-md flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
               <label className="flex items-center gap-2 text-sm text-muted-foreground">
-                Sort
+                {t('list.sort')}
                 <Select
                   className="h-10 min-w-[10rem]"
                   value={sort}
                   onChange={(e) => setSort(e.target.value)}
-                  aria-label="Sort products"
+                  aria-label={t('list.sortAria')}
                 >
-                  {SORT_OPTIONS.map((option) => (
+                  {sortOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
@@ -344,18 +347,18 @@ export function ProductListPage() {
               </label>
               <div className="flex flex-1 gap-0">
                 <label className="sr-only" htmlFor="product-search">
-                  Search products
+                  {t('list.searchProducts')}
                 </label>
                 <Input
                   id="product-search"
                   className="h-10 flex-1 rounded-r-none"
-                  placeholder="Search in store…"
+                  placeholder={t('list.searchInStore')}
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && applySearch()}
                 />
                 <Button type="button" variant="accent" className="h-10 rounded-l-none px-4" onClick={applySearch}>
-                  Go
+                  {t('list.go')}
                 </Button>
               </div>
             </div>
@@ -369,7 +372,7 @@ export function ProductListPage() {
                 variant={!categoryId ? 'default' : 'outline'}
                 onClick={() => setFilters(resolvedSuperId, undefined)}
               >
-                All in {activeSuperCategory?.name ?? 'aisle'}
+                {t('list.allIn', { name: catalogName(activeSuperCategory?.name) || t('list.aisle') })}
               </Button>
               {(subCategoriesBySuper.get(resolvedSuperId) ?? []).map((sub) => (
                 <Button
@@ -379,7 +382,7 @@ export function ProductListPage() {
                   variant={categoryId === sub.id ? 'default' : 'outline'}
                   onClick={() => setFilters(resolvedSuperId, sub.id)}
                 >
-                  {getCategoryVisual(sub.id).emoji} {sub.name}
+                  {getCategoryVisual(sub.id).emoji} {catalogName(sub.name)}
                 </Button>
               ))}
             </div>
@@ -416,31 +419,29 @@ export function ProductListPage() {
             </div>
             <div className="mt-8 flex items-center justify-center gap-3">
               <Button type="button" variant="outline" disabled={page <= 0} onClick={() => setPage(page - 1)}>
-                Previous
+                {t('list.previous')}
               </Button>
               <span className="text-sm font-medium text-muted-foreground">
-                Page {page + 1} of {data.totalPages}
+                {t('list.pageOf', { page: page + 1, total: data.totalPages })}
               </span>
               <Button type="button" variant="outline" disabled={data.last} onClick={() => setPage(page + 1)}>
-                Next
+                {t('list.next')}
               </Button>
             </div>
           </>
         ) : (
           <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center">
-            <p className="m-0 text-lg font-semibold text-foreground">No products found</p>
+            <p className="m-0 text-lg font-semibold text-foreground">{t('list.noProducts')}</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              {search
-                ? `We couldn't find anything matching “${search}”.`
-                : 'Try adjusting filters or browse another aisle.'}
+              {search ? t('list.noMatch', { search }) : t('list.tryFilters')}
             </p>
             <Button type="button" variant="outline" className="mt-4" onClick={clearAllFilters}>
-              Clear filters
+              {t('list.clearFilters')}
             </Button>
 
             {(featuredFallback?.content.length ?? 0) > 0 && (
               <div className="mt-10 text-left">
-                <h2 className="m-0 mb-4 text-lg font-bold text-foreground">Popular picks</h2>
+                <h2 className="m-0 mb-4 text-lg font-bold text-foreground">{t('home.popularPicks')}</h2>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   {featuredFallback!.content.map((product) => (
                     <ProductCard
@@ -463,12 +464,12 @@ export function ProductListPage() {
 
             {superCategories.length > 0 && (
               <div className="mt-8">
-                <p className="m-0 mb-3 text-sm font-semibold text-muted-foreground">Browse aisles</p>
+                <p className="m-0 mb-3 text-sm font-semibold text-muted-foreground">{t('list.browseAisles')}</p>
                 <div className="flex flex-wrap justify-center gap-2">
                   {superCategories.slice(0, 4).map((aisle) => (
                     <Button key={aisle.id} variant="outline" size="sm" asChild>
                       <Link to={`/products?superCategoryId=${aisle.id}`}>
-                        {getCategoryVisual(aisle.id).emoji} {aisle.name}
+                        {getCategoryVisual(aisle.id).emoji} {catalogName(aisle.name)}
                       </Link>
                     </Button>
                   ))}

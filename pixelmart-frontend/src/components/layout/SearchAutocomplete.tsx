@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
+import { useCatalogLabel } from '@/i18n/catalogI18n';
 import { useLazyGetSearchSuggestQuery } from '@/store/api/catalogApi';
 import type { SearchSuggestItem } from '@/types/catalog';
+import { useTranslation } from 'react-i18next';
 
 interface SearchAutocompleteProps {
   value: string;
@@ -12,6 +14,8 @@ interface SearchAutocompleteProps {
 }
 
 export function SearchAutocomplete({ value, onChange, onSubmit, className }: SearchAutocompleteProps) {
+  const { t } = useTranslation();
+  const catalogName = useCatalogLabel();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [triggerSuggest, { data, isFetching }] = useLazyGetSearchSuggestQuery();
@@ -77,9 +81,9 @@ export function SearchAutocomplete({ value, onChange, onSubmit, className }: Sea
             setOpen(false);
           }
         }}
-        placeholder="Search products…"
+        placeholder={t('search.placeholder')}
         className={className}
-        aria-label="Search products"
+        aria-label={t('search.aria')}
         aria-expanded={showDropdown}
         aria-autocomplete="list"
         role="combobox"
@@ -90,12 +94,12 @@ export function SearchAutocomplete({ value, onChange, onSubmit, className }: Sea
           role="listbox"
         >
           {isFetching && !hasResults && (
-            <p className="m-0 px-3 py-2 text-sm text-muted-foreground">Searching…</p>
+            <p className="m-0 px-3 py-2 text-sm text-muted-foreground">{t('search.searching')}</p>
           )}
           {categories.length > 0 && (
             <div className="px-2 py-1">
               <p className="m-0 px-1 py-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Categories
+                {t('search.categories')}
               </p>
               {categories.map((item) => (
                 <button
@@ -106,7 +110,7 @@ export function SearchAutocomplete({ value, onChange, onSubmit, className }: Sea
                   onClick={() => pickItem(item)}
                 >
                   <span aria-hidden>📂</span>
-                  <span className="truncate">{item.label}</span>
+                  <span className="truncate">{catalogName(item.label)}</span>
                 </button>
               ))}
             </div>
@@ -114,7 +118,7 @@ export function SearchAutocomplete({ value, onChange, onSubmit, className }: Sea
           {products.length > 0 && (
             <div className="px-2 py-1">
               <p className="m-0 px-1 py-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Products
+                {t('search.products')}
               </p>
               {products.map((item) => (
                 <button
@@ -125,13 +129,13 @@ export function SearchAutocomplete({ value, onChange, onSubmit, className }: Sea
                   onClick={() => pickItem(item)}
                 >
                   <span aria-hidden>🛍️</span>
-                  <span className="truncate">{item.label}</span>
+                  <span className="truncate">{catalogName(item.label)}</span>
                 </button>
               ))}
             </div>
           )}
           {!isFetching && !hasResults && (
-            <p className="m-0 px-3 py-2 text-sm text-muted-foreground">No suggestions — press Enter to search</p>
+            <p className="m-0 px-3 py-2 text-sm text-muted-foreground">{t('search.noSuggestions')}</p>
           )}
         </div>
       )}

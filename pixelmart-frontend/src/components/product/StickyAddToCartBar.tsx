@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -18,6 +19,7 @@ export function StickyAddToCartBar({
   loading,
   onAddToCart,
 }: StickyAddToCartBarProps) {
+  const { t } = useTranslation();
   return (
     <div
       className={cn(
@@ -26,7 +28,7 @@ export function StickyAddToCartBar({
         visible ? 'translate-y-0' : 'translate-y-full',
       )}
       role="region"
-      aria-label="Add to cart"
+      aria-label={t('cart.addToCart')}
     >
       <div className="mx-auto flex max-w-6xl items-center gap-3">
         <div className="min-w-0 flex-1">
@@ -41,7 +43,7 @@ export function StickyAddToCartBar({
           disabled={disabled || loading}
           onClick={onAddToCart}
         >
-          {loading ? 'Adding…' : disabled ? 'Out of stock' : 'ADD TO CART'}
+          {loading ? t('card.adding') : disabled ? t('cart.outOfStock') : t('cart.addToCartCaps')}
         </Button>
       </div>
     </div>

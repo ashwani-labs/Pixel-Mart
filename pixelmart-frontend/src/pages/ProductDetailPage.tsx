@@ -26,6 +26,7 @@ import {
 import { useAddCartItemMutation } from '../store/api/orderApi';
 import type { RootState } from '../store';
 import { selectIsAuthenticated } from '../store/slices/authSlice';
+import { useCatalogLabel } from '../i18n/catalogI18n';
 
 function formatPrice(value: number) {
   return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(value);
@@ -33,6 +34,7 @@ function formatPrice(value: number) {
 
 export function ProductDetailPage() {
   const { t } = useTranslation();
+  const catalogName = useCatalogLabel();
   const navigate = useNavigate();
   const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
   const { slug } = useParams<{ slug: string }>();
@@ -92,8 +94,8 @@ export function ProductDetailPage() {
   if (isError || !product) {
     return (
       <div className="flex flex-col gap-3">
-        <p className="text-muted-foreground">Product not found.</p>
-        <Link to="/products">← Back to products</Link>
+        <p className="text-muted-foreground">{t('product.notFound')}</p>
+        <Link to="/products">{t('product.backToProducts')}</Link>
       </div>
     );
   }
@@ -132,7 +134,7 @@ export function ProductDetailPage() {
       }).unwrap();
       setCartMessage(t('cart.addedToCart'));
     } catch {
-      setCartMessage('Could not add to cart.');
+      setCartMessage(t('cart.addFailed'));
     }
   };
 
@@ -150,7 +152,7 @@ export function ProductDetailPage() {
 
   return (
     <div className="flex flex-col gap-6 pb-20 md:pb-0">
-      <nav className="text-sm text-muted-foreground" aria-label="Breadcrumb">
+      <nav className="text-sm text-muted-foreground" aria-label={t('common.breadcrumb')}>
         <Link to="/" className="no-underline hover:text-primary hover:no-underline">
           {t('nav.home')}
         </Link>
@@ -159,7 +161,7 @@ export function ProductDetailPage() {
           {t('nav.allProducts')}
         </Link>
         <span className="mx-2">/</span>
-        <span className="text-foreground">{product.name}</span>
+        <span className="text-foreground">{catalogName(product.name)}</span>
       </nav>
       <div className="grid gap-8 md:grid-cols-2">
         {product.images.length > 0 ? (
@@ -174,12 +176,12 @@ export function ProductDetailPage() {
         )}
         <div>
           <div className="mb-3 flex flex-wrap gap-2">
-            {product.featured && <Badge>Featured</Badge>}
-            {product.offerName && <Badge variant="success">{product.offerName}</Badge>}
+            {product.featured && <Badge>{t('product.featured')}</Badge>}
+            {product.offerName && <Badge variant="success">{catalogName(product.offerName)}</Badge>}
             {lowStock && <Badge variant="deal">{t('product.onlyLeft', { count: stockQty })}</Badge>}
             {!outOfStock && stockQty > 5 && <Badge variant="success">{t('product.inStock')}</Badge>}
           </div>
-          <h1 className="m-0 mb-2 text-3xl font-bold text-foreground">{product.name}</h1>
+          <h1 className="m-0 mb-2 text-3xl font-bold text-foreground">{catalogName(product.name)}</h1>
           <div className="mb-4 flex items-baseline gap-2">
             <span className="text-2xl font-bold text-primary">{formatPrice(effectivePrice)}</span>
             {product.compareAtPrice && (
@@ -188,7 +190,9 @@ export function ProductDetailPage() {
               </span>
             )}
           </div>
-          <p className="text-muted-foreground">{product.description ?? 'No description available.'}</p>
+          <p className="text-muted-foreground">
+            {product.description ? catalogName(product.description) : t('product.noDescription')}
+          </p>
 
           {variants.length > 0 && (
             <VariantSelector
@@ -217,7 +221,7 @@ export function ProductDetailPage() {
                   : t('cart.addToCart').toUpperCase()}
             </Button>
             <Button type="button" variant="outline" onClick={() => void handleWishlistToggle()}>
-              {isWishlisted ? '♥ Remove from wishlist' : '♡ Add to wishlist'}
+              {isWishlisted ? t('product.removeWishlist') : t('product.addWishlist')}
             </Button>
             {isAuthenticated && (
               <Link to="/cart" className="text-sm font-medium text-primary hover:underline">
@@ -241,7 +245,7 @@ export function ProductDetailPage() {
       <ProductReviews productId={product.id} />
 
       <StickyAddToCartBar
-        productName={product.name}
+        productName={catalogName(product.name)}
         priceLabel={formatPrice(effectivePrice)}
         visible={showStickyBar}
         disabled={outOfStock || needsVariant}

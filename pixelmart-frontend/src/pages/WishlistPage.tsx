@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -15,6 +16,7 @@ function formatPrice(value: number) {
 }
 
 export function WishlistPage() {
+  const { t } = useTranslation();
   const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
   const { data: wishlist = [], isLoading, isFetching } = useGetWishlistQuery(undefined, {
     skip: !isAuthenticated,
@@ -29,12 +31,12 @@ export function WishlistPage() {
     <div className="mx-auto max-w-6xl">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="m-0 text-2xl font-extrabold text-foreground">My wishlist</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{wishlist.length} saved items</p>
+          <h1 className="m-0 text-2xl font-extrabold text-foreground">{t('wishlist.title')}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t('wishlist.savedItems', { count: wishlist.length })}</p>
         </div>
         <Button variant="outline" size="sm" asChild>
           <Link to="/products" className="no-underline hover:no-underline">
-            Continue shopping
+            {t('cart.continueShopping')}
           </Link>
         </Button>
       </div>
@@ -65,13 +67,13 @@ export function WishlistPage() {
       ) : (
         <Card className="py-16 text-center">
           <CardContent>
-            <p className="m-0 text-lg font-semibold text-card-foreground">Your wishlist is empty</p>
+            <p className="m-0 text-lg font-semibold text-card-foreground">{t('wishlist.empty')}</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Tap ♡ on any product to save it for later.
+              {t('wishlist.emptyHint')}
             </p>
             <Button variant="accent" className="mt-6" asChild>
               <Link to="/products" className="no-underline hover:no-underline">
-                Browse products
+                {t('cart.browseProducts')}
               </Link>
             </Button>
           </CardContent>

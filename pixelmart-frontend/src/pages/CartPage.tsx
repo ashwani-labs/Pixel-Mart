@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { useCatalogLabel } from '@/i18n/catalogI18n';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -26,6 +28,8 @@ function formatPrice(value: number, locale: string, currency: string) {
 }
 
 export function CartPage() {
+  const { t } = useTranslation();
+  const catalogName = useCatalogLabel();
   const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
   const marketLocale = useSelector((s: RootState) => s.settings.marketLocale);
   const marketCurrencyCode = useSelector((s: RootState) => s.settings.marketCurrencyCode);
@@ -41,16 +45,16 @@ export function CartPage() {
   }, [isAuthenticated]);
 
   if (isAuthenticated && isLoading) {
-    return <p className="py-12 text-center text-muted-foreground">Loading your cart…</p>;
+    return <p className="py-12 text-center text-muted-foreground">{t('common.loading')}</p>;
   }
 
   if (isAuthenticated && isError) {
     return (
       <div className="mx-auto max-w-lg py-12 text-center">
-        <p className="text-muted-foreground">Could not load your cart. Try again later.</p>
+        <p className="text-muted-foreground">{t('cart.loadError')}</p>
         <Button variant="default" className="mt-4" asChild>
           <Link to="/products" className="no-underline hover:no-underline">
-            Continue shopping
+            {t('cart.continueShopping')}
           </Link>
         </Button>
       </div>
@@ -89,21 +93,21 @@ export function CartPage() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <h1 className="m-0 mb-6 text-2xl font-extrabold">My cart</h1>
+      <h1 className="m-0 mb-6 text-2xl font-extrabold">{t('cart.myCart')}</h1>
       {!isAuthenticated && (
         <p className="mb-4 text-sm text-muted-foreground">
-          Checking out as a guest? Proceed to checkout — we will create an account with your email to track the order.
+          {t('cart.guestHint')}
         </p>
       )}
 
       {items.length === 0 ? (
         <Card className="py-16 text-center">
           <CardContent>
-            <p className="m-0 text-lg font-semibold">Your cart is empty</p>
-            <p className="mt-1 text-sm text-muted-foreground">Add items from our aisles to get started.</p>
+            <p className="m-0 text-lg font-semibold">{t('cart.empty')}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{t('cart.emptyHint')}</p>
             <Button variant="accent" className="mt-6" asChild>
               <Link to="/products" className="no-underline hover:no-underline">
-                Start shopping
+                {t('cart.startShopping')}
               </Link>
             </Button>
           </CardContent>
@@ -125,16 +129,18 @@ export function CartPage() {
                               to={`/products/${item.productSlug}`}
                               className="block truncate font-semibold no-underline hover:text-primary hover:no-underline"
                             >
-                              {item.productName}
+                              {catalogName(item.productName)}
                             </Link>
                             <p className="m-0 mt-0.5 text-sm text-muted-foreground">
-                              {formatPrice(item.unitPrice, marketLocale, marketCurrencyCode)} each
+                              {t('cart.each', {
+                                price: formatPrice(item.unitPrice, marketLocale, marketCurrencyCode),
+                              })}
                             </p>
                           </div>
                         </div>
                         <div className="flex shrink-0 items-center justify-between gap-4 sm:justify-end sm:gap-6">
                           <label className="flex items-center gap-2 whitespace-nowrap text-sm font-medium">
-                            Qty
+                            {t('cart.qty')}
                             <input
                               type="number"
                               min={1}
@@ -158,7 +164,7 @@ export function CartPage() {
                             className="shrink-0 text-destructive hover:text-destructive"
                             onClick={() => void item.onRemove()}
                           >
-                            Remove
+                            {t('cart.remove')}
                           </Button>
                         </div>
                       </div>
@@ -170,37 +176,37 @@ export function CartPage() {
 
           <Card className="h-fit border-primary/20 bg-card shadow-md lg:sticky lg:top-24">
             <CardContent className="flex flex-col gap-4 p-5">
-              <h2 className="m-0 text-lg font-bold">Order summary</h2>
+              <h2 className="m-0 text-lg font-bold">{t('cart.orderSummary')}</h2>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Items ({summary.totalQuantity})</span>
+                <span className="text-muted-foreground">{t('cart.itemsCount', { count: summary.totalQuantity })}</span>
                 <span className="font-semibold">
                   {formatPrice(summary.subtotal, marketLocale, marketCurrencyCode)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Delivery</span>
+                <span className="text-muted-foreground">{t('cart.delivery')}</span>
                 <span className="font-semibold">
                   {shippingFee === 0
-                    ? 'FREE'
+                    ? t('cart.free')
                     : formatPrice(shippingFee, marketLocale, marketCurrencyCode)}
                 </span>
               </div>
               <p className="m-0 text-xs text-primary">{freeDeliveryMessage(summary.subtotal)}</p>
               <div className="flex flex-col gap-3 border-t border-border pt-4">
                 <div className="flex justify-between text-base font-extrabold">
-                  <span>Estimated total</span>
+                  <span>{t('cart.estimatedTotal')}</span>
                   <span>{formatPrice(orderTotal, marketLocale, marketCurrencyCode)}</span>
                 </div>
                 <Button variant="accent" size="lg" className="w-full" asChild>
                   <Link to="/checkout" className="no-underline hover:no-underline">
-                    Proceed to checkout
+                    {t('cart.checkout')}
                   </Link>
                 </Button>
                 <Link
                   to="/products"
                   className="text-center text-sm font-medium text-primary hover:underline"
                 >
-                  Continue shopping
+                  {t('cart.continueShopping')}
                 </Link>
               </div>
             </CardContent>

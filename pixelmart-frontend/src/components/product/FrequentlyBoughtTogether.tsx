@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { ProductCard } from '@/components/storefront/ProductCard';
 import { useGetProductsByIdsQuery } from '@/store/api/catalogApi';
 import { useGetFrequentlyBoughtTogetherQuery } from '@/store/api/orderApi';
@@ -8,6 +9,7 @@ interface FrequentlyBoughtTogetherProps {
 }
 
 export function FrequentlyBoughtTogether({ productId, formatPrice }: FrequentlyBoughtTogetherProps) {
+  const { t } = useTranslation();
   const { data: insights, isLoading: loadingIds } = useGetFrequentlyBoughtTogetherQuery(productId);
   const productIds = insights?.productIds ?? [];
   const { data: products = [], isLoading: loadingProducts } = useGetProductsByIdsQuery(productIds, {
@@ -30,7 +32,7 @@ export function FrequentlyBoughtTogether({ productId, formatPrice }: FrequentlyB
 
   return (
     <section>
-      <h2 className="m-0 mb-4 text-xl font-bold text-foreground">Frequently bought together</h2>
+      <h2 className="m-0 mb-4 text-xl font-bold text-foreground">{t('product.fbt')}</h2>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {products.map((item) => (
           <ProductCard key={item.id} product={item} formatPrice={formatPrice} showAddToCart />

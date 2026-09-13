@@ -1,5 +1,7 @@
 import { Link, useLocation, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { useCatalogLabel } from '@/i18n/catalogI18n';
 import type { RootState } from '../store';
 import { OrderTrackingTimeline } from '../components/order/OrderTrackingTimeline';
 import { useGetOrderQuery } from '../store/api/orderApi';
@@ -10,6 +12,8 @@ function formatPrice(value: number, locale: string, currency: string) {
 }
 
 export function OrderDetailPage() {
+  const { t } = useTranslation();
+  const catalogName = useCatalogLabel();
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
   const checkedOut = Boolean((location.state as { checkedOut?: boolean } | null)?.checkedOut);
@@ -18,47 +22,47 @@ export function OrderDetailPage() {
   const { data: order, isLoading, isError } = useGetOrderQuery(id ?? '', { skip: !id });
 
   if (isLoading) {
-    return <p className={styles.muted}>Loading order…</p>;
+    return <p className={styles.muted}>{t('orders.loadingOne')}</p>;
   }
 
   if (isError || !order) {
     return (
       <div className={styles.page}>
-        <p className={styles.muted}>Order not found.</p>
-        <Link to="/products">Continue shopping</Link>
+        <p className={styles.muted}>{t('orders.notFound')}</p>
+        <Link to="/products">{t('cart.continueShopping')}</Link>
       </div>
     );
   }
 
   return (
     <div className={styles.page}>
-      {checkedOut && <div className={styles.success}>Order placed successfully.</div>}
+      {checkedOut && <div className={styles.success}>{t('orders.placed')}</div>}
       <Link to="/orders" className={styles.back}>
-        ← My orders
+        {t('orders.back')}
       </Link>
       <section className={styles.card}>
-        <h1>Order {order.orderNumber}</h1>
+        <h1>{t('orders.orderN', { number: order.orderNumber })}</h1>
         <OrderTrackingTimeline
           status={order.status}
           trackingNumber={order.trackingNumber}
           orderNumber={order.orderNumber}
         />
         <p className={styles.muted}>
-          Payment: <strong>{order.payment.status}</strong>
+          {t('orders.payment')} <strong>{t(`status.${order.payment.status}`, { defaultValue: order.payment.status })}</strong>
         </p>
         <p className={styles.muted}>
-          Method: {order.payment.method.replace('MOCK_', 'Mock ')} · Ref:{' '}
+          {t('orders.method')} {order.payment.method.replace('MOCK_', '')} · {t('orders.ref')}{' '}
           {order.payment.providerReference}
         </p>
       </section>
 
       <section className={styles.card}>
-        <h2>Items</h2>
+        <h2>{t('orders.items')}</h2>
         <ul className={styles.items}>
           {order.items.map((item) => (
             <li key={`${item.productId}-${item.productSlug}`}>
               <span>
-                {item.productName} × {item.quantity}
+                {catalogName(item.productName)} × {item.quantity}
               </span>
               <strong>{formatPrice(item.lineTotal, marketLocale, marketCurrencyCode)}</strong>
             </li>
@@ -66,12 +70,12 @@ export function OrderDetailPage() {
         </ul>
         <div className={styles.totals}>
           <p>
-            <span>Subtotal</span>
+            <span>{t('checkout.subtotal')}</span>
             <strong>{formatPrice(order.subtotal, marketLocale, marketCurrencyCode)}</strong>
           </p>
           {order.discountTotal > 0 && (
             <p>
-              <span>{order.discountLabel ?? 'Cart discount'}</span>
+              <span>{catalogName(order.discountLabel) || t('checkout.cartDiscount')}</span>
               <strong>-{formatPrice(order.discountTotal, marketLocale, marketCurrencyCode)}</strong>
             </p>
           )}
@@ -82,14 +86,14 @@ export function OrderDetailPage() {
             <strong>{formatPrice(order.taxTotal, marketLocale, marketCurrencyCode)}</strong>
           </p>
           <p className={styles.grandTotal}>
-            <span>Total</span>
+            <span>{t('checkout.total')}</span>
             <strong>{formatPrice(order.grandTotal, marketLocale, marketCurrencyCode)}</strong>
           </p>
         </div>
       </section>
 
       <section className={styles.card}>
-        <h2>Shipping address</h2>
+        <h2>{t('orders.shippingAddress')}</h2>
         <p>{order.shipToName} · {order.shipToPhone}</p>
         <p>
           {order.shipAddressLine1}

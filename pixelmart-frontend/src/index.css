@@ -3,7 +3,7 @@
 @custom-variant dark (&:where([data-theme-mode=dark], [data-theme-mode=dark] *));
 
 @theme {
-  --font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Segoe UI', 'Noto Sans Devanagari', system-ui, -apple-system, sans-serif;
   --radius-lg: 0.625rem;
   /* Page */
   --color-background: #f0f4f8;

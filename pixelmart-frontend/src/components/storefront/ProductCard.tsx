@@ -1,6 +1,8 @@
 import { useEffect, useState, type MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { useCatalogLabel } from '@/i18n/catalogI18n';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -63,6 +65,8 @@ export function ProductCard({
   showAddToCart = true,
   className,
 }: ProductCardProps) {
+  const { t } = useTranslation();
+  const catalogName = useCatalogLabel();
   const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
   const { data: cart } = useGetCartQuery(undefined, { skip: !isAuthenticated });
   const [addToCart, { isLoading: adding }] = useAddCartItemMutation();
@@ -181,14 +185,14 @@ export function ProductCard({
 
           <div className="absolute left-2 top-2 flex flex-col gap-1">
             {savings != null && savings > 0 && (
-              <Badge variant="deal">{savings}% OFF</Badge>
+              <Badge variant="deal">{t('card.off', { pct: savings })}</Badge>
             )}
-            {product.featured && <Badge variant="default">Popular</Badge>}
+            {product.featured && <Badge variant="default">{t('card.popular')}</Badge>}
           </div>
 
           {product.offerName && (
             <Badge variant="success" className="absolute right-2 top-2 max-w-[48%] truncate text-[10px]">
-              {product.offerName}
+              {catalogName(product.offerName)}
             </Badge>
           )}
 
@@ -207,13 +211,13 @@ export function ProductCard({
             to={`/products/${product.slug}`}
             className="line-clamp-2 text-sm font-semibold leading-snug text-card-foreground no-underline hover:text-primary hover:no-underline"
           >
-            {product.name}
+            {catalogName(product.name)}
           </Link>
           {showWishlist && onWishlistToggle && (
             <button
               type="button"
               className="shrink-0 border-0 bg-transparent p-0 text-base text-destructive hover:opacity-80"
-              aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+              aria-label={isWishlisted ? t('card.removeWishlist') : t('card.addWishlist')}
               onClick={onWishlistToggle}
             >
               {isWishlisted ? '♥' : '♡'}
@@ -234,12 +238,14 @@ export function ProductCard({
 
         {savedAmt != null && savedAmt > 0 && (
           <p className="m-0 text-[11px] font-semibold text-deal-foreground">
-            You save {formatPrice(savedAmt)}
+            {t('card.youSave', { amount: formatPrice(savedAmt) })}
           </p>
         )}
 
         {product.stockQty > 0 && product.stockQty <= 10 && (
-          <p className="m-0 text-[11px] font-medium text-primary">Only {product.stockQty} left</p>
+          <p className="m-0 text-[11px] font-medium text-primary">
+            {t('card.onlyLeft', { count: product.stockQty })}
+          </p>
         )}
 
         {showAddToCart && (
@@ -248,13 +254,13 @@ export function ProductCard({
               <div
                 className="qty-stepper flex h-9 w-full items-center justify-between gap-1 rounded-full border-2 border-accent bg-card px-1 shadow-sm ring-1 ring-accent/20"
                 role="group"
-                aria-label={`Quantity for ${product.name}`}
+                aria-label={t('card.qtyFor', { name: catalogName(product.name) })}
               >
                 <button
                   type="button"
                   className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-0 bg-accent p-0 text-accent-foreground shadow-sm transition hover:brightness-105 active:scale-95 disabled:opacity-60"
                   disabled={busy}
-                  aria-label="Decrease quantity"
+                  aria-label={t('card.decrease')}
                   onClick={(e) => void handleDecrement(e)}
                 >
                   <StepperIcon type="minus" />
@@ -271,8 +277,8 @@ export function ProductCard({
                   type="button"
                   className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-0 bg-accent p-0 text-accent-foreground shadow-sm transition hover:brightness-105 active:scale-95 disabled:opacity-40"
                   disabled={busy || quantity >= product.stockQty}
-                  aria-label="Increase quantity"
-                  title={quantity >= product.stockQty ? 'Maximum stock reached' : undefined}
+                  aria-label={t('card.increase')}
+                  title={quantity >= product.stockQty ? t('card.maxStock') : undefined}
                   onClick={(e) => void handleIncrement(e)}
                 >
                   <StepperIcon type="plus" />
@@ -287,7 +293,7 @@ export function ProductCard({
                 disabled={outOfStock || adding}
                 onClick={(e) => void handleAdd(e)}
               >
-                {outOfStock ? 'Out of stock' : adding ? 'Adding…' : 'ADD'}
+                {outOfStock ? t('cart.outOfStock') : adding ? t('card.adding') : t('card.add')}
               </Button>
             )}
           </div>

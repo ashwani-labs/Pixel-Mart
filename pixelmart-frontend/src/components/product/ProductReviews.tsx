@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import {
   useGetMyReviewQuery,
@@ -21,6 +22,7 @@ function formatDate(value: string) {
 }
 
 export function ProductReviews({ productId }: ProductReviewsProps) {
+  const { t } = useTranslation();
   const isAuthenticated = useSelector((s: RootState) => selectIsAuthenticated(s));
   const { data: reviews = [], isLoading } = useGetProductReviewsQuery(productId);
   const { data: myReview } = useGetMyReviewQuery(productId, { skip: !isAuthenticated });
@@ -58,15 +60,15 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
       setTitle('');
       setBody('');
       setImages([]);
-      setMessage('Review submitted and pending moderation.');
+      setMessage(t('reviews.submitted'));
     } catch {
-      setMessage('Could not submit review. You may need a delivered order for this product.');
+      setMessage(t('reviews.submitFailed'));
     }
   };
 
   return (
     <section className={styles.section}>
-      <h2 className={styles.title}>Customer reviews</h2>
+      <h2 className={styles.title}>{t('product.reviews')}</h2>
 
       {isLoading ? (
         <div className={styles.skeleton} />
@@ -90,50 +92,50 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
                       rel="noopener noreferrer"
                       className={styles.reviewImageLink}
                     >
-                      <img src={image.url} alt="Review photo" className={styles.reviewImage} />
+                      <img src={image.url} alt={t('reviews.photo')} className={styles.reviewImage} />
                     </a>
                   ))}
                 </div>
               )}
               <p className={styles.reviewMeta}>
                 {formatDate(review.createdAt)}
-                {review.verifiedPurchase && ' · Verified purchase'}
+                {review.verifiedPurchase && ` · ${t('reviews.verified')}`}
               </p>
             </li>
           ))}
         </ul>
       ) : (
-        <p className={styles.empty}>No approved reviews yet.</p>
+        <p className={styles.empty}>{t('reviews.empty')}</p>
       )}
 
       {isAuthenticated && myReview && (
         <p className={styles.notice}>
-          {myReview.status === 'PENDING' && 'Your review is pending moderation.'}
-          {myReview.status === 'REJECTED' && 'Your review was not approved.'}
-          {myReview.status === 'APPROVED' && 'Thanks — your review is published.'}
+          {myReview.status === 'PENDING' && t('reviews.pending')}
+          {myReview.status === 'REJECTED' && t('reviews.rejected')}
+          {myReview.status === 'APPROVED' && t('reviews.approved')}
         </p>
       )}
 
       {canSubmit && (
         <form className={styles.form} onSubmit={handleSubmit}>
-          <h3>Write a review</h3>
-          <p className={styles.hint}>Only available after this product is delivered on one of your orders.</p>
+          <h3>{t('reviews.write')}</h3>
+          <p className={styles.hint}>{t('reviews.hint')}</p>
           <label>
-            Rating
+            {t('reviews.rating')}
             <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
               {[5, 4, 3, 2, 1].map((value) => (
                 <option key={value} value={value}>
-                  {value} star{value === 1 ? '' : 's'}
+                  {t(value === 1 ? 'reviews.star' : 'reviews.stars', { count: value })}
                 </option>
               ))}
             </select>
           </label>
           <label>
-            Title (optional)
+            {t('reviews.title')}
             <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={255} />
           </label>
           <label>
-            Review
+            {t('reviews.body')}
             <textarea
               value={body}
               onChange={(e) => setBody(e.target.value)}
@@ -143,7 +145,7 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
             />
           </label>
           <label>
-            Photos (optional, up to {MAX_REVIEW_IMAGES})
+            {t('reviews.photos', { count: MAX_REVIEW_IMAGES })}
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp,image/gif"
@@ -151,11 +153,11 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
               onChange={handleImageChange}
             />
             {images.length > 0 && (
-              <span className={styles.hint}>{images.length} photo(s) selected</span>
+              <span className={styles.hint}>{t('reviews.photosSelected', { count: images.length })}</span>
             )}
           </label>
           <button type="submit" className={styles.submitBtn} disabled={submitting || !body.trim()}>
-            {submitting ? 'Submitting…' : 'Submit review'}
+            {submitting ? t('reviews.submitting') : t('reviews.submit')}
           </button>
           {message && <p className={styles.message}>{message}</p>}
         </form>

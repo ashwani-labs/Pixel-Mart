@@ -1,10 +1,11 @@
+import { useTranslation } from 'react-i18next';
 import styles from './OrderTrackingTimeline.module.css';
 
-const STEPS: Array<{ key: string; label: string; statuses: string[] }> = [
-  { key: 'PLACED', label: 'Order placed', statuses: ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED'] },
-  { key: 'CONFIRMED', label: 'Confirmed', statuses: ['CONFIRMED', 'SHIPPED', 'DELIVERED'] },
-  { key: 'SHIPPED', label: 'Shipped', statuses: ['SHIPPED', 'DELIVERED'] },
-  { key: 'DELIVERED', label: 'Delivered', statuses: ['DELIVERED'] },
+const STEPS: Array<{ key: string; labelKey: string; statuses: string[] }> = [
+  { key: 'PLACED', labelKey: 'orders.placedStep', statuses: ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED'] },
+  { key: 'CONFIRMED', labelKey: 'status.CONFIRMED', statuses: ['CONFIRMED', 'SHIPPED', 'DELIVERED'] },
+  { key: 'SHIPPED', labelKey: 'status.SHIPPED', statuses: ['SHIPPED', 'DELIVERED'] },
+  { key: 'DELIVERED', labelKey: 'status.DELIVERED', statuses: ['DELIVERED'] },
 ];
 
 interface OrderTrackingTimelineProps {
@@ -14,10 +15,11 @@ interface OrderTrackingTimelineProps {
 }
 
 export function OrderTrackingTimeline({ status, trackingNumber, orderNumber }: OrderTrackingTimelineProps) {
+  const { t } = useTranslation();
   if (status === 'CANCELLED') {
     return (
       <div className={styles.cancelled} role="status">
-        This order was cancelled.
+        {t('orders.cancelled')}
       </div>
     );
   }
@@ -28,7 +30,7 @@ export function OrderTrackingTimeline({ status, trackingNumber, orderNumber }: O
   return (
     <div className={styles.wrap}>
       <p className={styles.tracking}>
-        Tracking ID: <strong>{trackingNumber ?? orderNumber}</strong>
+        {t('orders.trackingId')} <strong>{trackingNumber ?? orderNumber}</strong>
       </p>
       <ol className={styles.timeline}>
         {STEPS.map((step, index) => {
@@ -37,7 +39,7 @@ export function OrderTrackingTimeline({ status, trackingNumber, orderNumber }: O
           return (
             <li key={step.key} className={`${styles.step} ${done ? styles.done : ''} ${current ? styles.current : ''}`}>
               <span className={styles.dot} aria-hidden />
-              <span className={styles.label}>{step.label}</span>
+              <span className={styles.label}>{t(step.labelKey)}</span>
             </li>
           );
         })}

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { ProductCard } from '@/components/storefront/ProductCard';
 import { useGetProductsQuery } from '@/store/api/catalogApi';
 
@@ -8,6 +9,7 @@ interface RelatedProductsProps {
 }
 
 export function RelatedProducts({ productId, categoryId, formatPrice }: RelatedProductsProps) {
+  const { t } = useTranslation();
   const { data, isLoading } = useGetProductsQuery({
     page: 0,
     size: 6,
@@ -33,7 +35,7 @@ export function RelatedProducts({ productId, categoryId, formatPrice }: RelatedP
 
   return (
     <section>
-      <h2 className="m-0 mb-4 text-xl font-bold text-foreground">You may also like</h2>
+      <h2 className="m-0 mb-4 text-xl font-bold text-foreground">{t('product.related')}</h2>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {related.map((item) => (
           <ProductCard key={item.id} product={item} formatPrice={formatPrice} showAddToCart />

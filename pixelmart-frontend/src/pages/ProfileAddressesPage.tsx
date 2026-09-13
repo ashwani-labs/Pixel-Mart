@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { RequireAuth } from '../components/auth/RequireAuth';
 import { AddressForm } from '../components/address/AddressForm';
@@ -13,6 +14,7 @@ import {
 import styles from './ProfileAddressesPage.module.css';
 
 function AddressesContent() {
+  const { t } = useTranslation();
   const { data: addresses, isLoading } = useGetAddressesQuery();
   const [createAddress] = useCreateAddressMutation();
   const [updateAddress] = useUpdateAddressMutation();
@@ -38,7 +40,7 @@ function AddressesContent() {
   };
 
   if (isLoading) {
-    return <p className={styles.muted}>Loading addresses…</p>;
+    return <p className={styles.muted}>{t('address.loading')}</p>;
   }
 
   const list = addresses ?? [];
@@ -46,10 +48,10 @@ function AddressesContent() {
   return (
     <div className={styles.page}>
       <Link to="/profile" className={styles.back}>
-        ← Profile
+        {t('address.back')}
       </Link>
-      <h1>Saved addresses</h1>
-      <p className={styles.muted}>Enter your PIN first to autofill city and state.</p>
+      <h1>{t('address.title')}</h1>
+      <p className={styles.muted}>{t('address.hint')}</p>
 
       {!showForm && !editing && (
         <button
@@ -60,7 +62,7 @@ function AddressesContent() {
             setEditing(null);
           }}
         >
-          Add new address
+          {t('address.add')}
         </button>
       )}
 
@@ -77,14 +79,14 @@ function AddressesContent() {
       )}
 
       {list.length === 0 && !showForm && !editing ? (
-        <p className={styles.muted}>No addresses yet.</p>
+        <p className={styles.muted}>{t('address.empty')}</p>
       ) : (
         <ul className={styles.list}>
           {list.map((addr) => (
             <li key={addr.id} className={styles.card}>
               <div className={styles.cardHeader}>
-                <strong>{addr.label ?? 'Address'}</strong>
-                {addr.isDefault && <span className={styles.badge}>Default</span>}
+                <strong>{addr.label ?? t('checkout.address')}</strong>
+                {addr.isDefault && <span className={styles.badge}>{t('address.default')}</span>}
               </div>
               <p className={styles.lines}>
                 {addr.fullName} · {addr.phone}
@@ -97,12 +99,12 @@ function AddressesContent() {
                 {addr.city}, {addr.state} {addr.pincode}
               </p>
               {addr.postOfficeName && (
-                <p className={styles.lines}>Post office: {addr.postOfficeName}</p>
+                <p className={styles.lines}>{t('address.postOffice')} {addr.postOfficeName}</p>
               )}
               <div className={styles.cardActions}>
                 {!addr.isDefault && (
                   <button type="button" onClick={() => setDefault(addr.id)}>
-                    Set default
+                    {t('address.setDefault')}
                   </button>
                 )}
                 <button
@@ -112,14 +114,14 @@ function AddressesContent() {
                     setShowForm(false);
                   }}
                 >
-                  Edit
+                  {t('common.edit')}
                 </button>
                 <button
                   type="button"
                   className={styles.deleteBtn}
                   onClick={() => deleteAddress(addr.id)}
                 >
-                  Delete
+                  {t('common.delete')}
                 </button>
               </div>
             </li>

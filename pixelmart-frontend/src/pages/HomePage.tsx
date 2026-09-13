@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useCatalogLabel } from '@/i18n/catalogI18n';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -21,6 +23,8 @@ function formatPrice(value: number) {
 const SPOTLIGHT_AISLES = ['super-grocery', 'super-electronics', 'super-fashion'] as const;
 
 export function HomePage() {
+  const { t } = useTranslation();
+  const catalogName = useCatalogLabel();
   const { data: heroSlides } = useGetHeroSlidesQuery();
   const { data: superCategories } = useGetSuperCategoriesQuery();
   const { data: featured, isLoading } = useGetProductsQuery({ page: 0, size: 12, featured: true });
@@ -60,8 +64,8 @@ export function HomePage() {
                       {visual.emoji}
                     </span>
                     <div>
-                      <p className="m-0 font-bold text-card-foreground">{aisle.name}</p>
-                      <p className="m-0 mt-0.5 text-xs text-primary">Shop now →</p>
+                      <p className="m-0 font-bold text-card-foreground">{catalogName(aisle.name)}</p>
+                      <p className="m-0 mt-0.5 text-xs text-primary">{t('home.shopNow')}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -78,7 +82,7 @@ export function HomePage() {
               to={`/products?superCategoryId=${aisle.id}`}
               className="no-underline hover:no-underline"
             >
-              {getCategoryVisual(aisle.id).emoji} {aisle.name}
+              {getCategoryVisual(aisle.id).emoji} {catalogName(aisle.name)}
             </Link>
           </Button>
         ))}
@@ -86,7 +90,7 @@ export function HomePage() {
 
       {activeOffers && activeOffers.length > 0 && (
         <section>
-          <h2 className="m-0 mb-3 text-lg font-bold text-foreground">Today&apos;s deals</h2>
+          <h2 className="m-0 mb-3 text-lg font-bold text-foreground">{t('home.todaysDeals')}</h2>
           <div className="flex gap-3 overflow-x-auto pb-1">
             {activeOffers.map((offer) => (
               <Card
@@ -94,17 +98,17 @@ export function HomePage() {
                 className="min-w-[220px] shrink-0 border-deal-foreground/20 bg-deal/30"
               >
                 <CardContent className="flex flex-col gap-2 p-4">
-                  <Badge variant="deal">Deal</Badge>
-                  <p className="m-0 font-semibold text-card-foreground">{offer.name}</p>
+                  <Badge variant="deal">{t('home.deal')}</Badge>
+                  <p className="m-0 font-semibold text-card-foreground">{catalogName(offer.name)}</p>
                   {offer.couponCode ? (
                     <p className="m-0 text-xs text-muted-foreground">
-                      Use code{' '}
+                      {t('home.useCode')}{' '}
                       <span className="rounded bg-muted px-1.5 py-0.5 font-mono font-bold text-primary">
                         {offer.couponCode}
                       </span>
                     </p>
                   ) : (
-                    <p className="m-0 text-xs text-muted-foreground">Auto-applied at checkout</p>
+                    <p className="m-0 text-xs text-muted-foreground">{t('home.autoApplied')}</p>
                   )}
                 </CardContent>
               </Card>
@@ -115,9 +119,9 @@ export function HomePage() {
 
       <section>
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="m-0 text-lg font-bold text-foreground">Popular picks</h2>
+          <h2 className="m-0 text-lg font-bold text-foreground">{t('home.popularPicks')}</h2>
           <Link to="/products" className="text-sm font-semibold text-primary no-underline hover:underline">
-            View all →
+            {t('home.viewAll')}
           </Link>
         </div>
         {isLoading ? (
@@ -141,12 +145,12 @@ export function HomePage() {
       {groceryDeals && groceryDeals.content.length > 0 && (
         <section>
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="m-0 text-lg font-bold text-foreground">Value grocery picks</h2>
+            <h2 className="m-0 text-lg font-bold text-foreground">{t('home.valueGrocery')}</h2>
             <Link
               to="/products?superCategoryId=super-grocery"
               className="text-sm font-semibold text-primary no-underline hover:underline"
             >
-              All groceries →
+              {t('home.allGroceries')}
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
@@ -158,7 +162,7 @@ export function HomePage() {
       )}
 
       <section>
-        <h2 className="m-0 mb-4 text-lg font-bold text-foreground">Shop by aisle</h2>
+        <h2 className="m-0 mb-4 text-lg font-bold text-foreground">{t('home.shopByAisle')}</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {aisles.map((aisle) => {
             const visual = getCategoryVisual(aisle.id);
@@ -176,8 +180,8 @@ export function HomePage() {
                       {visual.emoji}
                     </span>
                     <div className="min-w-0">
-                      <p className="m-0 truncate font-bold text-card-foreground">{aisle.name}</p>
-                      <p className="m-0 mt-0.5 text-xs text-muted-foreground">Browse aisle →</p>
+                      <p className="m-0 truncate font-bold text-card-foreground">{catalogName(aisle.name)}</p>
+                      <p className="m-0 mt-0.5 text-xs text-muted-foreground">{t('home.browseAisle')}</p>
                     </div>
                   </CardContent>
                 </Card>

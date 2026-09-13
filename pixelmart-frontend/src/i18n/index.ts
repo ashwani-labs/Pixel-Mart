@@ -15,6 +15,11 @@ function getStoredLocale(): string {
   return 'en';
 }
 
+function applyDocumentLang(locale: string) {
+  if (typeof document === 'undefined') return;
+  document.documentElement.lang = locale === 'hi' ? 'hi' : 'en';
+}
+
 i18n.use(initReactI18next).init({
   resources: {
     en: { translation: en },
@@ -25,9 +30,15 @@ i18n.use(initReactI18next).init({
   interpolation: { escapeValue: false },
 });
 
+applyDocumentLang(i18n.language);
+
+i18n.on('languageChanged', (lng) => {
+  applyDocumentLang(lng);
+});
+
 export function setAppLocale(locale: 'en' | 'hi') {
   localStorage.setItem(STORAGE_KEY, locale);
-  i18n.changeLanguage(locale);
+  void i18n.changeLanguage(locale);
 }
 
 export default i18n;

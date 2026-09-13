@@ -1,3 +1,5 @@
+import i18n from '@/i18n';
+
 export const FREE_DELIVERY_THRESHOLD = 499;
 export const STANDARD_SHIPPING_FEE = 49;
 export const COD_MAX_ORDER_TOTAL = 2000;
@@ -7,11 +9,11 @@ export function computeShippingFee(subtotalAfterDiscount: number): number {
 }
 
 export function freeDeliveryMessage(subtotalAfterDiscount: number): string {
+  const remaining = Math.ceil(FREE_DELIVERY_THRESHOLD - subtotalAfterDiscount);
   if (subtotalAfterDiscount >= FREE_DELIVERY_THRESHOLD) {
-    return 'You qualify for free delivery';
+    return i18n.t('shipping.qualified');
   }
-  const remaining = FREE_DELIVERY_THRESHOLD - subtotalAfterDiscount;
-  return `Add ₹${Math.ceil(remaining)} more for free delivery`;
+  return i18n.t('shipping.addMore', { amount: remaining });
 }
 
 export function isCodAvailable(grandTotal: number): boolean {
